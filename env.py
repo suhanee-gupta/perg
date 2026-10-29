@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import dataclasses
 import importlib.util
+import json
 import sys
 import types
 from pathlib import Path
@@ -72,10 +73,12 @@ def _as_perm(p: Perm | str) -> Perm:
 class Env:
     """One loaded config: the hidden full graph plus helpers for querying, checking and cutting."""
 
-    def __init__(self, config: TacConfig, name: str = "", warnings: dict | None = None):
+    def __init__(self, config: TacConfig, name: str = "", warnings: dict | None = None,
+                 meta: dict[str, dict] | None = None):
         self.config = config
         self.name = name
         self.warnings = warnings or {}   # converter warnings (Terraform-converted configs only)
+        self.meta = meta or {}           # entity id -> extra JSON keys, e.g. {"service": "lambda", "trusts": [...]}
         self._reach: dict[str, Result] = {}
 
     # ---------------------------------------------------------------- view of the config
@@ -140,7 +143,7 @@ class Env:
             new_assign[entity] = [p for p in new_assign[entity] if p != perm]
         cfg = dataclasses.replace(self.config, assignments=new_assign,
                                   relations=[r for r in self.config.relations if r not in drop_rel])
-        return Env(cfg, self.name, self.warnings)
+        return Env(cfg, self.name, self.warnings, self.meta)
 
 
 def action_specs() -> dict[str, dict]:
@@ -170,9 +173,13 @@ def load_config(name_or_path: str | Path, untrusted: str | None = None, target: 
 
     p = Path(name_or_path)
     if p.suffix == ".json":
-        return Env(load_tac_config(str(p), untrusted, target), p.stem)
-    root = convert(get_config(str(name_or_path)).path, action_specs(), use_cache=use_cache)
-    return Env(build_tac_config(root, untrusted, target), str(name_or_path), root["_source"]["warnings"])
+        root, name = json.loads(p.read_text()), p.stem
+        warnings = {}
+    else:
+        root = convert(get_config(str(name_or_path)).path, action_specs(), use_cache=use_cache)
+        name, warnings = str(name_or_path), root["_source"]["warnings"]
+    meta = {x["id"]: {k: v for k, v in x.items() if k not in ("id", "type", "name")} for x in root["entities"]}
+    return Env(build_tac_config(root, untrusted, target), name, warnings, meta)
 
 
 def available_configs() -> list[str]:

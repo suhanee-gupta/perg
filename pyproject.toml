@@ -8,6 +8,7 @@ dependencies = [
   "networkx>=3.2",
   "numpy",
   "pulp>=2.8",
+  "highspy>=1.7",
   "gymnasium>=1.0",
   "torch>=2.2",
   "torch_geometric>=2.5",

@@ -1,0 +1,22 @@
+{
+ "train": [
+  "arifen-15ocxf",
+  "fenlum-1bmogc",
+  "hextri-1bmol0",
+  "kasol-zq0qg",
+  "ariari-15ocx0",
+  "aridel-15oczk",
+  "axvel-1bmofe",
+  "taax-zq0zi"
+ ],
+ "test": [
+  "lumzen-15ocuk",
+  "rynor-zq0uj",
+  "axtri-1bmokt",
+  "zenax-zq111"
+ ],
+ "large": [
+  "arior-1njchw",
+  "solor-1njchy"
+ ]
+}

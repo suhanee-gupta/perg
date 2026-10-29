@@ -40,6 +40,7 @@ CONVERTER_VERSION = 1
 ADMIN_PERM = ("*", "*")
 _SERVICE_ALIAS = {"sts": "iam", "ssm": "ec2", "ec2-instance-connect": "ec2"}
 _POLICY_VERSION_ACTIONS = ("iam:CreatePolicyVersion", "iam:SetDefaultPolicyVersion")
+_PV = "pv|"                       # internal: a policy-version grant still naming its policy
 _REF_ONLY = re.compile(r"^\$\{(aws_[a-z0-9_]+)\.([A-Za-z0-9_\-]+)\.[a-z_]+\}$")
 
 
@@ -283,7 +284,7 @@ class _Converter:
             pols = [p for p, x in self.ents.items() if x["type"] == "Policy"] if targets == ["*"] else targets
             if action == "iam:SetDefaultPolicyVersion":
                 pols = [p for p in pols if p in self.admin_versions]
-            targets = list(dict.fromkeys(pr for p in pols for pr in self.attached.get(p, ())))
+            targets = [_PV + p for p in pols]   # re-targeted to the attached principals after Deny
         return targets
 
     def _expand(self, action: str, targets: list[str]) -> list[str]:
@@ -323,10 +324,8 @@ class _Converter:
                 out.add((a, r))
             elif any("*" in d.resources for d in ds):
                 continue
-            elif a in _POLICY_VERSION_ACTIONS:  # r is a principal; the Deny names policies
-                pols = [p for p in self.policies_of.get(r, ())
-                        if a != "iam:SetDefaultPolicyVersion" or p in self.admin_versions]
-                if not all(self._denied(p, ds) for p in pols):
+            elif r.startswith(_PV):                # r names the policy; the Deny names policies too
+                if not self._denied(r[len(_PV):], ds):
                     out.add((a, r))
             elif r == "*":
                 if self.actions.get(a, {}).get("on_star"):
@@ -341,6 +340,16 @@ class _Converter:
         return any(match_resource(p, arn) for d in ds for p in d.resources for arn in self.ents[eid]["arns"])
 
     # ---------------------------------------------------------------- assemble
+    def _entity_json(self, eid: str, x: dict) -> dict:
+        """TAC entity plus extra keys the engine ignores: `service` (from the ARN) and, for roles,
+        `trusts` (service principals in the trust policy). The graph builder uses them."""
+        out = {"id": eid, "type": x["type"], "name": x["name"]}
+        if x["arns"]:
+            out["service"] = _arn_service(x["arns"][0])
+        if x["type"] == "Role":
+            out["trusts"] = sorted(self.role_services.get(eid, ()))
+        return out
+
     def run(self) -> dict:
         self._build_entities()
         self._build_relations()
@@ -376,6 +385,7 @@ class _Converter:
 
         assignments = {}
         for e, g in list(grants.items()) + list(direct.items()):
+            g = {(a, pr) for a, r in g for pr in (self.attached.get(r[len(_PV):], ()) if r.startswith(_PV) else (r,))}
             if g:
                 assignments.setdefault(e, set()).update(g)
         out_txt = (self.path / "outputs.tf").read_text() if (self.path / "outputs.tf").exists() else ""
@@ -387,7 +397,7 @@ class _Converter:
                         "warnings": dict(sorted(self.warn.items()))},
             "untrusted": f"{m.group(1)}:{self._short(m.group(2))}",
             "target": "*@*",
-            "entities": [{"id": e, "type": x["type"], "name": x["name"]} for e, x in self.ents.items()],
+            "entities": [self._entity_json(e, x) for e, x in self.ents.items()],
             "assignments": {e: sorted(f"{a}@{r}" for a, r in ps) for e, ps in sorted(assignments.items())},
             "relations": [{"from": s, "to": d} for s, d in relations],
         }
