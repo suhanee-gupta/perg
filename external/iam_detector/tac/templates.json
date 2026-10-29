@@ -1,0 +1,2675 @@
+{
+  "_comment": "Permission flow templates assembled from four public IAM privilege-escalation sources (pathfinding.cloud, PMapper, Pacu, Cloudsplaining; 'sources' lists which detect each path, 'ref' cites the pathfinding.cloud path id), cast into this project's flow-template format. These overlap heavily with the 219 unpublished templates of Hu et al., TAC (arXiv 2304.14540). Multi-step combinations (e.g. AttachRolePolicy+AssumeRole) are derived by the engine's chaining, so only atomic templates are listed.",
+  "templates": [
+    {
+      "id": "add-user-to-group",
+      "category": "PermissionInheritance",
+      "description": "Add self to a group and inherit its permissions",
+      "ref": "pathfinding.cloud:iam-013",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "prowler"
+      ],
+      "src_types": [
+        "Group"
+      ],
+      "sink_types": [
+        "User"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:AddUserToGroup",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "assume-or-edit-trust",
+      "category": "PermissionInheritance",
+      "description": "Assume the role, or rewrite its trust policy to name yourself then assume it",
+      "ref": "pathfinding.cloud:iam-012,pathfinding.cloud:sts-001",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "sts:AssumeRole",
+          "on": "src"
+        },
+        {
+          "action": "iam:UpdateAssumeRolePolicy",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "create-access-key",
+      "category": "CredentialTakeover",
+      "description": "Take over a user's credentials via iam:CreateAccessKey",
+      "ref": "pathfinding.cloud:iam-002",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "User"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:CreateAccessKey",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "create-login-profile",
+      "category": "CredentialTakeover",
+      "description": "Take over a user's credentials via iam:CreateLoginProfile",
+      "ref": "pathfinding.cloud:iam-004",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "User"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:CreateLoginProfile",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "update-login-profile",
+      "category": "CredentialTakeover",
+      "description": "Take over a user's credentials via iam:UpdateLoginProfile",
+      "ref": "pathfinding.cloud:iam-006",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "User"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:UpdateLoginProfile",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "attach-user-policy",
+      "category": "PermissionRequest",
+      "description": "Grant permissions to a principal via iam:AttachUserPolicy on a managed policy",
+      "ref": "pathfinding.cloud:iam-008",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "prowler"
+      ],
+      "src_types": [
+        "Policy"
+      ],
+      "sink_types": [
+        "User"
+      ],
+      "sink": "any",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:AttachUserPolicy",
+          "on": "sink"
+        }
+      ]
+    },
+    {
+      "id": "attach-role-policy",
+      "category": "PermissionRequest",
+      "description": "Grant permissions to a principal via iam:AttachRolePolicy on a managed policy",
+      "ref": "pathfinding.cloud:iam-009",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "prowler"
+      ],
+      "src_types": [
+        "Policy"
+      ],
+      "sink_types": [
+        "Role"
+      ],
+      "sink": "any",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:AttachRolePolicy",
+          "on": "sink"
+        }
+      ]
+    },
+    {
+      "id": "attach-group-policy",
+      "category": "PermissionRequest",
+      "description": "Grant permissions to a principal via iam:AttachGroupPolicy on a managed policy",
+      "ref": "pathfinding.cloud:iam-010",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "prowler"
+      ],
+      "src_types": [
+        "Policy"
+      ],
+      "sink_types": [
+        "Group"
+      ],
+      "sink": "any",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:AttachGroupPolicy",
+          "on": "sink"
+        }
+      ]
+    },
+    {
+      "id": "create-policy-version",
+      "category": "PermissionRequest",
+      "description": "Grant permissions to a principal via iam:CreatePolicyVersion on a managed policy",
+      "ref": "pathfinding.cloud:iam-001",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "prowler"
+      ],
+      "src_types": [
+        "Policy"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Group"
+      ],
+      "sink": "any",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:CreatePolicyVersion",
+          "on": "sink"
+        }
+      ]
+    },
+    {
+      "id": "set-default-policy-version",
+      "category": "PermissionRequest",
+      "description": "Grant permissions to a principal via iam:SetDefaultPolicyVersion on a managed policy",
+      "ref": "",
+      "sources": [
+        "cloudsplaining",
+        "pacu"
+      ],
+      "src_types": [
+        "Policy"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Group"
+      ],
+      "sink": "any",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:SetDefaultPolicyVersion",
+          "on": "sink"
+        }
+      ]
+    },
+    {
+      "id": "put-user-policy",
+      "category": "PermissionRequest",
+      "description": "Write an arbitrary inline policy via iam:PutUserPolicy",
+      "ref": "pathfinding.cloud:iam-007",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "prowler"
+      ],
+      "src_types": [
+        "AnyPolicy"
+      ],
+      "sink_types": [
+        "User"
+      ],
+      "sink": "any",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:PutUserPolicy",
+          "on": "sink"
+        }
+      ]
+    },
+    {
+      "id": "put-role-policy",
+      "category": "PermissionRequest",
+      "description": "Write an arbitrary inline policy via iam:PutRolePolicy",
+      "ref": "pathfinding.cloud:iam-005",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "prowler"
+      ],
+      "src_types": [
+        "AnyPolicy"
+      ],
+      "sink_types": [
+        "Role"
+      ],
+      "sink": "any",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:PutRolePolicy",
+          "on": "sink"
+        }
+      ]
+    },
+    {
+      "id": "put-group-policy",
+      "category": "PermissionRequest",
+      "description": "Write an arbitrary inline policy via iam:PutGroupPolicy",
+      "ref": "pathfinding.cloud:iam-011",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "prowler"
+      ],
+      "src_types": [
+        "AnyPolicy"
+      ],
+      "sink_types": [
+        "Group"
+      ],
+      "sink": "any",
+      "require": "any",
+      "ops": [
+        {
+          "action": "iam:PutGroupPolicy",
+          "on": "sink"
+        }
+      ]
+    },
+    {
+      "id": "apprunner-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `apprunner:CreateService` can create an AWS App Runner service with a privileged IAM role attached. The service runs with the attached role's permissions, and the a",
+      "ref": "pathfinding.cloud:apprunner-001",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "apprunner:CreateService",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "apprunner-002",
+      "category": "CodeExecution",
+      "description": "A principal with `apprunner:UpdateService` can modify an existing App Runner service's configuration. If the target service has a privileged IAM role attached, the attacker can update the service to l",
+      "ref": "pathfinding.cloud:apprunner-002",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "apprunner:UpdateService",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "batch-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `batch:RegisterJobDefinition`, and `batch:SubmitJob` can escalate privileges by registering a new AWS Batch job definition that passes an admin IAM role as the `jobRol",
+      "ref": "pathfinding.cloud:batch-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "batch:RegisterJobDefinition",
+          "on": "*"
+        },
+        {
+          "action": "batch:SubmitJob",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "batch-002",
+      "category": "CodeExecution",
+      "description": "A principal with only `batch:SubmitJob` can escalate privileges by submitting a job to an existing Batch job queue using a pre-existing job definition that already has an admin `jobRoleArn`. The `Cont",
+      "ref": "pathfinding.cloud:batch-002",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "batch:SubmitJob",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "batch-003",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and broad AWS Batch permissions can escalate privileges by building the entire Batch pipeline from scratch \u2014 a Fargate compute environment, a job queue, and a job defin",
+      "ref": "pathfinding.cloud:batch-003",
+      "sources": [
+        "pathfinding.cloud"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "batch:CreateComputeEnvironment",
+          "on": "*"
+        },
+        {
+          "action": "batch:CreateJobQueue",
+          "on": "*"
+        },
+        {
+          "action": "batch:RegisterJobDefinition",
+          "on": "*"
+        },
+        {
+          "action": "batch:SubmitJob",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "bedrock-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `bedrock-agentcore:CreateCodeInterpreter`, `bedrock-agentcore:StartCodeInterpreterSession`, and `bedrock-agentcore:InvokeCodeInterpreter` can create and invoke an AWS ",
+      "ref": "pathfinding.cloud:bedrock-001",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "bedrock-agentcore:CreateCodeInterpreter",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:StartCodeInterpreterSession",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:InvokeCodeInterpreter",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "bedrock-002",
+      "category": "CodeExecution",
+      "description": "A principal with `bedrock-agentcore:StartCodeInterpreterSession` and `bedrock-agentcore:InvokeCodeInterpreter` can access an existing Bedrock AgentCore code interpreter that has a privileged IAM execu",
+      "ref": "pathfinding.cloud:bedrock-002",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "bedrock-agentcore:StartCodeInterpreterSession",
+          "on": "src"
+        },
+        {
+          "action": "bedrock-agentcore:InvokeCodeInterpreter",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "bedrock-003",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `bedrock-agentcore:CreateAgentRuntime`, `bedrock-agentcore:CreateAgentRuntimeEndpoint`, `bedrock-agentcore:CreateWorkloadIdentity` and `bedrock-agentcore:InvokeAgentRu",
+      "ref": "pathfinding.cloud:bedrock-003",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "bedrock-agentcore:CreateAgentRuntime",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:CreateAgentRuntimeEndpoint",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:CreateWorkloadIdentity",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:InvokeAgentRuntimeCommand",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "bedrock-004",
+      "category": "CodeExecution",
+      "description": "A principal with `bedrock-agentcore:InvokeAgentRuntimeCommand` can run a shell command as root inside the Firecracker microVM of an existing AgentCore Runtime or Harness, parallel to the customer agen",
+      "ref": "pathfinding.cloud:bedrock-004",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "bedrock-agentcore:InvokeAgentRuntimeCommand",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "bedrock-005",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `bedrock-agentcore:CreateHarness` and the supporting create and invoke permissions can deploy a new AgentCore Harness with a privileged IAM execution role and then run",
+      "ref": "pathfinding.cloud:bedrock-005",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "bedrock-agentcore:CreateHarness",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:CreateAgentRuntime",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:CreateAgentRuntimeEndpoint",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:CreateWorkloadIdentity",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:GetAgentRuntime",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:GetHarness",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:InvokeAgentRuntimeCommand",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "bedrock-006",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `bedrock-agentcore:CreateBrowser`, `bedrock-agentcore:StartBrowserSession` and `bedrock-agentcore:ConnectBrowserAutomationStream` can create a Custom Browser with a pr",
+      "ref": "pathfinding.cloud:bedrock-006",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "bedrock-agentcore:CreateBrowser",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:StartBrowserSession",
+          "on": "*"
+        },
+        {
+          "action": "bedrock-agentcore:ConnectBrowserAutomationStream",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "bedrock-007",
+      "category": "CodeExecution",
+      "description": "A principal with `bedrock-agentcore:StartBrowserSession` and `bedrock-agentcore:ConnectBrowserAutomationStream` can access an existing AgentCore Custom Browser that has a privileged IAM execution role",
+      "ref": "pathfinding.cloud:bedrock-007",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "bedrock-agentcore:StartBrowserSession",
+          "on": "src"
+        },
+        {
+          "action": "bedrock-agentcore:ConnectBrowserAutomationStream",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "braket-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `braket:CreateJob` can escalate privileges by creating an Amazon Braket Hybrid Job that passes an admin IAM role as the `jobExecutionRoleArn`. The Hybrid Job runs a",
+      "ref": "pathfinding.cloud:braket-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "braket:CreateJob",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "cloudformation-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `cloudformation:CreateStack` can launch a CloudFormation template that creates AWS resources. The template executes with the permissions of the passed IAM role. Thi",
+      "ref": "pathfinding.cloud:cloudformation-001",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "cloudformation:CreateStack",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "cloudformation-002",
+      "category": "CodeExecution",
+      "description": "A principal with `cloudformation:UpdateStack` can modify an existing CloudFormation stack that has an administrative service role attached. CloudFormation stacks execute with the permissions of their ",
+      "ref": "pathfinding.cloud:cloudformation-002",
+      "sources": [
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "cloudformation:UpdateStack",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "cloudformation-003",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `cloudformation:CreateStackSet`, and `cloudformation:CreateStackInstances` can escalate privileges by creating a CloudFormation StackSet with a privileged execution ro",
+      "ref": "pathfinding.cloud:cloudformation-003",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "cloudformation:CreateStackSet",
+          "on": "*"
+        },
+        {
+          "action": "cloudformation:CreateStackInstances",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "cloudformation-004",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `cloudformation:UpdateStackSet` can escalate privileges by modifying an existing CloudFormation StackSet that has a privileged execution role. Both permissions are ",
+      "ref": "pathfinding.cloud:cloudformation-004",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "cloudformation:UpdateStackSet",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "cloudformation-005",
+      "category": "CodeExecution",
+      "description": "A principal with `cloudformation:CreateChangeSet` and `cloudformation:ExecuteChangeSet` can take over an existing CloudFormation stack that has a privileged service role: stage a change set with a malicious template, then execute it. CloudFormation applies the change set with the stack's own service role, so the attacker inherits that role's permissions without holding them directly. Both permissions are required (require: all); no iam:PassRole is needed because the role is already attached to the stack.",
+      "ref": "pathfinding.cloud:cloudformation-005",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "cloudformation:CreateChangeSet",
+          "on": "src"
+        },
+        {
+          "action": "cloudformation:ExecuteChangeSet",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "codebuild-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `codebuild:CreateProject`, and `codebuild:StartBuild` can create a new CodeBuild project and attach an existing privileged IAM role to it. By starting a build with a m",
+      "ref": "pathfinding.cloud:codebuild-001",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "codebuild:CreateProject",
+          "on": "*"
+        },
+        {
+          "action": "codebuild:StartBuild",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "codebuild-002",
+      "category": "CodeExecution",
+      "description": "A principal with `codebuild:StartBuild` can exploit an existing CodeBuild project that has a privileged service role by using the `--buildspec-override` parameter to execute arbitrary commands with el",
+      "ref": "pathfinding.cloud:codebuild-002",
+      "sources": [
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "codebuild:StartBuild",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "codebuild-003",
+      "category": "CodeExecution",
+      "description": "A principal with `codebuild:StartBuildBatch` can exploit an existing CodeBuild project that has a privileged service role by using the `--buildspec-override` parameter to execute arbitrary commands wi",
+      "ref": "pathfinding.cloud:codebuild-003",
+      "sources": [
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "codebuild:StartBuildBatch",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "codebuild-004",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `codebuild:CreateProject`, and `codebuild:StartBuildBatch` can create a new CodeBuild project configured for batch builds and attach an existing privileged IAM role to",
+      "ref": "pathfinding.cloud:codebuild-004",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "codebuild:CreateProject",
+          "on": "*"
+        },
+        {
+          "action": "codebuild:StartBuildBatch",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "codedeploy-001",
+      "category": "CodeExecution",
+      "description": "A principal with `codedeploy:CreateDeployment` and `codedeploy:RegisterApplicationRevision` can escalate privileges by deploying a malicious revision to an existing CodeDeploy deployment group that ta",
+      "ref": "pathfinding.cloud:codedeploy-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "codedeploy:CreateDeployment",
+          "on": "src"
+        },
+        {
+          "action": "codedeploy:RegisterApplicationRevision",
+          "on": "src"
+        },
+        {
+          "action": "codedeploy:GetDeploymentConfig",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "cognitoidentity-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `cognito-identity:SetIdentityPoolRoles` can bind an admin IAM role to an existing Cognito Identity Pool's unauthenticated identity slot. Once bound, any unauthentic",
+      "ref": "pathfinding.cloud:cognitoidentity-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "cognito-identity:SetIdentityPoolRoles",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "datapipeline-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `datapipeline:CreatePipeline`, `datapipeline:PutPipelineDefinition`, and `datapipeline:ActivatePipeline` can create a new Data Pipeline that executes arbitrary code wi",
+      "ref": "pathfinding.cloud:datapipeline-001",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "datapipeline:CreatePipeline",
+          "on": "*"
+        },
+        {
+          "action": "datapipeline:PutPipelineDefinition",
+          "on": "*"
+        },
+        {
+          "action": "datapipeline:ActivatePipeline",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ec2instanceconnect-003",
+      "category": "CodeExecution",
+      "description": "A principal with `ec2-instance-connect:SendSSHPublicKey` can push a temporary SSH public key to an EC2 instance and establish an SSH connection. If the target EC2 instance has a privileged IAM role at",
+      "ref": "pathfinding.cloud:ec2instanceconnect-003",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "ec2-instance-connect:SendSSHPublicKey",
+          "on": "src"
+        },
+        {
+          "action": "ec2:DescribeInstances",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ec2-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `ec2:RunInstances` permissions can launch a new EC2 instance and attach an existing IAM Role to it. By accessing this new instance (e.g., via User Data or SSM), the",
+      "ref": "pathfinding.cloud:ec2-001",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ec2:RunInstances",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ec2-002",
+      "category": "CodeExecution",
+      "description": "An attacker with the permissions to modify an EC2 instance's attributes, stop it, and start it can gain full control over the instance. The `ec2:ModifyInstanceAttribute` permission can be used to chan",
+      "ref": "pathfinding.cloud:ec2-002",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "ec2:ModifyInstanceAttribute",
+          "on": "src"
+        },
+        {
+          "action": "ec2:StopInstances",
+          "on": "src"
+        },
+        {
+          "action": "ec2:StartInstances",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "ec2-003",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `ec2:RequestSpotInstances` permissions can escalate privileges by requesting an EC2 Spot Instance with a privileged IAM instance profile. The Spot Instance launches",
+      "ref": "pathfinding.cloud:ec2-003",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ec2:RequestSpotInstances",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ec2-004",
+      "category": "CodeExecution",
+      "description": "A principal with `ec2:CreateLaunchTemplateVersion` and `ec2:ModifyLaunchTemplate` permissions can escalate privileges by modifying an existing launch template that already references a privileged IAM ",
+      "ref": "pathfinding.cloud:ec2-004",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "ec2:CreateLaunchTemplateVersion",
+          "on": "src"
+        },
+        {
+          "action": "ec2:ModifyLaunchTemplate",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "ec2-005",
+      "category": "CodeExecution",
+      "description": "A principal with `ec2:CreateLaunchTemplateVersion` and `ec2:ModifyLaunchTemplate` can escalate privileges by creating a new version of an existing EC2 launch template that already has an admin IAM ins",
+      "ref": "pathfinding.cloud:ec2-005",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "ec2:CreateLaunchTemplateVersion",
+          "on": "src"
+        },
+        {
+          "action": "ec2:ModifyLaunchTemplate",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "ecs-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `ecs:CreateCluster`, `ecs:RegisterTaskDefinition`, and `ecs:CreateService` can escalate privileges by creating a new ECS cluster, registering a task definition with a ",
+      "ref": "pathfinding.cloud:ecs-001",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ecs:CreateCluster",
+          "on": "*"
+        },
+        {
+          "action": "ecs:RegisterTaskDefinition",
+          "on": "*"
+        },
+        {
+          "action": "ecs:CreateService",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ecs-002",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `ecs:CreateCluster`, `ecs:RegisterTaskDefinition`, and `ecs:RunTask` can achieve privilege escalation by creating a new ECS cluster, registering a task definition that",
+      "ref": "pathfinding.cloud:ecs-002",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ecs:CreateCluster",
+          "on": "*"
+        },
+        {
+          "action": "ecs:RegisterTaskDefinition",
+          "on": "*"
+        },
+        {
+          "action": "ecs:RunTask",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ecs-003",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `ecs:RegisterTaskDefinition`, and `ecs:CreateService` can create an ECS task definition with a privileged IAM role and launch it as a Fargate service. When the task ru",
+      "ref": "pathfinding.cloud:ecs-003",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ecs:RegisterTaskDefinition",
+          "on": "*"
+        },
+        {
+          "action": "ecs:CreateService",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ecs-004",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `ecs:RegisterTaskDefinition`, and `ecs:RunTask` can create a new ECS task definition and attach an existing IAM role to it. When the task is run on Fargate or EC2, the",
+      "ref": "pathfinding.cloud:ecs-004",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ecs:RegisterTaskDefinition",
+          "on": "*"
+        },
+        {
+          "action": "ecs:RunTask",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ecs-005",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `ecs:RegisterTaskDefinition`, and `ecs:StartTask` can create a new ECS task definition and attach an existing privileged IAM role to it, then start the task on an exis",
+      "ref": "pathfinding.cloud:ecs-005",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ecs:RegisterTaskDefinition",
+          "on": "*"
+        },
+        {
+          "action": "ecs:StartTask",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ecs-006",
+      "category": "CodeExecution",
+      "description": "A principal with `ecs:ExecuteCommand` and `ecs:DescribeTasks` can establish an interactive shell session in a running ECS container, but only if ECS Exec has been explicitly enabled on the service (it",
+      "ref": "pathfinding.cloud:ecs-006",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "ecs:ExecuteCommand",
+          "on": "src"
+        },
+        {
+          "action": "ecs:DescribeTasks",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ecs-007",
+      "category": "PermissionDelegation",
+      "description": "An EC2 instance role with `iam:PassRole`, `ecs:RegisterContainerInstance`, and `ecs:StartTask` can be exploited when the attacker has Remote Code Execution (RCE) on the EC2 instance. The attacker retr",
+      "ref": "pathfinding.cloud:ecs-007",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ecs:RegisterContainerInstance",
+          "on": "*"
+        },
+        {
+          "action": "ecs:StartTask",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ecs-008",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `ecs:RunTask` can override an existing ECS task definition's container command and task role at runtime using the `--overrides` parameter \u2014 without needing `ecs:Reg",
+      "ref": "pathfinding.cloud:ecs-008",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ecs:RunTask",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ecs-009",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `ecs:StartTask` can override an existing ECS task definition's container command and task role at runtime using the `--overrides` parameter, then start the task on ",
+      "ref": "pathfinding.cloud:ecs-009",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ecs:StartTask",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "emr-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `elasticmapreduce:RunJobFlow` can escalate privileges by creating an EMR cluster and passing an admin IAM role as the EC2 instance profile (`JobFlowRole`). An EMR s",
+      "ref": "pathfinding.cloud:emr-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "elasticmapreduce:RunJobFlow",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "emrserverless-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `emr-serverless:CreateApplication`, and `emr-serverless:StartJobRun` can escalate privileges by creating an EMR Serverless Spark application and starting a job run tha",
+      "ref": "pathfinding.cloud:emrserverless-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "emr-serverless:CreateApplication",
+          "on": "*"
+        },
+        {
+          "action": "emr-serverless:StartJobRun",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "gamelift-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `gamelift:CreateBuild`, `gamelift:CreateFleet`, and `gamelift:RequestUploadCredentials` can escalate privileges by uploading a malicious game server binary as a GameLi",
+      "ref": "pathfinding.cloud:gamelift-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "gamelift:CreateBuild",
+          "on": "*"
+        },
+        {
+          "action": "gamelift:CreateFleet",
+          "on": "*"
+        },
+        {
+          "action": "gamelift:RequestUploadCredentials",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "glue-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `glue:CreateDevEndpoint` can create a new Glue development endpoint and attach an existing IAM role to it. Glue dev endpoints provide SSH/Zeppelin notebook access w",
+      "ref": "pathfinding.cloud:glue-001",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "glue:CreateDevEndpoint",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "glue-002",
+      "category": "CodeExecution",
+      "description": "A principal with `glue:UpdateDevEndpoint` can update an existing Glue development endpoint to add their SSH public key, granting them SSH access to the endpoint. Since the endpoint executes with the p",
+      "ref": "pathfinding.cloud:glue-002",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "glue:UpdateDevEndpoint",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "glue-003",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `glue:CreateJob`, and `glue:StartJobRun` can create an AWS Glue job with a privileged IAM role and execute Python code that modifies IAM permissions. AWS Glue jobs are",
+      "ref": "pathfinding.cloud:glue-003",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "glue:CreateJob",
+          "on": "*"
+        },
+        {
+          "action": "glue:StartJobRun",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "glue-004",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `glue:CreateJob`, and `glue:CreateTrigger` can create an AWS Glue job with a privileged IAM role and establish a scheduled trigger that automatically executes the job.",
+      "ref": "pathfinding.cloud:glue-004",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "glue:CreateJob",
+          "on": "*"
+        },
+        {
+          "action": "glue:CreateTrigger",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "glue-005",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `glue:UpdateJob`, and `glue:StartJobRun` can modify an existing AWS Glue ETL job to execute with an administrative role and malicious Python code that grants the start",
+      "ref": "pathfinding.cloud:glue-005",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "glue:UpdateJob",
+          "on": "*"
+        },
+        {
+          "action": "glue:StartJobRun",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "glue-006",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `glue:UpdateJob`, and `glue:CreateTrigger` can modify an existing AWS Glue job to use an administrative role and execute malicious code, then establish a scheduled tri",
+      "ref": "pathfinding.cloud:glue-006",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "glue:UpdateJob",
+          "on": "*"
+        },
+        {
+          "action": "glue:CreateTrigger",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "glue-007",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `glue:CreateSession`, and `glue:RunStatement` can escalate privileges by creating an AWS Glue Interactive Session that passes an admin IAM role, then running arbitrary",
+      "ref": "pathfinding.cloud:glue-007",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "glue:CreateSession",
+          "on": "*"
+        },
+        {
+          "action": "glue:RunStatement",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "imagebuilder-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and EC2 Image Builder creation permissions can escalate privileges by building a multi-step pipeline (creating a component containing malicious shell commands, adding i",
+      "ref": "pathfinding.cloud:imagebuilder-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "imagebuilder:CreateComponent",
+          "on": "*"
+        },
+        {
+          "action": "imagebuilder:CreateImageRecipe",
+          "on": "*"
+        },
+        {
+          "action": "imagebuilder:CreateInfrastructureConfiguration",
+          "on": "*"
+        },
+        {
+          "action": "imagebuilder:CreateImage",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "kinesisanalytics-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `kinesisanalytics:CreateApplication`, and `kinesisanalytics:StartApplication` can escalate privileges by creating a Managed Apache Flink application (Amazon Kinesis Da",
+      "ref": "pathfinding.cloud:kinesisanalytics-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "kinesisanalytics:CreateApplication",
+          "on": "*"
+        },
+        {
+          "action": "kinesisanalytics:StartApplication",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "lambda-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `lambda:CreateFunction`, and `lambda:InvokeFunction` can create a new Lambda function and attach an existing IAM Role to it. When the function is invoked, the code exe",
+      "ref": "pathfinding.cloud:lambda-001",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "lambda:CreateFunction",
+          "on": "*"
+        },
+        {
+          "action": "lambda:InvokeFunction",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "lambda-002",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `lambda:CreateFunction`, and `lambda:CreateEventSourceMapping` can create a Lambda function with a privileged role and configure it to be automatically triggered by an",
+      "ref": "pathfinding.cloud:lambda-002",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "lambda:CreateFunction",
+          "on": "*"
+        },
+        {
+          "action": "lambda:CreateEventSourceMapping",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "lambda-003",
+      "category": "CodeExecution",
+      "description": "A principal with `lambda:UpdateFunctionCode` can modify the code of an existing Lambda function that has a privileged execution role. By replacing the function code with malicious code, the attacker c",
+      "ref": "pathfinding.cloud:lambda-003",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "lambda:UpdateFunctionCode",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "lambda-004",
+      "category": "CodeExecution",
+      "description": "A principal with `lambda:UpdateFunctionCode` and `lambda:InvokeFunction` can modify the code of an existing Lambda function that has a privileged execution role and then manually invoke it. By replaci",
+      "ref": "pathfinding.cloud:lambda-004",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "lambda:UpdateFunctionCode",
+          "on": "src"
+        },
+        {
+          "action": "lambda:InvokeFunction",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "lambda-005",
+      "category": "CodeExecution",
+      "description": "A principal with `lambda:UpdateFunctionCode` and `lambda:AddPermission` can modify an existing Lambda function's code with malicious code and grant themselves permission to invoke it via the resource-",
+      "ref": "pathfinding.cloud:lambda-005",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "lambda:UpdateFunctionCode",
+          "on": "src"
+        },
+        {
+          "action": "lambda:AddPermission",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "lambda-006",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `lambda:CreateFunction`, and `lambda:AddPermission` can create a new Lambda function with a privileged execution role and grant themselves permission to invoke it via ",
+      "ref": "pathfinding.cloud:lambda-006",
+      "sources": [
+        "cloudsplaining",
+        "pacu",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "lambda:CreateFunction",
+          "on": "*"
+        },
+        {
+          "action": "lambda:AddPermission",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "omics-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `omics:CreateWorkflow`, and `omics:StartRun` can escalate privileges by creating an AWS HealthOmics WDL workflow containing a task that exfiltrates the execution role'",
+      "ref": "pathfinding.cloud:omics-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "omics:CreateWorkflow",
+          "on": "*"
+        },
+        {
+          "action": "omics:StartRun",
+          "on": "*"
+        },
+        {
+          "action": "s3:GetObject",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "sagemaker-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `sagemaker:CreateNotebookInstance` can create a SageMaker notebook instance with a privileged execution role. SageMaker notebooks run Jupyter environments that prov",
+      "ref": "pathfinding.cloud:sagemaker-001",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "sagemaker:CreateNotebookInstance",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "sagemaker-002",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `sagemaker:CreateTrainingJob` can create a SageMaker training job with a privileged execution role. Training jobs can execute arbitrary container code and access AW",
+      "ref": "pathfinding.cloud:sagemaker-002",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "sagemaker:CreateTrainingJob",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "sagemaker-003",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `sagemaker:CreateProcessingJob` can create a SageMaker processing job with a privileged execution role. Processing jobs can execute arbitrary container code for dat",
+      "ref": "pathfinding.cloud:sagemaker-003",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "sagemaker:CreateProcessingJob",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "sagemaker-004",
+      "category": "CodeExecution",
+      "description": "A principal with `sagemaker:CreatePresignedNotebookInstanceUrl` can generate a presigned URL to access an existing SageMaker notebook instance. If the notebook instance has a privileged execution role",
+      "ref": "pathfinding.cloud:sagemaker-004",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "sagemaker:CreatePresignedNotebookInstanceUrl",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "sagemaker-005",
+      "category": "CodeExecution",
+      "description": "A principal with SageMaker notebook management permissions can inject malicious code into an existing notebook instance by creating a malicious lifecycle configuration and attaching it to the notebook",
+      "ref": "pathfinding.cloud:sagemaker-005",
+      "sources": [
+        "cloudsplaining",
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "sagemaker:CreateNotebookInstanceLifecycleConfig",
+          "on": "src"
+        },
+        {
+          "action": "sagemaker:StopNotebookInstance",
+          "on": "src"
+        },
+        {
+          "action": "sagemaker:UpdateNotebookInstance",
+          "on": "src"
+        },
+        {
+          "action": "sagemaker:StartNotebookInstance",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "scheduler-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole` and `scheduler:CreateSchedule` can escalate privileges by creating a one-time EventBridge Scheduler schedule that targets the universal target (`arn:aws:scheduler:::aws",
+      "ref": "pathfinding.cloud:scheduler-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "scheduler:CreateSchedule",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "ssm-001",
+      "category": "CodeExecution",
+      "description": "The `ssm:StartSession` permission allows a principal to remotely access any EC2 instance on which they have this permission. This access is contingent on the EC2 instance having the SSM agent installe",
+      "ref": "pathfinding.cloud:ssm-001",
+      "sources": [
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "ssm:StartSession",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "ssm-002",
+      "category": "CodeExecution",
+      "description": "The `ssm:SendCommand` permission allows a principal to execute commands on any EC2 instance on which they have this permission, using SSM Run Command. This access is contingent on the EC2 instance hav",
+      "ref": "pathfinding.cloud:ssm-002",
+      "sources": [
+        "pathfinding.cloud",
+        "pmapper",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "any",
+      "ops": [
+        {
+          "action": "ssm:SendCommand",
+          "on": "src"
+        }
+      ]
+    },
+    {
+      "id": "ssm-003",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `ssm:CreateDocument`, and `ssm:StartAutomationExecution` can escalate privileges by creating a custom SSM Automation document with a Python `aws:executeScript` step th",
+      "ref": "pathfinding.cloud:ssm-003",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "ssm:CreateDocument",
+          "on": "*"
+        },
+        {
+          "action": "ssm:StartAutomationExecution",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "stepfunctions-001",
+      "category": "PermissionDelegation",
+      "description": "A principal with `iam:PassRole`, `states:CreateStateMachine`, and `states:StartExecution` can escalate privileges by creating a Step Functions state machine that uses an admin IAM role and contains an",
+      "ref": "pathfinding.cloud:stepfunctions-001",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Role"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "iam:PassRole",
+          "on": "src"
+        },
+        {
+          "action": "states:CreateStateMachine",
+          "on": "*"
+        },
+        {
+          "action": "states:StartExecution",
+          "on": "*"
+        }
+      ]
+    },
+    {
+      "id": "stepfunctions-002",
+      "category": "CodeExecution",
+      "description": "A principal with `states:UpdateStateMachine` and `states:StartExecution` can replace the ASL definition of an existing Step Functions state machine that already has an admin IAM role attached. The att",
+      "ref": "pathfinding.cloud:stepfunctions-002",
+      "sources": [
+        "pathfinding.cloud",
+        "prowler"
+      ],
+      "src_types": [
+        "Service"
+      ],
+      "sink_types": [
+        "User",
+        "Role",
+        "Service"
+      ],
+      "sink": "actor",
+      "require": "all",
+      "ops": [
+        {
+          "action": "states:UpdateStateMachine",
+          "on": "src"
+        },
+        {
+          "action": "states:StartExecution",
+          "on": "src"
+        }
+      ]
+    }
+  ]
+}

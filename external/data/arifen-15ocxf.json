@@ -1,0 +1,6066 @@
+{
+ "_source": {
+  "org": "arifen-15ocxf",
+  "archetype": "healthcare",
+  "seed": 70000755,
+  "untrusted_type": "contractor-user",
+  "ground_truth": {
+   "has_pe": true,
+   "min_len": 1,
+   "witness": [
+    {
+     "prim": "attach_group_policy",
+     "via": [
+      "user:ext-raj.singh"
+     ],
+     "to": "admin:*"
+    }
+   ]
+  },
+  "stats": {
+   "n_entities": 282,
+   "n_users": 129,
+   "n_groups": 49,
+   "n_roles": 104,
+   "n_policies": 105,
+   "n_functions": 28,
+   "n_workloads": 11,
+   "n_connections": 768
+  },
+  "converter": {
+   "trust": "strict",
+   "widen": true
+  },
+  "warnings": {
+   "arn_glob_matches_nothing": 32,
+   "condition_ignored": 2,
+   "deny_statement_skipped": 2,
+   "assume_role_blocked_by_trust": 8
+  }
+ },
+ "untrusted": "user:ext-raj.singh",
+ "target": "*@*",
+ "entities": [
+  {
+   "id": "function:analytics-2-imaging-fn0",
+   "type": "Service",
+   "name": "arifen-15ocxf-analytics-2-imaging-fn0"
+  },
+  {
+   "id": "function:analytics-2-imaging-fn13",
+   "type": "Service",
+   "name": "arifen-15ocxf-analytics-2-imaging-fn13"
+  },
+  {
+   "id": "function:billing-ehr-fn19",
+   "type": "Service",
+   "name": "arifen-15ocxf-billing-ehr-fn19"
+  },
+  {
+   "id": "function:billing-reports-fn27",
+   "type": "Service",
+   "name": "arifen-15ocxf-billing-reports-fn27"
+  },
+  {
+   "id": "function:claims-2-imaging-fn17",
+   "type": "Service",
+   "name": "arifen-15ocxf-claims-2-imaging-fn17"
+  },
+  {
+   "id": "function:claims-phi-fn23",
+   "type": "Service",
+   "name": "arifen-15ocxf-claims-phi-fn23"
+  },
+  {
+   "id": "function:clinical-data-2-ehr-fn11",
+   "type": "Service",
+   "name": "arifen-15ocxf-clinical-data-2-ehr-fn11"
+  },
+  {
+   "id": "function:clinical-data-2-ehr-fn6",
+   "type": "Service",
+   "name": "arifen-15ocxf-clinical-data-2-ehr-fn6"
+  },
+  {
+   "id": "function:clinical-data-2-ehr-fn9",
+   "type": "Service",
+   "name": "arifen-15ocxf-clinical-data-2-ehr-fn9"
+  },
+  {
+   "id": "function:clinical-data-2-reports-fn3",
+   "type": "Service",
+   "name": "arifen-15ocxf-clinical-data-2-reports-fn3"
+  },
+  {
+   "id": "function:clinical-data-audit-fn24",
+   "type": "Service",
+   "name": "arifen-15ocxf-clinical-data-audit-fn24"
+  },
+  {
+   "id": "function:imaging-2-claims-fn1",
+   "type": "Service",
+   "name": "arifen-15ocxf-imaging-2-claims-fn1"
+  },
+  {
+   "id": "function:imaging-2-phi-fn10",
+   "type": "Service",
+   "name": "arifen-15ocxf-imaging-2-phi-fn10"
+  },
+  {
+   "id": "function:imaging-phi-fn5",
+   "type": "Service",
+   "name": "arifen-15ocxf-imaging-phi-fn5"
+  },
+  {
+   "id": "function:imaging-reports-fn12",
+   "type": "Service",
+   "name": "arifen-15ocxf-imaging-reports-fn12"
+  },
+  {
+   "id": "function:lab-systems-claims-fn21",
+   "type": "Service",
+   "name": "arifen-15ocxf-lab-systems-claims-fn21"
+  },
+  {
+   "id": "function:lab-systems-claims-fn25",
+   "type": "Service",
+   "name": "arifen-15ocxf-lab-systems-claims-fn25"
+  },
+  {
+   "id": "function:lab-systems-phi-fn22",
+   "type": "Service",
+   "name": "arifen-15ocxf-lab-systems-phi-fn22"
+  },
+  {
+   "id": "function:patient-portal-2-audit-fn2",
+   "type": "Service",
+   "name": "arifen-15ocxf-patient-portal-2-audit-fn2"
+  },
+  {
+   "id": "function:pharmacy-audit-fn14",
+   "type": "Service",
+   "name": "arifen-15ocxf-pharmacy-audit-fn14"
+  },
+  {
+   "id": "function:pharmacy-audit-fn26",
+   "type": "Service",
+   "name": "arifen-15ocxf-pharmacy-audit-fn26"
+  },
+  {
+   "id": "function:research-2-ehr-fn20",
+   "type": "Service",
+   "name": "arifen-15ocxf-research-2-ehr-fn20"
+  },
+  {
+   "id": "function:research-2-ehr-fn8",
+   "type": "Service",
+   "name": "arifen-15ocxf-research-2-ehr-fn8"
+  },
+  {
+   "id": "function:scheduling-2-ehr-fn15",
+   "type": "Service",
+   "name": "arifen-15ocxf-scheduling-2-ehr-fn15"
+  },
+  {
+   "id": "function:telehealth-2-claims-fn18",
+   "type": "Service",
+   "name": "arifen-15ocxf-telehealth-2-claims-fn18"
+  },
+  {
+   "id": "function:telehealth-2-phi-fn4",
+   "type": "Service",
+   "name": "arifen-15ocxf-telehealth-2-phi-fn4"
+  },
+  {
+   "id": "function:telehealth-2-phi-fn7",
+   "type": "Service",
+   "name": "arifen-15ocxf-telehealth-2-phi-fn7"
+  },
+  {
+   "id": "function:telehealth-audit-fn16",
+   "type": "Service",
+   "name": "arifen-15ocxf-telehealth-audit-fn16"
+  },
+  {
+   "id": "group:analytics-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-analytics-2-analysts"
+  },
+  {
+   "id": "group:analytics-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-analytics-2-devs"
+  },
+  {
+   "id": "group:analytics-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-analytics-analysts"
+  },
+  {
+   "id": "group:analytics-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-analytics-devs"
+  },
+  {
+   "id": "group:billing-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-billing-2-analysts"
+  },
+  {
+   "id": "group:billing-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-billing-2-devs"
+  },
+  {
+   "id": "group:billing-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-billing-analysts"
+  },
+  {
+   "id": "group:billing-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-billing-devs"
+  },
+  {
+   "id": "group:claims-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-claims-2-analysts"
+  },
+  {
+   "id": "group:claims-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-claims-2-devs"
+  },
+  {
+   "id": "group:claims-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-claims-analysts"
+  },
+  {
+   "id": "group:claims-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-claims-devs"
+  },
+  {
+   "id": "group:clinical-data-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-clinical-data-2-analysts"
+  },
+  {
+   "id": "group:clinical-data-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-clinical-data-2-devs"
+  },
+  {
+   "id": "group:clinical-data-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-clinical-data-analysts"
+  },
+  {
+   "id": "group:clinical-data-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-clinical-data-devs"
+  },
+  {
+   "id": "group:compliance-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-compliance-2-analysts"
+  },
+  {
+   "id": "group:compliance-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-compliance-2-devs"
+  },
+  {
+   "id": "group:compliance-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-compliance-analysts"
+  },
+  {
+   "id": "group:compliance-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-compliance-devs"
+  },
+  {
+   "id": "group:contractors",
+   "type": "Group",
+   "name": "arifen-15ocxf-contractors"
+  },
+  {
+   "id": "group:imaging-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-imaging-2-analysts"
+  },
+  {
+   "id": "group:imaging-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-imaging-2-devs"
+  },
+  {
+   "id": "group:imaging-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-imaging-analysts"
+  },
+  {
+   "id": "group:imaging-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-imaging-devs"
+  },
+  {
+   "id": "group:inj-grp-g3",
+   "type": "Group",
+   "name": "arifen-15ocxf-inj-grp-g3"
+  },
+  {
+   "id": "group:lab-systems-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-lab-systems-analysts"
+  },
+  {
+   "id": "group:lab-systems-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-lab-systems-devs"
+  },
+  {
+   "id": "group:patient-portal-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-patient-portal-2-analysts"
+  },
+  {
+   "id": "group:patient-portal-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-patient-portal-2-devs"
+  },
+  {
+   "id": "group:patient-portal-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-patient-portal-analysts"
+  },
+  {
+   "id": "group:patient-portal-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-patient-portal-devs"
+  },
+  {
+   "id": "group:pharmacy-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-pharmacy-2-analysts"
+  },
+  {
+   "id": "group:pharmacy-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-pharmacy-2-devs"
+  },
+  {
+   "id": "group:pharmacy-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-pharmacy-analysts"
+  },
+  {
+   "id": "group:pharmacy-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-pharmacy-devs"
+  },
+  {
+   "id": "group:platform-admins",
+   "type": "Group",
+   "name": "arifen-15ocxf-platform-admins"
+  },
+  {
+   "id": "group:research-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-research-2-analysts"
+  },
+  {
+   "id": "group:research-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-research-2-devs"
+  },
+  {
+   "id": "group:research-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-research-analysts"
+  },
+  {
+   "id": "group:research-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-research-devs"
+  },
+  {
+   "id": "group:scheduling-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-scheduling-2-analysts"
+  },
+  {
+   "id": "group:scheduling-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-scheduling-2-devs"
+  },
+  {
+   "id": "group:scheduling-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-scheduling-analysts"
+  },
+  {
+   "id": "group:scheduling-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-scheduling-devs"
+  },
+  {
+   "id": "group:telehealth-2-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-telehealth-2-analysts"
+  },
+  {
+   "id": "group:telehealth-2-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-telehealth-2-devs"
+  },
+  {
+   "id": "group:telehealth-analysts",
+   "type": "Group",
+   "name": "arifen-15ocxf-telehealth-analysts"
+  },
+  {
+   "id": "group:telehealth-devs",
+   "type": "Group",
+   "name": "arifen-15ocxf-telehealth-devs"
+  },
+  {
+   "id": "policy:admin-all",
+   "type": "Policy",
+   "name": "arifen-15ocxf-admin-all"
+  },
+  {
+   "id": "policy:analytics-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-analytics-2-data-rw"
+  },
+  {
+   "id": "policy:analytics-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-analytics-2-deploy-perms"
+  },
+  {
+   "id": "policy:analytics-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-analytics-2-ops"
+  },
+  {
+   "id": "policy:analytics-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-analytics-2-read"
+  },
+  {
+   "id": "policy:analytics-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-analytics-data-rw"
+  },
+  {
+   "id": "policy:analytics-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-analytics-deploy-perms"
+  },
+  {
+   "id": "policy:analytics-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-analytics-ops"
+  },
+  {
+   "id": "policy:analytics-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-analytics-read"
+  },
+  {
+   "id": "policy:base-readonly",
+   "type": "Policy",
+   "name": "arifen-15ocxf-base-readonly"
+  },
+  {
+   "id": "policy:billing-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-billing-2-data-rw"
+  },
+  {
+   "id": "policy:billing-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-billing-2-deploy-perms"
+  },
+  {
+   "id": "policy:billing-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-billing-2-ops"
+  },
+  {
+   "id": "policy:billing-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-billing-2-read"
+  },
+  {
+   "id": "policy:billing-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-billing-data-rw"
+  },
+  {
+   "id": "policy:billing-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-billing-deploy-perms"
+  },
+  {
+   "id": "policy:billing-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-billing-ops"
+  },
+  {
+   "id": "policy:billing-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-billing-read"
+  },
+  {
+   "id": "policy:ci-assume",
+   "type": "Policy",
+   "name": "arifen-15ocxf-ci-assume"
+  },
+  {
+   "id": "policy:claims-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-claims-2-data-rw"
+  },
+  {
+   "id": "policy:claims-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-claims-2-deploy-perms"
+  },
+  {
+   "id": "policy:claims-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-claims-2-ops"
+  },
+  {
+   "id": "policy:claims-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-claims-2-read"
+  },
+  {
+   "id": "policy:claims-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-claims-data-rw"
+  },
+  {
+   "id": "policy:claims-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-claims-deploy-perms"
+  },
+  {
+   "id": "policy:claims-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-claims-ops"
+  },
+  {
+   "id": "policy:claims-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-claims-read"
+  },
+  {
+   "id": "policy:clinical-data-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-clinical-data-2-data-rw"
+  },
+  {
+   "id": "policy:clinical-data-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-clinical-data-2-deploy-perms"
+  },
+  {
+   "id": "policy:clinical-data-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-clinical-data-2-ops"
+  },
+  {
+   "id": "policy:clinical-data-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-clinical-data-2-read"
+  },
+  {
+   "id": "policy:clinical-data-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-clinical-data-data-rw"
+  },
+  {
+   "id": "policy:clinical-data-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-clinical-data-deploy-perms"
+  },
+  {
+   "id": "policy:clinical-data-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-clinical-data-ops"
+  },
+  {
+   "id": "policy:clinical-data-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-clinical-data-read"
+  },
+  {
+   "id": "policy:compliance-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-compliance-2-data-rw"
+  },
+  {
+   "id": "policy:compliance-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-compliance-2-deploy-perms"
+  },
+  {
+   "id": "policy:compliance-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-compliance-2-ops"
+  },
+  {
+   "id": "policy:compliance-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-compliance-2-read"
+  },
+  {
+   "id": "policy:compliance-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-compliance-data-rw"
+  },
+  {
+   "id": "policy:compliance-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-compliance-deploy-perms"
+  },
+  {
+   "id": "policy:compliance-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-compliance-ops"
+  },
+  {
+   "id": "policy:compliance-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-compliance-read"
+  },
+  {
+   "id": "policy:imaging-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-imaging-2-data-rw"
+  },
+  {
+   "id": "policy:imaging-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-imaging-2-deploy-perms"
+  },
+  {
+   "id": "policy:imaging-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-imaging-2-ops"
+  },
+  {
+   "id": "policy:imaging-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-imaging-2-read"
+  },
+  {
+   "id": "policy:imaging-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-imaging-data-rw"
+  },
+  {
+   "id": "policy:imaging-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-imaging-deploy-perms"
+  },
+  {
+   "id": "policy:imaging-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-imaging-ops"
+  },
+  {
+   "id": "policy:imaging-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-imaging-read"
+  },
+  {
+   "id": "policy:inj-pol-p1",
+   "type": "Policy",
+   "name": "arifen-15ocxf-inj-pol-p1"
+  },
+  {
+   "id": "policy:inj-pol-p10",
+   "type": "Policy",
+   "name": "arifen-15ocxf-inj-pol-p10"
+  },
+  {
+   "id": "policy:inj-pol-p2",
+   "type": "Policy",
+   "name": "arifen-15ocxf-inj-pol-p2"
+  },
+  {
+   "id": "policy:inj-pol-p4",
+   "type": "Policy",
+   "name": "arifen-15ocxf-inj-pol-p4"
+  },
+  {
+   "id": "policy:inj-pol-p5",
+   "type": "Policy",
+   "name": "arifen-15ocxf-inj-pol-p5"
+  },
+  {
+   "id": "policy:inj-pol-p7",
+   "type": "Policy",
+   "name": "arifen-15ocxf-inj-pol-p7"
+  },
+  {
+   "id": "policy:inj-pol-p8",
+   "type": "Policy",
+   "name": "arifen-15ocxf-inj-pol-p8"
+  },
+  {
+   "id": "policy:inj-pol-p9",
+   "type": "Policy",
+   "name": "arifen-15ocxf-inj-pol-p9"
+  },
+  {
+   "id": "policy:lab-systems-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-lab-systems-data-rw"
+  },
+  {
+   "id": "policy:lab-systems-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-lab-systems-deploy-perms"
+  },
+  {
+   "id": "policy:lab-systems-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-lab-systems-ops"
+  },
+  {
+   "id": "policy:lab-systems-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-lab-systems-read"
+  },
+  {
+   "id": "policy:patient-portal-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-patient-portal-2-data-rw"
+  },
+  {
+   "id": "policy:patient-portal-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-patient-portal-2-deploy-perms"
+  },
+  {
+   "id": "policy:patient-portal-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-patient-portal-2-ops"
+  },
+  {
+   "id": "policy:patient-portal-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-patient-portal-2-read"
+  },
+  {
+   "id": "policy:patient-portal-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-patient-portal-data-rw"
+  },
+  {
+   "id": "policy:patient-portal-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-patient-portal-deploy-perms"
+  },
+  {
+   "id": "policy:patient-portal-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-patient-portal-ops"
+  },
+  {
+   "id": "policy:patient-portal-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-patient-portal-read"
+  },
+  {
+   "id": "policy:pharmacy-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-pharmacy-2-data-rw"
+  },
+  {
+   "id": "policy:pharmacy-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-pharmacy-2-deploy-perms"
+  },
+  {
+   "id": "policy:pharmacy-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-pharmacy-2-ops"
+  },
+  {
+   "id": "policy:pharmacy-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-pharmacy-2-read"
+  },
+  {
+   "id": "policy:pharmacy-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-pharmacy-data-rw"
+  },
+  {
+   "id": "policy:pharmacy-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-pharmacy-deploy-perms"
+  },
+  {
+   "id": "policy:pharmacy-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-pharmacy-ops"
+  },
+  {
+   "id": "policy:pharmacy-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-pharmacy-read"
+  },
+  {
+   "id": "policy:research-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-research-2-data-rw"
+  },
+  {
+   "id": "policy:research-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-research-2-deploy-perms"
+  },
+  {
+   "id": "policy:research-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-research-2-ops"
+  },
+  {
+   "id": "policy:research-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-research-2-read"
+  },
+  {
+   "id": "policy:research-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-research-data-rw"
+  },
+  {
+   "id": "policy:research-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-research-deploy-perms"
+  },
+  {
+   "id": "policy:research-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-research-ops"
+  },
+  {
+   "id": "policy:research-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-research-read"
+  },
+  {
+   "id": "policy:scheduling-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-scheduling-2-data-rw"
+  },
+  {
+   "id": "policy:scheduling-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-scheduling-2-deploy-perms"
+  },
+  {
+   "id": "policy:scheduling-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-scheduling-2-ops"
+  },
+  {
+   "id": "policy:scheduling-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-scheduling-2-read"
+  },
+  {
+   "id": "policy:scheduling-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-scheduling-data-rw"
+  },
+  {
+   "id": "policy:scheduling-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-scheduling-deploy-perms"
+  },
+  {
+   "id": "policy:scheduling-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-scheduling-ops"
+  },
+  {
+   "id": "policy:scheduling-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-scheduling-read"
+  },
+  {
+   "id": "policy:security-audit",
+   "type": "Policy",
+   "name": "arifen-15ocxf-security-audit"
+  },
+  {
+   "id": "policy:self-service",
+   "type": "Policy",
+   "name": "arifen-15ocxf-self-service"
+  },
+  {
+   "id": "policy:telehealth-2-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-telehealth-2-data-rw"
+  },
+  {
+   "id": "policy:telehealth-2-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-telehealth-2-deploy-perms"
+  },
+  {
+   "id": "policy:telehealth-2-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-telehealth-2-ops"
+  },
+  {
+   "id": "policy:telehealth-2-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-telehealth-2-read"
+  },
+  {
+   "id": "policy:telehealth-data-rw",
+   "type": "Policy",
+   "name": "arifen-15ocxf-telehealth-data-rw"
+  },
+  {
+   "id": "policy:telehealth-deploy-perms",
+   "type": "Policy",
+   "name": "arifen-15ocxf-telehealth-deploy-perms"
+  },
+  {
+   "id": "policy:telehealth-ops",
+   "type": "Policy",
+   "name": "arifen-15ocxf-telehealth-ops"
+  },
+  {
+   "id": "policy:telehealth-read",
+   "type": "Policy",
+   "name": "arifen-15ocxf-telehealth-read"
+  },
+  {
+   "id": "role:analytics-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-analytics-2-deploy"
+  },
+  {
+   "id": "role:analytics-2-imaging-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-analytics-2-imaging-svc"
+  },
+  {
+   "id": "role:analytics-2-imaging-svc44",
+   "type": "Role",
+   "name": "arifen-15ocxf-analytics-2-imaging-svc44"
+  },
+  {
+   "id": "role:analytics-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-analytics-2-svc"
+  },
+  {
+   "id": "role:analytics-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-analytics-deploy"
+  },
+  {
+   "id": "role:analytics-ehr-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-analytics-ehr-svc"
+  },
+  {
+   "id": "role:analytics-ehr-svc32",
+   "type": "Role",
+   "name": "arifen-15ocxf-analytics-ehr-svc32"
+  },
+  {
+   "id": "role:analytics-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-analytics-svc"
+  },
+  {
+   "id": "role:billing-2-audit-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-billing-2-audit-svc"
+  },
+  {
+   "id": "role:billing-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-billing-2-deploy"
+  },
+  {
+   "id": "role:billing-2-imaging-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-billing-2-imaging-svc"
+  },
+  {
+   "id": "role:billing-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-billing-2-svc"
+  },
+  {
+   "id": "role:billing-audit-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-billing-audit-svc"
+  },
+  {
+   "id": "role:billing-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-billing-deploy"
+  },
+  {
+   "id": "role:billing-ehr-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-billing-ehr-svc"
+  },
+  {
+   "id": "role:billing-reports-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-billing-reports-svc"
+  },
+  {
+   "id": "role:billing-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-billing-svc"
+  },
+  {
+   "id": "role:ci-runner",
+   "type": "Role",
+   "name": "arifen-15ocxf-ci-runner"
+  },
+  {
+   "id": "role:claims-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-claims-2-deploy"
+  },
+  {
+   "id": "role:claims-2-imaging-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-claims-2-imaging-svc"
+  },
+  {
+   "id": "role:claims-2-reports-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-claims-2-reports-svc"
+  },
+  {
+   "id": "role:claims-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-claims-2-svc"
+  },
+  {
+   "id": "role:claims-audit-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-claims-audit-svc"
+  },
+  {
+   "id": "role:claims-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-claims-deploy"
+  },
+  {
+   "id": "role:claims-phi-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-claims-phi-svc"
+  },
+  {
+   "id": "role:claims-stack-role",
+   "type": "Role",
+   "name": "arifen-15ocxf-claims-stack-role"
+  },
+  {
+   "id": "role:claims-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-claims-svc"
+  },
+  {
+   "id": "role:clinical-data-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-2-deploy"
+  },
+  {
+   "id": "role:clinical-data-2-ehr-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-2-ehr-svc"
+  },
+  {
+   "id": "role:clinical-data-2-reports-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-2-reports-svc"
+  },
+  {
+   "id": "role:clinical-data-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-2-svc"
+  },
+  {
+   "id": "role:clinical-data-audit-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-audit-svc"
+  },
+  {
+   "id": "role:clinical-data-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-deploy"
+  },
+  {
+   "id": "role:clinical-data-reports-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-reports-svc"
+  },
+  {
+   "id": "role:clinical-data-reports-svc46",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-reports-svc46"
+  },
+  {
+   "id": "role:clinical-data-stack-role",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-stack-role"
+  },
+  {
+   "id": "role:clinical-data-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-clinical-data-svc"
+  },
+  {
+   "id": "role:compliance-2-claims-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-compliance-2-claims-svc"
+  },
+  {
+   "id": "role:compliance-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-compliance-2-deploy"
+  },
+  {
+   "id": "role:compliance-2-phi-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-compliance-2-phi-svc"
+  },
+  {
+   "id": "role:compliance-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-compliance-2-svc"
+  },
+  {
+   "id": "role:compliance-claims-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-compliance-claims-svc"
+  },
+  {
+   "id": "role:compliance-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-compliance-deploy"
+  },
+  {
+   "id": "role:compliance-phi-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-compliance-phi-svc"
+  },
+  {
+   "id": "role:compliance-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-compliance-svc"
+  },
+  {
+   "id": "role:imaging-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-imaging-2-deploy"
+  },
+  {
+   "id": "role:imaging-2-phi-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-imaging-2-phi-svc"
+  },
+  {
+   "id": "role:imaging-2-reports-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-imaging-2-reports-svc"
+  },
+  {
+   "id": "role:imaging-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-imaging-2-svc"
+  },
+  {
+   "id": "role:imaging-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-imaging-deploy"
+  },
+  {
+   "id": "role:imaging-imaging-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-imaging-imaging-svc"
+  },
+  {
+   "id": "role:imaging-nb-role",
+   "type": "Role",
+   "name": "arifen-15ocxf-imaging-nb-role"
+  },
+  {
+   "id": "role:imaging-phi-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-imaging-phi-svc"
+  },
+  {
+   "id": "role:imaging-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-imaging-svc"
+  },
+  {
+   "id": "role:inj-trust-edit-r6",
+   "type": "Role",
+   "name": "arifen-15ocxf-inj-trust-edit-r6"
+  },
+  {
+   "id": "role:lab-systems-claims-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-lab-systems-claims-svc"
+  },
+  {
+   "id": "role:lab-systems-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-lab-systems-deploy"
+  },
+  {
+   "id": "role:lab-systems-phi-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-lab-systems-phi-svc"
+  },
+  {
+   "id": "role:lab-systems-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-lab-systems-svc"
+  },
+  {
+   "id": "role:org-admin",
+   "type": "Role",
+   "name": "arifen-15ocxf-org-admin"
+  },
+  {
+   "id": "role:patient-portal-2-audit-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-patient-portal-2-audit-svc"
+  },
+  {
+   "id": "role:patient-portal-2-audit-svc36",
+   "type": "Role",
+   "name": "arifen-15ocxf-patient-portal-2-audit-svc36"
+  },
+  {
+   "id": "role:patient-portal-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-patient-portal-2-deploy"
+  },
+  {
+   "id": "role:patient-portal-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-patient-portal-2-svc"
+  },
+  {
+   "id": "role:patient-portal-claims-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-patient-portal-claims-svc"
+  },
+  {
+   "id": "role:patient-portal-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-patient-portal-deploy"
+  },
+  {
+   "id": "role:patient-portal-ehr-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-patient-portal-ehr-svc"
+  },
+  {
+   "id": "role:patient-portal-phi-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-patient-portal-phi-svc"
+  },
+  {
+   "id": "role:patient-portal-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-patient-portal-svc"
+  },
+  {
+   "id": "role:pharmacy-2-audit-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-pharmacy-2-audit-svc"
+  },
+  {
+   "id": "role:pharmacy-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-pharmacy-2-deploy"
+  },
+  {
+   "id": "role:pharmacy-2-imaging-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-pharmacy-2-imaging-svc"
+  },
+  {
+   "id": "role:pharmacy-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-pharmacy-2-svc"
+  },
+  {
+   "id": "role:pharmacy-audit-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-pharmacy-audit-svc"
+  },
+  {
+   "id": "role:pharmacy-audit-svc27",
+   "type": "Role",
+   "name": "arifen-15ocxf-pharmacy-audit-svc27"
+  },
+  {
+   "id": "role:pharmacy-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-pharmacy-deploy"
+  },
+  {
+   "id": "role:pharmacy-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-pharmacy-svc"
+  },
+  {
+   "id": "role:research-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-research-2-deploy"
+  },
+  {
+   "id": "role:research-2-ehr-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-research-2-ehr-svc"
+  },
+  {
+   "id": "role:research-2-ehr-svc41",
+   "type": "Role",
+   "name": "arifen-15ocxf-research-2-ehr-svc41"
+  },
+  {
+   "id": "role:research-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-research-2-svc"
+  },
+  {
+   "id": "role:research-claims-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-research-claims-svc"
+  },
+  {
+   "id": "role:research-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-research-deploy"
+  },
+  {
+   "id": "role:research-ehr-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-research-ehr-svc"
+  },
+  {
+   "id": "role:research-nb-role",
+   "type": "Role",
+   "name": "arifen-15ocxf-research-nb-role"
+  },
+  {
+   "id": "role:research-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-research-svc"
+  },
+  {
+   "id": "role:scheduling-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-scheduling-2-deploy"
+  },
+  {
+   "id": "role:scheduling-2-ehr-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-scheduling-2-ehr-svc"
+  },
+  {
+   "id": "role:scheduling-2-phi-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-scheduling-2-phi-svc"
+  },
+  {
+   "id": "role:scheduling-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-scheduling-2-svc"
+  },
+  {
+   "id": "role:scheduling-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-scheduling-deploy"
+  },
+  {
+   "id": "role:scheduling-imaging-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-scheduling-imaging-svc"
+  },
+  {
+   "id": "role:scheduling-imaging-svc31",
+   "type": "Role",
+   "name": "arifen-15ocxf-scheduling-imaging-svc31"
+  },
+  {
+   "id": "role:scheduling-nb-role",
+   "type": "Role",
+   "name": "arifen-15ocxf-scheduling-nb-role"
+  },
+  {
+   "id": "role:scheduling-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-scheduling-svc"
+  },
+  {
+   "id": "role:security-audit-role",
+   "type": "Role",
+   "name": "arifen-15ocxf-security-audit-role"
+  },
+  {
+   "id": "role:telehealth-2-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-telehealth-2-deploy"
+  },
+  {
+   "id": "role:telehealth-2-ehr-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-telehealth-2-ehr-svc"
+  },
+  {
+   "id": "role:telehealth-2-phi-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-telehealth-2-phi-svc"
+  },
+  {
+   "id": "role:telehealth-2-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-telehealth-2-svc"
+  },
+  {
+   "id": "role:telehealth-audit-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-telehealth-audit-svc"
+  },
+  {
+   "id": "role:telehealth-audit-svc28",
+   "type": "Role",
+   "name": "arifen-15ocxf-telehealth-audit-svc28"
+  },
+  {
+   "id": "role:telehealth-deploy",
+   "type": "Role",
+   "name": "arifen-15ocxf-telehealth-deploy"
+  },
+  {
+   "id": "role:telehealth-svc",
+   "type": "Role",
+   "name": "arifen-15ocxf-telehealth-svc"
+  },
+  {
+   "id": "user:adm-alice.novak",
+   "type": "User",
+   "name": "arifen-15ocxf-adm-alice.novak"
+  },
+  {
+   "id": "user:adm-karl.smith",
+   "type": "User",
+   "name": "arifen-15ocxf-adm-karl.smith"
+  },
+  {
+   "id": "user:adm-leo.chen",
+   "type": "User",
+   "name": "arifen-15ocxf-adm-leo.chen"
+  },
+  {
+   "id": "user:alice.jones",
+   "type": "User",
+   "name": "arifen-15ocxf-alice.jones"
+  },
+  {
+   "id": "user:alice.reddy",
+   "type": "User",
+   "name": "arifen-15ocxf-alice.reddy"
+  },
+  {
+   "id": "user:alice.wong",
+   "type": "User",
+   "name": "arifen-15ocxf-alice.wong"
+  },
+  {
+   "id": "user:amit.chen",
+   "type": "User",
+   "name": "arifen-15ocxf-amit.chen"
+  },
+  {
+   "id": "user:amit.davis",
+   "type": "User",
+   "name": "arifen-15ocxf-amit.davis"
+  },
+  {
+   "id": "user:amit.larsen",
+   "type": "User",
+   "name": "arifen-15ocxf-amit.larsen"
+  },
+  {
+   "id": "user:amit.patel",
+   "type": "User",
+   "name": "arifen-15ocxf-amit.patel"
+  },
+  {
+   "id": "user:bela.mehta",
+   "type": "User",
+   "name": "arifen-15ocxf-bela.mehta"
+  },
+  {
+   "id": "user:bela.nguyen",
+   "type": "User",
+   "name": "arifen-15ocxf-bela.nguyen"
+  },
+  {
+   "id": "user:carol.cohen",
+   "type": "User",
+   "name": "arifen-15ocxf-carol.cohen"
+  },
+  {
+   "id": "user:chen.haddad",
+   "type": "User",
+   "name": "arifen-15ocxf-chen.haddad"
+  },
+  {
+   "id": "user:chen.novak",
+   "type": "User",
+   "name": "arifen-15ocxf-chen.novak"
+  },
+  {
+   "id": "user:chen.reddy",
+   "type": "User",
+   "name": "arifen-15ocxf-chen.reddy"
+  },
+  {
+   "id": "user:chen.reddy7712",
+   "type": "User",
+   "name": "arifen-15ocxf-chen.reddy7712"
+  },
+  {
+   "id": "user:chen.tanaka",
+   "type": "User",
+   "name": "arifen-15ocxf-chen.tanaka"
+  },
+  {
+   "id": "user:chen.wong",
+   "type": "User",
+   "name": "arifen-15ocxf-chen.wong"
+  },
+  {
+   "id": "user:chen.wong7709",
+   "type": "User",
+   "name": "arifen-15ocxf-chen.wong7709"
+  },
+  {
+   "id": "user:dara.dubois",
+   "type": "User",
+   "name": "arifen-15ocxf-dara.dubois"
+  },
+  {
+   "id": "user:dara.muller",
+   "type": "User",
+   "name": "arifen-15ocxf-dara.muller"
+  },
+  {
+   "id": "user:dave.khan",
+   "type": "User",
+   "name": "arifen-15ocxf-dave.khan"
+  },
+  {
+   "id": "user:dave.kim",
+   "type": "User",
+   "name": "arifen-15ocxf-dave.kim"
+  },
+  {
+   "id": "user:dave.okafor",
+   "type": "User",
+   "name": "arifen-15ocxf-dave.okafor"
+  },
+  {
+   "id": "user:eli.ali",
+   "type": "User",
+   "name": "arifen-15ocxf-eli.ali"
+  },
+  {
+   "id": "user:erin.cohen",
+   "type": "User",
+   "name": "arifen-15ocxf-erin.cohen"
+  },
+  {
+   "id": "user:erin.miller",
+   "type": "User",
+   "name": "arifen-15ocxf-erin.miller"
+  },
+  {
+   "id": "user:erin.silva",
+   "type": "User",
+   "name": "arifen-15ocxf-erin.silva"
+  },
+  {
+   "id": "user:ext-bela.sato",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-bela.sato"
+  },
+  {
+   "id": "user:ext-chen.muller",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-chen.muller"
+  },
+  {
+   "id": "user:ext-chen.okafor",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-chen.okafor"
+  },
+  {
+   "id": "user:ext-judy.davis",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-judy.davis"
+  },
+  {
+   "id": "user:ext-jun.jones",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-jun.jones"
+  },
+  {
+   "id": "user:ext-karl.miller",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-karl.miller"
+  },
+  {
+   "id": "user:ext-leo.nguyen",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-leo.nguyen"
+  },
+  {
+   "id": "user:ext-raj.singh",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-raj.singh"
+  },
+  {
+   "id": "user:ext-sara.wong",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-sara.wong"
+  },
+  {
+   "id": "user:ext-xia.haddad",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-xia.haddad"
+  },
+  {
+   "id": "user:ext-yara.novak",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-yara.novak"
+  },
+  {
+   "id": "user:ext-yara.tanaka",
+   "type": "User",
+   "name": "arifen-15ocxf-ext-yara.tanaka"
+  },
+  {
+   "id": "user:fay.miller",
+   "type": "User",
+   "name": "arifen-15ocxf-fay.miller"
+  },
+  {
+   "id": "user:fay.reddy",
+   "type": "User",
+   "name": "arifen-15ocxf-fay.reddy"
+  },
+  {
+   "id": "user:fay.sato",
+   "type": "User",
+   "name": "arifen-15ocxf-fay.sato"
+  },
+  {
+   "id": "user:frank.chen",
+   "type": "User",
+   "name": "arifen-15ocxf-frank.chen"
+  },
+  {
+   "id": "user:frank.chen132",
+   "type": "User",
+   "name": "arifen-15ocxf-frank.chen132"
+  },
+  {
+   "id": "user:frank.mehta",
+   "type": "User",
+   "name": "arifen-15ocxf-frank.mehta"
+  },
+  {
+   "id": "user:frank.reddy",
+   "type": "User",
+   "name": "arifen-15ocxf-frank.reddy"
+  },
+  {
+   "id": "user:frank.sato",
+   "type": "User",
+   "name": "arifen-15ocxf-frank.sato"
+  },
+  {
+   "id": "user:frank.singh",
+   "type": "User",
+   "name": "arifen-15ocxf-frank.singh"
+  },
+  {
+   "id": "user:grace.lopez",
+   "type": "User",
+   "name": "arifen-15ocxf-grace.lopez"
+  },
+  {
+   "id": "user:grace.patel",
+   "type": "User",
+   "name": "arifen-15ocxf-grace.patel"
+  },
+  {
+   "id": "user:grace.smith",
+   "type": "User",
+   "name": "arifen-15ocxf-grace.smith"
+  },
+  {
+   "id": "user:grace.wong",
+   "type": "User",
+   "name": "arifen-15ocxf-grace.wong"
+  },
+  {
+   "id": "user:gus.garcia",
+   "type": "User",
+   "name": "arifen-15ocxf-gus.garcia"
+  },
+  {
+   "id": "user:gus.tanaka",
+   "type": "User",
+   "name": "arifen-15ocxf-gus.tanaka"
+  },
+  {
+   "id": "user:hana.larsen",
+   "type": "User",
+   "name": "arifen-15ocxf-hana.larsen"
+  },
+  {
+   "id": "user:hana.lopez",
+   "type": "User",
+   "name": "arifen-15ocxf-hana.lopez"
+  },
+  {
+   "id": "user:hana.smith",
+   "type": "User",
+   "name": "arifen-15ocxf-hana.smith"
+  },
+  {
+   "id": "user:heidi.wong",
+   "type": "User",
+   "name": "arifen-15ocxf-heidi.wong"
+  },
+  {
+   "id": "user:ian.khan",
+   "type": "User",
+   "name": "arifen-15ocxf-ian.khan"
+  },
+  {
+   "id": "user:ian.rossi",
+   "type": "User",
+   "name": "arifen-15ocxf-ian.rossi"
+  },
+  {
+   "id": "user:ivan.kim",
+   "type": "User",
+   "name": "arifen-15ocxf-ivan.kim"
+  },
+  {
+   "id": "user:ivan.smith",
+   "type": "User",
+   "name": "arifen-15ocxf-ivan.smith"
+  },
+  {
+   "id": "user:judy.brown",
+   "type": "User",
+   "name": "arifen-15ocxf-judy.brown"
+  },
+  {
+   "id": "user:judy.haddad",
+   "type": "User",
+   "name": "arifen-15ocxf-judy.haddad"
+  },
+  {
+   "id": "user:judy.haddad6532",
+   "type": "User",
+   "name": "arifen-15ocxf-judy.haddad6532"
+  },
+  {
+   "id": "user:judy.jones",
+   "type": "User",
+   "name": "arifen-15ocxf-judy.jones"
+  },
+  {
+   "id": "user:judy.novak",
+   "type": "User",
+   "name": "arifen-15ocxf-judy.novak"
+  },
+  {
+   "id": "user:judy.wong",
+   "type": "User",
+   "name": "arifen-15ocxf-judy.wong"
+  },
+  {
+   "id": "user:jun.cohen",
+   "type": "User",
+   "name": "arifen-15ocxf-jun.cohen"
+  },
+  {
+   "id": "user:jun.dubois",
+   "type": "User",
+   "name": "arifen-15ocxf-jun.dubois"
+  },
+  {
+   "id": "user:jun.dubois243",
+   "type": "User",
+   "name": "arifen-15ocxf-jun.dubois243"
+  },
+  {
+   "id": "user:jun.novak",
+   "type": "User",
+   "name": "arifen-15ocxf-jun.novak"
+  },
+  {
+   "id": "user:jun.novak5250",
+   "type": "User",
+   "name": "arifen-15ocxf-jun.novak5250"
+  },
+  {
+   "id": "user:jun.silva",
+   "type": "User",
+   "name": "arifen-15ocxf-jun.silva"
+  },
+  {
+   "id": "user:karl.davis",
+   "type": "User",
+   "name": "arifen-15ocxf-karl.davis"
+  },
+  {
+   "id": "user:karl.silva",
+   "type": "User",
+   "name": "arifen-15ocxf-karl.silva"
+  },
+  {
+   "id": "user:karl.tanaka",
+   "type": "User",
+   "name": "arifen-15ocxf-karl.tanaka"
+  },
+  {
+   "id": "user:kia.nguyen",
+   "type": "User",
+   "name": "arifen-15ocxf-kia.nguyen"
+  },
+  {
+   "id": "user:lena.cohen",
+   "type": "User",
+   "name": "arifen-15ocxf-lena.cohen"
+  },
+  {
+   "id": "user:lena.khan",
+   "type": "User",
+   "name": "arifen-15ocxf-lena.khan"
+  },
+  {
+   "id": "user:lena.larsen",
+   "type": "User",
+   "name": "arifen-15ocxf-lena.larsen"
+  },
+  {
+   "id": "user:lena.miller",
+   "type": "User",
+   "name": "arifen-15ocxf-lena.miller"
+  },
+  {
+   "id": "user:lena.okafor",
+   "type": "User",
+   "name": "arifen-15ocxf-lena.okafor"
+  },
+  {
+   "id": "user:leo.brown",
+   "type": "User",
+   "name": "arifen-15ocxf-leo.brown"
+  },
+  {
+   "id": "user:leo.cohen",
+   "type": "User",
+   "name": "arifen-15ocxf-leo.cohen"
+  },
+  {
+   "id": "user:leo.dubois",
+   "type": "User",
+   "name": "arifen-15ocxf-leo.dubois"
+  },
+  {
+   "id": "user:mei.garcia",
+   "type": "User",
+   "name": "arifen-15ocxf-mei.garcia"
+  },
+  {
+   "id": "user:mei.smith",
+   "type": "User",
+   "name": "arifen-15ocxf-mei.smith"
+  },
+  {
+   "id": "user:mike.mehta",
+   "type": "User",
+   "name": "arifen-15ocxf-mike.mehta"
+  },
+  {
+   "id": "user:mike.silva",
+   "type": "User",
+   "name": "arifen-15ocxf-mike.silva"
+  },
+  {
+   "id": "user:nina.silva",
+   "type": "User",
+   "name": "arifen-15ocxf-nina.silva"
+  },
+  {
+   "id": "user:omar.haddad",
+   "type": "User",
+   "name": "arifen-15ocxf-omar.haddad"
+  },
+  {
+   "id": "user:omar.kim",
+   "type": "User",
+   "name": "arifen-15ocxf-omar.kim"
+  },
+  {
+   "id": "user:omar.muller",
+   "type": "User",
+   "name": "arifen-15ocxf-omar.muller"
+  },
+  {
+   "id": "user:omar.reddy",
+   "type": "User",
+   "name": "arifen-15ocxf-omar.reddy"
+  },
+  {
+   "id": "user:priya.davis",
+   "type": "User",
+   "name": "arifen-15ocxf-priya.davis"
+  },
+  {
+   "id": "user:priya.dubois",
+   "type": "User",
+   "name": "arifen-15ocxf-priya.dubois"
+  },
+  {
+   "id": "user:priya.gupta",
+   "type": "User",
+   "name": "arifen-15ocxf-priya.gupta"
+  },
+  {
+   "id": "user:priya.larsen",
+   "type": "User",
+   "name": "arifen-15ocxf-priya.larsen"
+  },
+  {
+   "id": "user:priya.miller",
+   "type": "User",
+   "name": "arifen-15ocxf-priya.miller"
+  },
+  {
+   "id": "user:priya.smith",
+   "type": "User",
+   "name": "arifen-15ocxf-priya.smith"
+  },
+  {
+   "id": "user:quinn.kim",
+   "type": "User",
+   "name": "arifen-15ocxf-quinn.kim"
+  },
+  {
+   "id": "user:quinn.patel",
+   "type": "User",
+   "name": "arifen-15ocxf-quinn.patel"
+  },
+  {
+   "id": "user:raj.khan",
+   "type": "User",
+   "name": "arifen-15ocxf-raj.khan"
+  },
+  {
+   "id": "user:raj.miller",
+   "type": "User",
+   "name": "arifen-15ocxf-raj.miller"
+  },
+  {
+   "id": "user:raj.novak",
+   "type": "User",
+   "name": "arifen-15ocxf-raj.novak"
+  },
+  {
+   "id": "user:raj.novak6903",
+   "type": "User",
+   "name": "arifen-15ocxf-raj.novak6903"
+  },
+  {
+   "id": "user:sara.brown",
+   "type": "User",
+   "name": "arifen-15ocxf-sara.brown"
+  },
+  {
+   "id": "user:sara.muller",
+   "type": "User",
+   "name": "arifen-15ocxf-sara.muller"
+  },
+  {
+   "id": "user:sara.okafor",
+   "type": "User",
+   "name": "arifen-15ocxf-sara.okafor"
+  },
+  {
+   "id": "user:tom.ali",
+   "type": "User",
+   "name": "arifen-15ocxf-tom.ali"
+  },
+  {
+   "id": "user:tom.lopez",
+   "type": "User",
+   "name": "arifen-15ocxf-tom.lopez"
+  },
+  {
+   "id": "user:uma.khan",
+   "type": "User",
+   "name": "arifen-15ocxf-uma.khan"
+  },
+  {
+   "id": "user:uma.silva",
+   "type": "User",
+   "name": "arifen-15ocxf-uma.silva"
+  },
+  {
+   "id": "user:vik.patel",
+   "type": "User",
+   "name": "arifen-15ocxf-vik.patel"
+  },
+  {
+   "id": "user:wen.kim",
+   "type": "User",
+   "name": "arifen-15ocxf-wen.kim"
+  },
+  {
+   "id": "user:wen.okafor",
+   "type": "User",
+   "name": "arifen-15ocxf-wen.okafor"
+  },
+  {
+   "id": "user:wen.silva",
+   "type": "User",
+   "name": "arifen-15ocxf-wen.silva"
+  },
+  {
+   "id": "user:xia.chen",
+   "type": "User",
+   "name": "arifen-15ocxf-xia.chen"
+  },
+  {
+   "id": "user:xia.davis",
+   "type": "User",
+   "name": "arifen-15ocxf-xia.davis"
+  },
+  {
+   "id": "user:xia.miller",
+   "type": "User",
+   "name": "arifen-15ocxf-xia.miller"
+  },
+  {
+   "id": "user:yara.brown",
+   "type": "User",
+   "name": "arifen-15ocxf-yara.brown"
+  },
+  {
+   "id": "user:yara.mehta",
+   "type": "User",
+   "name": "arifen-15ocxf-yara.mehta"
+  },
+  {
+   "id": "user:zed.ivanov",
+   "type": "User",
+   "name": "arifen-15ocxf-zed.ivanov"
+  },
+  {
+   "id": "user:zed.ivanov731",
+   "type": "User",
+   "name": "arifen-15ocxf-zed.ivanov731"
+  },
+  {
+   "id": "user:zed.larsen",
+   "type": "User",
+   "name": "arifen-15ocxf-zed.larsen"
+  },
+  {
+   "id": "user:zed.novak",
+   "type": "User",
+   "name": "arifen-15ocxf-zed.novak"
+  },
+  {
+   "id": "workload:analytics-ec29",
+   "type": "Service",
+   "name": "arifen-15ocxf-analytics-ec29"
+  },
+  {
+   "id": "workload:billing-ec22",
+   "type": "Service",
+   "name": "arifen-15ocxf-billing-ec22"
+  },
+  {
+   "id": "workload:claims-stack7",
+   "type": "Service",
+   "name": "arifen-15ocxf-claims-stack7"
+  },
+  {
+   "id": "workload:clinical-data-stack0",
+   "type": "Service",
+   "name": "arifen-15ocxf-clinical-data-stack0"
+  },
+  {
+   "id": "workload:compliance-ec210",
+   "type": "Service",
+   "name": "arifen-15ocxf-compliance-ec210"
+  },
+  {
+   "id": "workload:imaging-nb3",
+   "type": "Service",
+   "name": "arifen-15ocxf-imaging-nb3"
+  },
+  {
+   "id": "workload:patient-portal-ec21",
+   "type": "Service",
+   "name": "arifen-15ocxf-patient-portal-ec21"
+  },
+  {
+   "id": "workload:pharmacy-ec24",
+   "type": "Service",
+   "name": "arifen-15ocxf-pharmacy-ec24"
+  },
+  {
+   "id": "workload:research-nb6",
+   "type": "Service",
+   "name": "arifen-15ocxf-research-nb6"
+  },
+  {
+   "id": "workload:scheduling-nb8",
+   "type": "Service",
+   "name": "arifen-15ocxf-scheduling-nb8"
+  },
+  {
+   "id": "workload:telehealth-ec25",
+   "type": "Service",
+   "name": "arifen-15ocxf-telehealth-ec25"
+  }
+ ],
+ "assignments": {
+  "policy:admin-all": [
+   "*@*"
+  ],
+  "policy:analytics-2-data-rw": [
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/analytics-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/analytics-2/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/analytics-2/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/analytics-2/*"
+  ],
+  "policy:analytics-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:analytics-2-*",
+   "iam:PassRole@role:analytics-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:analytics-2-imaging-fn0",
+   "lambda:CreateFunction@function:analytics-2-imaging-fn13",
+   "lambda:GetFunction@function:analytics-2-imaging-fn0",
+   "lambda:GetFunction@function:analytics-2-imaging-fn13",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:analytics-2-imaging-fn0",
+   "lambda:InvokeFunction@function:analytics-2-imaging-fn13",
+   "lambda:UpdateFunctionCode@function:analytics-2-imaging-fn0",
+   "lambda:UpdateFunctionCode@function:analytics-2-imaging-fn13",
+   "lambda:UpdateFunctionConfiguration@function:analytics-2-imaging-fn0",
+   "lambda:UpdateFunctionConfiguration@function:analytics-2-imaging-fn13"
+  ],
+  "policy:analytics-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/analytics-2/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/analytics-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/analytics-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/analytics-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/analytics-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/analytics-2/*"
+  ],
+  "policy:analytics-2-read": [
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/analytics-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/analytics-2/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/analytics-2/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/analytics-2/*"
+  ],
+  "policy:analytics-data-rw": [
+   "dynamodb:BatchGetItem@dynamodb:table/arifen-15ocxf-analytics-ehr",
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-analytics-ehr",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-analytics-ehr",
+   "dynamodb:PutItem@dynamodb:table/arifen-15ocxf-analytics-ehr",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-analytics-ehr",
+   "dynamodb:UpdateItem@dynamodb:table/arifen-15ocxf-analytics-ehr",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/analytics/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/analytics/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/analytics/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/analytics/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/analytics/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/analytics/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/analytics/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/analytics/*"
+  ],
+  "policy:analytics-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:analytics-ec29",
+   "cloudformation:UpdateStack@workload:analytics-ec29",
+   "iam:PassRole@role:analytics-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:analytics-2-imaging-fn0",
+   "lambda:CreateFunction@function:analytics-2-imaging-fn13",
+   "lambda:GetFunction@function:analytics-2-imaging-fn0",
+   "lambda:GetFunction@function:analytics-2-imaging-fn13",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:analytics-2-imaging-fn0",
+   "lambda:InvokeFunction@function:analytics-2-imaging-fn13",
+   "lambda:UpdateFunctionCode@function:analytics-2-imaging-fn0",
+   "lambda:UpdateFunctionCode@function:analytics-2-imaging-fn13",
+   "lambda:UpdateFunctionConfiguration@function:analytics-2-imaging-fn0",
+   "lambda:UpdateFunctionConfiguration@function:analytics-2-imaging-fn13",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:analytics-ec29"
+  ],
+  "policy:analytics-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/analytics/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/analytics/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/analytics/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/analytics/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/analytics/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/analytics/*"
+  ],
+  "policy:analytics-read": [
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-analytics-ehr",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-analytics-ehr",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/analytics/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/analytics/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/analytics/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/analytics/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/analytics/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/analytics/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/analytics/*"
+  ],
+  "policy:base-readonly": [
+   "ec2:DescribeInstances@*",
+   "s3:ListAllMyBuckets@*"
+  ],
+  "policy:billing-2-data-rw": [
+   "s3:AbortMultipartUpload@s3:billing-2-audit",
+   "s3:AbortMultipartUpload@s3:billing-2-audit/*",
+   "s3:DeleteObject@s3:billing-2-audit",
+   "s3:DeleteObject@s3:billing-2-audit/*",
+   "s3:GetBucketLocation@s3:billing-2-audit",
+   "s3:GetBucketLocation@s3:billing-2-audit/*",
+   "s3:GetObjectVersion@s3:billing-2-audit",
+   "s3:GetObjectVersion@s3:billing-2-audit/*",
+   "s3:PutObject@s3:billing-2-audit",
+   "s3:PutObject@s3:billing-2-audit/*",
+   "sns:GetTopicAttributes@sns:billing-2-audit",
+   "sns:Publish@sns:billing-2-audit",
+   "sqs:DeleteMessage@sqs:billing-2-audit",
+   "sqs:ReceiveMessage@sqs:billing-2-audit",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/billing-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/billing-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/billing-2/*"
+  ],
+  "policy:billing-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:billing-2-*",
+   "iam:PassRole@role:billing-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:GetFunction@function:billing-2-*",
+   "lambda:InvokeFunction@*",
+   "lambda:UpdateFunctionConfiguration@function:billing-2-*"
+  ],
+  "policy:billing-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/billing-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/billing-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/billing-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/billing-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/billing-2/*"
+  ],
+  "policy:billing-2-read": [
+   "s3:GetObject@*",
+   "s3:ListBucket@s3:billing-2-audit",
+   "s3:ListBucket@s3:billing-2-audit/*",
+   "sns:GetTopicAttributes@sns:billing-2-audit",
+   "sqs:GetQueueAttributes@sqs:billing-2-audit",
+   "sqs:ReceiveMessage@sqs:billing-2-audit",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/billing-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/billing-2/*"
+  ],
+  "policy:billing-data-rw": [
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-billing-ehr",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-billing-ehr",
+   "dynamodb:PutItem@dynamodb:table/arifen-15ocxf-billing-ehr",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-billing-ehr",
+   "sns:GetTopicAttributes@sns:billing-audit",
+   "sns:Publish@sns:billing-audit",
+   "sns:Subscribe@sns:billing-audit",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/billing/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/billing/*"
+  ],
+  "policy:billing-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:billing-ec22",
+   "cloudformation:UpdateStack@workload:billing-ec22",
+   "iam:PassRole@role:billing-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:billing-ehr-fn19",
+   "lambda:CreateFunction@function:billing-reports-fn27",
+   "lambda:GetFunction@function:billing-ehr-fn19",
+   "lambda:GetFunction@function:billing-reports-fn27",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:billing-ehr-fn19",
+   "lambda:InvokeFunction@function:billing-reports-fn27",
+   "lambda:UpdateFunctionCode@function:billing-ehr-fn19",
+   "lambda:UpdateFunctionCode@function:billing-reports-fn27",
+   "lambda:UpdateFunctionConfiguration@function:billing-ehr-fn19",
+   "lambda:UpdateFunctionConfiguration@function:billing-reports-fn27",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:billing-ec22"
+  ],
+  "policy:billing-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/billing/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/billing/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/billing/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/billing/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/billing/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/billing/*"
+  ],
+  "policy:billing-read": [
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-billing-audit",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-billing-audit",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-billing-audit",
+   "sns:GetTopicAttributes@sns:billing-ehr",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/billing/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/billing/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/billing/*"
+  ],
+  "policy:claims-2-data-rw": [
+   "dynamodb:BatchGetItem@dynamodb:table/arifen-15ocxf-claims-2-phi",
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-claims-2-phi",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-claims-2-phi",
+   "dynamodb:PutItem@dynamodb:table/arifen-15ocxf-claims-2-phi",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-claims-2-phi",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-claims-2-phi",
+   "dynamodb:UpdateItem@dynamodb:table/arifen-15ocxf-claims-2-phi",
+   "sns:GetTopicAttributes@sns:claims-2-reports",
+   "sns:Publish@sns:claims-2-reports",
+   "sns:Subscribe@sns:claims-2-reports"
+  ],
+  "policy:claims-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:claims-2-*",
+   "iam:PassRole@role:claims-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:claims-2-imaging-fn17",
+   "lambda:GetFunction@function:claims-2-imaging-fn17",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:claims-2-imaging-fn17",
+   "lambda:UpdateFunctionCode@function:claims-2-imaging-fn17",
+   "lambda:UpdateFunctionConfiguration@function:claims-2-imaging-fn17"
+  ],
+  "policy:claims-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/claims-2/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/claims-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/claims-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/claims-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/claims-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/claims-2/*"
+  ],
+  "policy:claims-2-read": [
+   "dynamodb:BatchGetItem@dynamodb:table/arifen-15ocxf-claims-2-imaging",
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-claims-2-imaging",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-claims-2-imaging",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-claims-2-imaging",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-claims-2-imaging",
+   "sns:GetTopicAttributes@sns:claims-2-phi"
+  ],
+  "policy:claims-data-rw": [
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/claims/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/claims/*",
+   "sns:GetTopicAttributes@sns:claims-phi",
+   "sns:Publish@sns:claims-phi",
+   "sns:Subscribe@sns:claims-phi",
+   "sqs:GetQueueAttributes@sqs:claims-claims",
+   "sqs:ReceiveMessage@sqs:claims-claims",
+   "sqs:SendMessage@sqs:claims-claims",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/claims/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/claims/*"
+  ],
+  "policy:claims-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:claims-stack7",
+   "cloudformation:UpdateStack@workload:claims-stack7",
+   "iam:PassRole@role:claims-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:claims-2-imaging-fn17",
+   "lambda:CreateFunction@function:claims-phi-fn23",
+   "lambda:GetFunction@function:claims-2-imaging-fn17",
+   "lambda:GetFunction@function:claims-phi-fn23",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:claims-2-imaging-fn17",
+   "lambda:InvokeFunction@function:claims-phi-fn23",
+   "lambda:UpdateFunctionCode@function:claims-2-imaging-fn17",
+   "lambda:UpdateFunctionCode@function:claims-phi-fn23",
+   "lambda:UpdateFunctionConfiguration@function:claims-2-imaging-fn17",
+   "lambda:UpdateFunctionConfiguration@function:claims-phi-fn23",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:claims-stack7"
+  ],
+  "policy:claims-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/claims/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/claims/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/claims/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/claims/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/claims/*"
+  ],
+  "policy:claims-read": [
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/claims/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/claims/*",
+   "sns:GetTopicAttributes@sns:claims-phi",
+   "sqs:GetQueueAttributes@sqs:claims-audit",
+   "sqs:ReceiveMessage@sqs:claims-audit",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/claims/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/claims/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/claims/*"
+  ],
+  "policy:clinical-data-2-data-rw": [
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/clinical-data-2/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/clinical-data-2/*",
+   "sqs:DeleteMessage@sqs:clinical-data-2-imaging",
+   "sqs:GetQueueAttributes@sqs:clinical-data-2-imaging",
+   "sqs:SendMessage@sqs:clinical-data-2-imaging"
+  ],
+  "policy:clinical-data-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:clinical-data-2-*",
+   "iam:PassRole@role:clinical-data-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:clinical-data-2-ehr-fn11",
+   "lambda:CreateFunction@function:clinical-data-2-ehr-fn6",
+   "lambda:CreateFunction@function:clinical-data-2-ehr-fn9",
+   "lambda:CreateFunction@function:clinical-data-2-reports-fn3",
+   "lambda:GetFunction@function:clinical-data-2-ehr-fn11",
+   "lambda:GetFunction@function:clinical-data-2-ehr-fn6",
+   "lambda:GetFunction@function:clinical-data-2-ehr-fn9",
+   "lambda:GetFunction@function:clinical-data-2-reports-fn3",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:clinical-data-2-ehr-fn11",
+   "lambda:InvokeFunction@function:clinical-data-2-ehr-fn6",
+   "lambda:InvokeFunction@function:clinical-data-2-ehr-fn9",
+   "lambda:InvokeFunction@function:clinical-data-2-reports-fn3",
+   "lambda:UpdateFunctionCode@function:clinical-data-2-ehr-fn11",
+   "lambda:UpdateFunctionCode@function:clinical-data-2-ehr-fn6",
+   "lambda:UpdateFunctionCode@function:clinical-data-2-ehr-fn9",
+   "lambda:UpdateFunctionCode@function:clinical-data-2-reports-fn3",
+   "lambda:UpdateFunctionConfiguration@function:clinical-data-2-ehr-fn11",
+   "lambda:UpdateFunctionConfiguration@function:clinical-data-2-ehr-fn6",
+   "lambda:UpdateFunctionConfiguration@function:clinical-data-2-ehr-fn9",
+   "lambda:UpdateFunctionConfiguration@function:clinical-data-2-reports-fn3"
+  ],
+  "policy:clinical-data-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/clinical-data-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/clinical-data-2/*"
+  ],
+  "policy:clinical-data-2-read": [
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/clinical-data-2/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/clinical-data-2/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/clinical-data-2/*",
+   "sqs:GetQueueAttributes@sqs:clinical-data-2-reports",
+   "sqs:ReceiveMessage@sqs:clinical-data-2-reports"
+  ],
+  "policy:clinical-data-data-rw": [
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/clinical-data/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/clinical-data/*",
+   "sns:Publish@sns:clinical-data-audit",
+   "sns:Subscribe@sns:clinical-data-audit",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/clinical-data/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/clinical-data/*"
+  ],
+  "policy:clinical-data-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:clinical-data-stack0",
+   "cloudformation:UpdateStack@workload:clinical-data-stack0",
+   "iam:PassRole@role:clinical-data-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:clinical-data-2-ehr-fn11",
+   "lambda:CreateFunction@function:clinical-data-2-ehr-fn6",
+   "lambda:CreateFunction@function:clinical-data-2-ehr-fn9",
+   "lambda:CreateFunction@function:clinical-data-2-reports-fn3",
+   "lambda:CreateFunction@function:clinical-data-audit-fn24",
+   "lambda:GetFunction@function:clinical-data-2-ehr-fn11",
+   "lambda:GetFunction@function:clinical-data-2-ehr-fn6",
+   "lambda:GetFunction@function:clinical-data-2-ehr-fn9",
+   "lambda:GetFunction@function:clinical-data-2-reports-fn3",
+   "lambda:GetFunction@function:clinical-data-audit-fn24",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:clinical-data-2-ehr-fn11",
+   "lambda:InvokeFunction@function:clinical-data-2-ehr-fn6",
+   "lambda:InvokeFunction@function:clinical-data-2-ehr-fn9",
+   "lambda:InvokeFunction@function:clinical-data-2-reports-fn3",
+   "lambda:InvokeFunction@function:clinical-data-audit-fn24",
+   "lambda:UpdateFunctionCode@function:clinical-data-2-ehr-fn11",
+   "lambda:UpdateFunctionCode@function:clinical-data-2-ehr-fn6",
+   "lambda:UpdateFunctionCode@function:clinical-data-2-ehr-fn9",
+   "lambda:UpdateFunctionCode@function:clinical-data-2-reports-fn3",
+   "lambda:UpdateFunctionCode@function:clinical-data-audit-fn24",
+   "lambda:UpdateFunctionConfiguration@function:clinical-data-2-ehr-fn11",
+   "lambda:UpdateFunctionConfiguration@function:clinical-data-2-ehr-fn6",
+   "lambda:UpdateFunctionConfiguration@function:clinical-data-2-ehr-fn9",
+   "lambda:UpdateFunctionConfiguration@function:clinical-data-2-reports-fn3",
+   "lambda:UpdateFunctionConfiguration@function:clinical-data-audit-fn24",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:clinical-data-stack0"
+  ],
+  "policy:clinical-data-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/clinical-data/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/clinical-data/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/clinical-data/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/clinical-data/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/clinical-data/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/clinical-data/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/clinical-data/*"
+  ],
+  "policy:clinical-data-read": [
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/clinical-data/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/clinical-data/*",
+   "sns:GetTopicAttributes@sns:clinical-data-audit",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/clinical-data/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/clinical-data/*"
+  ],
+  "policy:compliance-2-data-rw": [
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/compliance-2/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/compliance-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/compliance-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/compliance-2/*"
+  ],
+  "policy:compliance-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:compliance-2-*",
+   "iam:PassRole@role:compliance-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:GetFunction@function:compliance-2-*",
+   "lambda:InvokeFunction@*",
+   "lambda:UpdateFunctionConfiguration@function:compliance-2-*"
+  ],
+  "policy:compliance-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/compliance-2/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/compliance-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/compliance-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/compliance-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/compliance-2/*"
+  ],
+  "policy:compliance-2-read": [
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/compliance-2/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/compliance-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/compliance-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/compliance-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/compliance-2/*"
+  ],
+  "policy:compliance-data-rw": [
+   "sns:Publish@sns:compliance-imaging",
+   "sns:Subscribe@sns:compliance-imaging",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/compliance/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/compliance/*"
+  ],
+  "policy:compliance-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:compliance-ec210",
+   "cloudformation:UpdateStack@workload:compliance-ec210",
+   "iam:PassRole@role:compliance-svc",
+   "lambda:CreateFunction@*",
+   "lambda:GetFunction@function:compliance-*",
+   "lambda:InvokeFunction@*",
+   "lambda:UpdateFunctionConfiguration@function:compliance-*",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:compliance-ec210"
+  ],
+  "policy:compliance-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/compliance/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/compliance/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/compliance/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/compliance/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/compliance/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/compliance/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/compliance/*"
+  ],
+  "policy:compliance-read": [
+   "sns:GetTopicAttributes@sns:compliance-claims",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/compliance/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/compliance/*"
+  ],
+  "policy:imaging-2-data-rw": [
+   "s3:DeleteObject@s3:imaging-2-claims",
+   "s3:DeleteObject@s3:imaging-2-claims/*",
+   "s3:GetBucketLocation@s3:imaging-2-claims",
+   "s3:GetBucketLocation@s3:imaging-2-claims/*",
+   "s3:GetObject@*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/imaging-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/imaging-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/imaging-2/*"
+  ],
+  "policy:imaging-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:imaging-2-*",
+   "iam:PassRole@role:imaging-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:imaging-2-claims-fn1",
+   "lambda:CreateFunction@function:imaging-2-phi-fn10",
+   "lambda:GetFunction@function:imaging-2-claims-fn1",
+   "lambda:GetFunction@function:imaging-2-phi-fn10",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:imaging-2-claims-fn1",
+   "lambda:InvokeFunction@function:imaging-2-phi-fn10",
+   "lambda:UpdateFunctionCode@function:imaging-2-claims-fn1",
+   "lambda:UpdateFunctionCode@function:imaging-2-phi-fn10",
+   "lambda:UpdateFunctionConfiguration@function:imaging-2-claims-fn1",
+   "lambda:UpdateFunctionConfiguration@function:imaging-2-phi-fn10"
+  ],
+  "policy:imaging-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/imaging-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/imaging-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/imaging-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/imaging-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/imaging-2/*"
+  ],
+  "policy:imaging-2-read": [
+   "s3:GetObjectVersion@s3:imaging-2-phi",
+   "s3:GetObjectVersion@s3:imaging-2-phi/*",
+   "s3:ListBucket@s3:imaging-2-phi",
+   "s3:ListBucket@s3:imaging-2-phi/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/imaging-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/imaging-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/imaging-2/*"
+  ],
+  "policy:imaging-data-rw": [
+   "dynamodb:BatchGetItem@dynamodb:table/arifen-15ocxf-imaging-phi",
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-imaging-phi",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-imaging-phi",
+   "dynamodb:PutItem@dynamodb:table/arifen-15ocxf-imaging-phi",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-imaging-phi",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-imaging-phi",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/imaging/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/imaging/*"
+  ],
+  "policy:imaging-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:imaging-nb3",
+   "cloudformation:UpdateStack@workload:imaging-nb3",
+   "iam:PassRole@role:imaging-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:imaging-2-claims-fn1",
+   "lambda:CreateFunction@function:imaging-2-phi-fn10",
+   "lambda:CreateFunction@function:imaging-phi-fn5",
+   "lambda:CreateFunction@function:imaging-reports-fn12",
+   "lambda:GetFunction@function:imaging-2-claims-fn1",
+   "lambda:GetFunction@function:imaging-2-phi-fn10",
+   "lambda:GetFunction@function:imaging-phi-fn5",
+   "lambda:GetFunction@function:imaging-reports-fn12",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:imaging-2-claims-fn1",
+   "lambda:InvokeFunction@function:imaging-2-phi-fn10",
+   "lambda:InvokeFunction@function:imaging-phi-fn5",
+   "lambda:InvokeFunction@function:imaging-reports-fn12",
+   "lambda:UpdateFunctionCode@function:imaging-2-claims-fn1",
+   "lambda:UpdateFunctionCode@function:imaging-2-phi-fn10",
+   "lambda:UpdateFunctionCode@function:imaging-phi-fn5",
+   "lambda:UpdateFunctionCode@function:imaging-reports-fn12",
+   "lambda:UpdateFunctionConfiguration@function:imaging-2-claims-fn1",
+   "lambda:UpdateFunctionConfiguration@function:imaging-2-phi-fn10",
+   "lambda:UpdateFunctionConfiguration@function:imaging-phi-fn5",
+   "lambda:UpdateFunctionConfiguration@function:imaging-reports-fn12",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:imaging-nb3"
+  ],
+  "policy:imaging-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/imaging/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/imaging/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/imaging/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/imaging/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/imaging/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/imaging/*"
+  ],
+  "policy:imaging-read": [
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-imaging-phi",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-imaging-phi",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-imaging-phi",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/imaging/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/imaging/*"
+  ],
+  "policy:inj-pol-p1": [
+   "iam:AttachGroupPolicy@group:contractors"
+  ],
+  "policy:inj-pol-p10": [
+   "iam:AttachGroupPolicy@*"
+  ],
+  "policy:inj-pol-p2": [
+   "iam:PutGroupPolicy@*"
+  ],
+  "policy:inj-pol-p4": [
+   "iam:AddUserToGroup@group:inj-grp-g3"
+  ],
+  "policy:inj-pol-p7": [
+   "iam:UpdateAssumeRolePolicy@role:inj-trust-edit-r6"
+  ],
+  "policy:inj-pol-p8": [
+   "iam:PutUserPolicy@user:ext-raj.singh"
+  ],
+  "policy:inj-pol-p9": [
+   "iam:PutGroupPolicy@*"
+  ],
+  "policy:lab-systems-data-rw": [
+   "dynamodb:BatchGetItem@dynamodb:table/arifen-15ocxf-lab-systems-phi",
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-lab-systems-phi",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-lab-systems-phi",
+   "dynamodb:PutItem@dynamodb:table/arifen-15ocxf-lab-systems-phi",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-lab-systems-phi",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-lab-systems-phi",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/lab-systems/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/lab-systems/*",
+   "sqs:ReceiveMessage@sqs:lab-systems-phi",
+   "sqs:SendMessage@sqs:lab-systems-phi"
+  ],
+  "policy:lab-systems-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:lab-systems-*",
+   "iam:PassRole@role:lab-systems-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:lab-systems-claims-fn21",
+   "lambda:CreateFunction@function:lab-systems-claims-fn25",
+   "lambda:CreateFunction@function:lab-systems-phi-fn22",
+   "lambda:GetFunction@function:lab-systems-claims-fn21",
+   "lambda:GetFunction@function:lab-systems-claims-fn25",
+   "lambda:GetFunction@function:lab-systems-phi-fn22",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:lab-systems-claims-fn21",
+   "lambda:InvokeFunction@function:lab-systems-claims-fn25",
+   "lambda:InvokeFunction@function:lab-systems-phi-fn22",
+   "lambda:UpdateFunctionCode@function:lab-systems-claims-fn21",
+   "lambda:UpdateFunctionCode@function:lab-systems-claims-fn25",
+   "lambda:UpdateFunctionCode@function:lab-systems-phi-fn22",
+   "lambda:UpdateFunctionConfiguration@function:lab-systems-claims-fn21",
+   "lambda:UpdateFunctionConfiguration@function:lab-systems-claims-fn25",
+   "lambda:UpdateFunctionConfiguration@function:lab-systems-phi-fn22"
+  ],
+  "policy:lab-systems-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/lab-systems/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/lab-systems/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/lab-systems/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/lab-systems/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/lab-systems/*"
+  ],
+  "policy:lab-systems-read": [
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-lab-systems-phi",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-lab-systems-phi",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/lab-systems/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/lab-systems/*",
+   "sqs:GetQueueAttributes@sqs:lab-systems-phi",
+   "sqs:ReceiveMessage@sqs:lab-systems-phi"
+  ],
+  "policy:patient-portal-2-data-rw": [
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-patient-portal-2-audit",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-patient-portal-2-audit",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/patient-portal-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/patient-portal-2/*",
+   "s3:AbortMultipartUpload@s3:patient-portal-2-audit",
+   "s3:AbortMultipartUpload@s3:patient-portal-2-audit/*",
+   "s3:DeleteObject@s3:patient-portal-2-audit",
+   "s3:DeleteObject@s3:patient-portal-2-audit/*",
+   "s3:GetObject@*",
+   "s3:GetObjectVersion@s3:patient-portal-2-audit",
+   "s3:GetObjectVersion@s3:patient-portal-2-audit/*",
+   "s3:PutObject@s3:patient-portal-2-audit",
+   "s3:PutObject@s3:patient-portal-2-audit/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/patient-portal-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/patient-portal-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/patient-portal-2/*"
+  ],
+  "policy:patient-portal-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:patient-portal-2-*",
+   "iam:PassRole@role:patient-portal-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:patient-portal-2-audit-fn2",
+   "lambda:GetFunction@function:patient-portal-2-audit-fn2",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:patient-portal-2-audit-fn2",
+   "lambda:UpdateFunctionCode@function:patient-portal-2-audit-fn2",
+   "lambda:UpdateFunctionConfiguration@function:patient-portal-2-audit-fn2"
+  ],
+  "policy:patient-portal-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/patient-portal-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/patient-portal-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/patient-portal-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/patient-portal-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/patient-portal-2/*"
+  ],
+  "policy:patient-portal-2-read": [
+   "dynamodb:BatchGetItem@dynamodb:table/arifen-15ocxf-patient-portal-2-audit",
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-patient-portal-2-audit",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-patient-portal-2-audit",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-patient-portal-2-audit",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-patient-portal-2-audit",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/patient-portal-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/patient-portal-2/*",
+   "s3:GetBucketLocation@s3:patient-portal-2-audit",
+   "s3:GetBucketLocation@s3:patient-portal-2-audit/*",
+   "s3:GetObject@*",
+   "s3:GetObjectVersion@s3:patient-portal-2-audit",
+   "s3:GetObjectVersion@s3:patient-portal-2-audit/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/patient-portal-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/patient-portal-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/patient-portal-2/*"
+  ],
+  "policy:patient-portal-data-rw": [
+   "s3:AbortMultipartUpload@s3:patient-portal-ehr",
+   "s3:AbortMultipartUpload@s3:patient-portal-ehr/*",
+   "s3:DeleteObject@s3:patient-portal-ehr",
+   "s3:DeleteObject@s3:patient-portal-ehr/*",
+   "s3:GetBucketLocation@s3:patient-portal-ehr",
+   "s3:GetBucketLocation@s3:patient-portal-ehr/*",
+   "s3:GetObject@*",
+   "s3:GetObjectVersion@s3:patient-portal-ehr",
+   "s3:GetObjectVersion@s3:patient-portal-ehr/*",
+   "s3:ListBucket@s3:patient-portal-ehr",
+   "s3:ListBucket@s3:patient-portal-ehr/*",
+   "sns:GetTopicAttributes@sns:patient-portal-ehr",
+   "sns:Publish@sns:patient-portal-ehr",
+   "sqs:DeleteMessage@sqs:patient-portal-claims",
+   "sqs:GetQueueAttributes@sqs:patient-portal-claims",
+   "sqs:ReceiveMessage@sqs:patient-portal-claims",
+   "sqs:SendMessage@sqs:patient-portal-claims"
+  ],
+  "policy:patient-portal-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:patient-portal-ec21",
+   "cloudformation:UpdateStack@workload:patient-portal-ec21",
+   "iam:PassRole@role:patient-portal-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:patient-portal-2-audit-fn2",
+   "lambda:GetFunction@function:patient-portal-2-audit-fn2",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:patient-portal-2-audit-fn2",
+   "lambda:UpdateFunctionCode@function:patient-portal-2-audit-fn2",
+   "lambda:UpdateFunctionConfiguration@function:patient-portal-2-audit-fn2",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:patient-portal-ec21"
+  ],
+  "policy:patient-portal-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/patient-portal/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/patient-portal/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/patient-portal/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/patient-portal/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/patient-portal/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/patient-portal/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/patient-portal/*"
+  ],
+  "policy:patient-portal-read": [
+   "s3:GetBucketLocation@s3:patient-portal-claims",
+   "s3:GetBucketLocation@s3:patient-portal-claims/*",
+   "s3:GetObject@*",
+   "s3:GetObjectVersion@s3:patient-portal-claims",
+   "s3:GetObjectVersion@s3:patient-portal-claims/*",
+   "s3:ListBucket@s3:patient-portal-claims",
+   "s3:ListBucket@s3:patient-portal-claims/*",
+   "sns:GetTopicAttributes@sns:patient-portal-ehr",
+   "sqs:GetQueueAttributes@sqs:patient-portal-phi",
+   "sqs:ReceiveMessage@sqs:patient-portal-phi"
+  ],
+  "policy:pharmacy-2-data-rw": [
+   "sns:GetTopicAttributes@sns:pharmacy-2-imaging",
+   "sns:Subscribe@sns:pharmacy-2-imaging",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/pharmacy-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/pharmacy-2/*"
+  ],
+  "policy:pharmacy-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:pharmacy-2-*",
+   "iam:PassRole@role:pharmacy-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:GetFunction@function:pharmacy-2-*",
+   "lambda:InvokeFunction@*",
+   "lambda:UpdateFunctionConfiguration@function:pharmacy-2-*"
+  ],
+  "policy:pharmacy-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/pharmacy-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/pharmacy-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/pharmacy-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/pharmacy-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/pharmacy-2/*"
+  ],
+  "policy:pharmacy-2-read": [
+   "sns:GetTopicAttributes@sns:pharmacy-2-imaging",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/pharmacy-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/pharmacy-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/pharmacy-2/*"
+  ],
+  "policy:pharmacy-data-rw": [
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/pharmacy/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/pharmacy/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/pharmacy/*",
+   "sns:Publish@sns:pharmacy-audit",
+   "sns:Subscribe@sns:pharmacy-audit"
+  ],
+  "policy:pharmacy-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:pharmacy-ec24",
+   "cloudformation:UpdateStack@workload:pharmacy-ec24",
+   "iam:PassRole@role:pharmacy-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:pharmacy-audit-fn14",
+   "lambda:CreateFunction@function:pharmacy-audit-fn26",
+   "lambda:GetFunction@function:pharmacy-audit-fn14",
+   "lambda:GetFunction@function:pharmacy-audit-fn26",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:pharmacy-audit-fn14",
+   "lambda:InvokeFunction@function:pharmacy-audit-fn26",
+   "lambda:UpdateFunctionCode@function:pharmacy-audit-fn14",
+   "lambda:UpdateFunctionCode@function:pharmacy-audit-fn26",
+   "lambda:UpdateFunctionConfiguration@function:pharmacy-audit-fn14",
+   "lambda:UpdateFunctionConfiguration@function:pharmacy-audit-fn26",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:pharmacy-ec24"
+  ],
+  "policy:pharmacy-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/pharmacy/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/pharmacy/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/pharmacy/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/pharmacy/*"
+  ],
+  "policy:pharmacy-read": [
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/pharmacy/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/pharmacy/*",
+   "sns:GetTopicAttributes@sns:pharmacy-audit"
+  ],
+  "policy:research-2-data-rw": [
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/research-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/research-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/research-2/*",
+   "sns:GetTopicAttributes@sns:research-2-ehr",
+   "sns:Publish@sns:research-2-ehr",
+   "sns:Subscribe@sns:research-2-ehr"
+  ],
+  "policy:research-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:research-2-*",
+   "iam:PassRole@role:research-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:research-2-ehr-fn20",
+   "lambda:CreateFunction@function:research-2-ehr-fn8",
+   "lambda:GetFunction@function:research-2-ehr-fn20",
+   "lambda:GetFunction@function:research-2-ehr-fn8",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:research-2-ehr-fn20",
+   "lambda:InvokeFunction@function:research-2-ehr-fn8",
+   "lambda:UpdateFunctionCode@function:research-2-ehr-fn20",
+   "lambda:UpdateFunctionCode@function:research-2-ehr-fn8",
+   "lambda:UpdateFunctionConfiguration@function:research-2-ehr-fn20",
+   "lambda:UpdateFunctionConfiguration@function:research-2-ehr-fn8"
+  ],
+  "policy:research-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/research-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/research-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/research-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/research-2/*"
+  ],
+  "policy:research-2-read": [
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/research-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/research-2/*",
+   "sns:GetTopicAttributes@sns:research-2-ehr"
+  ],
+  "policy:research-data-rw": [
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/research/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/research/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/research/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/research/*",
+   "sns:Publish@sns:research-ehr",
+   "sns:Subscribe@sns:research-ehr",
+   "sqs:DeleteMessage@sqs:research-claims",
+   "sqs:GetQueueAttributes@sqs:research-claims",
+   "sqs:ReceiveMessage@sqs:research-claims"
+  ],
+  "policy:research-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:research-nb6",
+   "cloudformation:UpdateStack@workload:research-nb6",
+   "iam:PassRole@role:research-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:research-2-ehr-fn20",
+   "lambda:CreateFunction@function:research-2-ehr-fn8",
+   "lambda:GetFunction@function:research-2-ehr-fn20",
+   "lambda:GetFunction@function:research-2-ehr-fn8",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:research-2-ehr-fn20",
+   "lambda:InvokeFunction@function:research-2-ehr-fn8",
+   "lambda:UpdateFunctionCode@function:research-2-ehr-fn20",
+   "lambda:UpdateFunctionCode@function:research-2-ehr-fn8",
+   "lambda:UpdateFunctionConfiguration@function:research-2-ehr-fn20",
+   "lambda:UpdateFunctionConfiguration@function:research-2-ehr-fn8",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:research-nb6"
+  ],
+  "policy:research-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/research/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/research/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/research/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/research/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/research/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/research/*"
+  ],
+  "policy:research-read": [
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/research/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/research/*",
+   "sns:GetTopicAttributes@sns:research-claims",
+   "sqs:GetQueueAttributes@sqs:research-claims",
+   "sqs:ReceiveMessage@sqs:research-claims"
+  ],
+  "policy:scheduling-2-data-rw": [
+   "s3:DeleteObject@s3:scheduling-2-ehr",
+   "s3:DeleteObject@s3:scheduling-2-ehr/*",
+   "s3:GetBucketLocation@s3:scheduling-2-ehr",
+   "s3:GetBucketLocation@s3:scheduling-2-ehr/*",
+   "s3:GetObject@*",
+   "s3:GetObjectVersion@s3:scheduling-2-ehr",
+   "s3:GetObjectVersion@s3:scheduling-2-ehr/*",
+   "s3:ListBucket@s3:scheduling-2-ehr",
+   "s3:ListBucket@s3:scheduling-2-ehr/*",
+   "s3:PutObject@s3:scheduling-2-ehr",
+   "s3:PutObject@s3:scheduling-2-ehr/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/scheduling-2/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/scheduling-2/*",
+   "sns:GetTopicAttributes@sns:scheduling-2-phi",
+   "sns:Publish@sns:scheduling-2-phi",
+   "sns:Subscribe@sns:scheduling-2-phi",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/scheduling-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/scheduling-2/*"
+  ],
+  "policy:scheduling-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:scheduling-2-*",
+   "iam:PassRole@role:scheduling-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:scheduling-2-ehr-fn15",
+   "lambda:GetFunction@function:scheduling-2-ehr-fn15",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:scheduling-2-ehr-fn15",
+   "lambda:UpdateFunctionCode@function:scheduling-2-ehr-fn15",
+   "lambda:UpdateFunctionConfiguration@function:scheduling-2-ehr-fn15"
+  ],
+  "policy:scheduling-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/scheduling-2/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/scheduling-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/scheduling-2/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/scheduling-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/scheduling-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/scheduling-2/*"
+  ],
+  "policy:scheduling-2-read": [
+   "s3:GetBucketLocation@s3:scheduling-2-phi",
+   "s3:GetBucketLocation@s3:scheduling-2-phi/*",
+   "s3:GetObject@*",
+   "s3:GetObjectVersion@s3:scheduling-2-phi",
+   "s3:GetObjectVersion@s3:scheduling-2-phi/*",
+   "s3:ListBucket@s3:scheduling-2-phi",
+   "s3:ListBucket@s3:scheduling-2-phi/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/scheduling-2/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/scheduling-2/*",
+   "sns:GetTopicAttributes@sns:scheduling-2-phi",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/scheduling-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/scheduling-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/scheduling-2/*"
+  ],
+  "policy:scheduling-data-rw": [
+   "dynamodb:BatchGetItem@dynamodb:table/arifen-15ocxf-scheduling-imaging",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-scheduling-imaging",
+   "dynamodb:PutItem@dynamodb:table/arifen-15ocxf-scheduling-imaging",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-scheduling-imaging",
+   "s3:AbortMultipartUpload@s3:scheduling-imaging",
+   "s3:AbortMultipartUpload@s3:scheduling-imaging/*",
+   "s3:DeleteObject@s3:scheduling-imaging",
+   "s3:DeleteObject@s3:scheduling-imaging/*",
+   "s3:GetBucketLocation@s3:scheduling-imaging",
+   "s3:GetBucketLocation@s3:scheduling-imaging/*",
+   "s3:GetObject@*",
+   "s3:PutObject@s3:scheduling-imaging",
+   "s3:PutObject@s3:scheduling-imaging/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/scheduling/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/scheduling/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/scheduling/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/scheduling/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/scheduling/*"
+  ],
+  "policy:scheduling-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:scheduling-nb8",
+   "cloudformation:UpdateStack@workload:scheduling-nb8",
+   "iam:PassRole@role:scheduling-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:scheduling-2-ehr-fn15",
+   "lambda:GetFunction@function:scheduling-2-ehr-fn15",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:scheduling-2-ehr-fn15",
+   "lambda:UpdateFunctionCode@function:scheduling-2-ehr-fn15",
+   "lambda:UpdateFunctionConfiguration@function:scheduling-2-ehr-fn15",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:scheduling-nb8"
+  ],
+  "policy:scheduling-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/scheduling/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/scheduling/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/scheduling/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/scheduling/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/scheduling/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/scheduling/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/scheduling/*"
+  ],
+  "policy:scheduling-read": [
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-scheduling-imaging",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-scheduling-imaging",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-scheduling-imaging",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-scheduling-imaging",
+   "s3:GetBucketLocation@s3:scheduling-imaging",
+   "s3:GetBucketLocation@s3:scheduling-imaging/*",
+   "s3:GetObject@*",
+   "s3:GetObjectVersion@s3:scheduling-imaging",
+   "s3:GetObjectVersion@s3:scheduling-imaging/*",
+   "s3:ListBucket@s3:scheduling-imaging",
+   "s3:ListBucket@s3:scheduling-imaging/*",
+   "secretsmanager:DescribeSecret@secretsmanager:secret:arifen-15ocxf/scheduling/*",
+   "secretsmanager:GetSecretValue@secretsmanager:secret:arifen-15ocxf/scheduling/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/scheduling/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/scheduling/*"
+  ],
+  "policy:security-audit": [
+   "cloudtrail:LookupEvents@*"
+  ],
+  "policy:self-service": [
+   "iam:GetAccountSummary@user:adm-alice.novak",
+   "iam:GetAccountSummary@user:adm-karl.smith",
+   "iam:GetAccountSummary@user:adm-leo.chen",
+   "iam:GetAccountSummary@user:alice.jones",
+   "iam:GetAccountSummary@user:alice.reddy",
+   "iam:GetAccountSummary@user:alice.wong",
+   "iam:GetAccountSummary@user:amit.chen",
+   "iam:GetAccountSummary@user:amit.davis",
+   "iam:GetAccountSummary@user:amit.larsen",
+   "iam:GetAccountSummary@user:amit.patel",
+   "iam:GetAccountSummary@user:bela.mehta",
+   "iam:GetAccountSummary@user:bela.nguyen",
+   "iam:GetAccountSummary@user:carol.cohen",
+   "iam:GetAccountSummary@user:chen.haddad",
+   "iam:GetAccountSummary@user:chen.novak",
+   "iam:GetAccountSummary@user:chen.reddy",
+   "iam:GetAccountSummary@user:chen.reddy7712",
+   "iam:GetAccountSummary@user:chen.tanaka",
+   "iam:GetAccountSummary@user:chen.wong",
+   "iam:GetAccountSummary@user:chen.wong7709",
+   "iam:GetAccountSummary@user:dara.dubois",
+   "iam:GetAccountSummary@user:dara.muller",
+   "iam:GetAccountSummary@user:dave.khan",
+   "iam:GetAccountSummary@user:dave.kim",
+   "iam:GetAccountSummary@user:dave.okafor",
+   "iam:GetAccountSummary@user:eli.ali",
+   "iam:GetAccountSummary@user:erin.cohen",
+   "iam:GetAccountSummary@user:erin.miller",
+   "iam:GetAccountSummary@user:erin.silva",
+   "iam:GetAccountSummary@user:ext-bela.sato",
+   "iam:GetAccountSummary@user:ext-chen.muller",
+   "iam:GetAccountSummary@user:ext-chen.okafor",
+   "iam:GetAccountSummary@user:ext-judy.davis",
+   "iam:GetAccountSummary@user:ext-jun.jones",
+   "iam:GetAccountSummary@user:ext-karl.miller",
+   "iam:GetAccountSummary@user:ext-leo.nguyen",
+   "iam:GetAccountSummary@user:ext-raj.singh",
+   "iam:GetAccountSummary@user:ext-sara.wong",
+   "iam:GetAccountSummary@user:ext-xia.haddad",
+   "iam:GetAccountSummary@user:ext-yara.novak",
+   "iam:GetAccountSummary@user:ext-yara.tanaka",
+   "iam:GetAccountSummary@user:fay.miller",
+   "iam:GetAccountSummary@user:fay.reddy",
+   "iam:GetAccountSummary@user:fay.sato",
+   "iam:GetAccountSummary@user:frank.chen",
+   "iam:GetAccountSummary@user:frank.chen132",
+   "iam:GetAccountSummary@user:frank.mehta",
+   "iam:GetAccountSummary@user:frank.reddy",
+   "iam:GetAccountSummary@user:frank.sato",
+   "iam:GetAccountSummary@user:frank.singh",
+   "iam:GetAccountSummary@user:grace.lopez",
+   "iam:GetAccountSummary@user:grace.patel",
+   "iam:GetAccountSummary@user:grace.smith",
+   "iam:GetAccountSummary@user:grace.wong",
+   "iam:GetAccountSummary@user:gus.garcia",
+   "iam:GetAccountSummary@user:gus.tanaka",
+   "iam:GetAccountSummary@user:hana.larsen",
+   "iam:GetAccountSummary@user:hana.lopez",
+   "iam:GetAccountSummary@user:hana.smith",
+   "iam:GetAccountSummary@user:heidi.wong",
+   "iam:GetAccountSummary@user:ian.khan",
+   "iam:GetAccountSummary@user:ian.rossi",
+   "iam:GetAccountSummary@user:ivan.kim",
+   "iam:GetAccountSummary@user:ivan.smith",
+   "iam:GetAccountSummary@user:judy.brown",
+   "iam:GetAccountSummary@user:judy.haddad",
+   "iam:GetAccountSummary@user:judy.haddad6532",
+   "iam:GetAccountSummary@user:judy.jones",
+   "iam:GetAccountSummary@user:judy.novak",
+   "iam:GetAccountSummary@user:judy.wong",
+   "iam:GetAccountSummary@user:jun.cohen",
+   "iam:GetAccountSummary@user:jun.dubois",
+   "iam:GetAccountSummary@user:jun.dubois243",
+   "iam:GetAccountSummary@user:jun.novak",
+   "iam:GetAccountSummary@user:jun.novak5250",
+   "iam:GetAccountSummary@user:jun.silva",
+   "iam:GetAccountSummary@user:karl.davis",
+   "iam:GetAccountSummary@user:karl.silva",
+   "iam:GetAccountSummary@user:karl.tanaka",
+   "iam:GetAccountSummary@user:kia.nguyen",
+   "iam:GetAccountSummary@user:lena.cohen",
+   "iam:GetAccountSummary@user:lena.khan",
+   "iam:GetAccountSummary@user:lena.larsen",
+   "iam:GetAccountSummary@user:lena.miller",
+   "iam:GetAccountSummary@user:lena.okafor",
+   "iam:GetAccountSummary@user:leo.brown",
+   "iam:GetAccountSummary@user:leo.cohen",
+   "iam:GetAccountSummary@user:leo.dubois",
+   "iam:GetAccountSummary@user:mei.garcia",
+   "iam:GetAccountSummary@user:mei.smith",
+   "iam:GetAccountSummary@user:mike.mehta",
+   "iam:GetAccountSummary@user:mike.silva",
+   "iam:GetAccountSummary@user:nina.silva",
+   "iam:GetAccountSummary@user:omar.haddad",
+   "iam:GetAccountSummary@user:omar.kim",
+   "iam:GetAccountSummary@user:omar.muller",
+   "iam:GetAccountSummary@user:omar.reddy",
+   "iam:GetAccountSummary@user:priya.davis",
+   "iam:GetAccountSummary@user:priya.dubois",
+   "iam:GetAccountSummary@user:priya.gupta",
+   "iam:GetAccountSummary@user:priya.larsen",
+   "iam:GetAccountSummary@user:priya.miller",
+   "iam:GetAccountSummary@user:priya.smith",
+   "iam:GetAccountSummary@user:quinn.kim",
+   "iam:GetAccountSummary@user:quinn.patel",
+   "iam:GetAccountSummary@user:raj.khan",
+   "iam:GetAccountSummary@user:raj.miller",
+   "iam:GetAccountSummary@user:raj.novak",
+   "iam:GetAccountSummary@user:raj.novak6903",
+   "iam:GetAccountSummary@user:sara.brown",
+   "iam:GetAccountSummary@user:sara.muller",
+   "iam:GetAccountSummary@user:sara.okafor",
+   "iam:GetAccountSummary@user:tom.ali",
+   "iam:GetAccountSummary@user:tom.lopez",
+   "iam:GetAccountSummary@user:uma.khan",
+   "iam:GetAccountSummary@user:uma.silva",
+   "iam:GetAccountSummary@user:vik.patel",
+   "iam:GetAccountSummary@user:wen.kim",
+   "iam:GetAccountSummary@user:wen.okafor",
+   "iam:GetAccountSummary@user:wen.silva",
+   "iam:GetAccountSummary@user:xia.chen",
+   "iam:GetAccountSummary@user:xia.davis",
+   "iam:GetAccountSummary@user:xia.miller",
+   "iam:GetAccountSummary@user:yara.brown",
+   "iam:GetAccountSummary@user:yara.mehta",
+   "iam:GetAccountSummary@user:zed.ivanov",
+   "iam:GetAccountSummary@user:zed.ivanov731",
+   "iam:GetAccountSummary@user:zed.larsen",
+   "iam:GetAccountSummary@user:zed.novak",
+   "iam:GetUser@user:adm-alice.novak",
+   "iam:GetUser@user:adm-karl.smith",
+   "iam:GetUser@user:adm-leo.chen",
+   "iam:GetUser@user:alice.jones",
+   "iam:GetUser@user:alice.reddy",
+   "iam:GetUser@user:alice.wong",
+   "iam:GetUser@user:amit.chen",
+   "iam:GetUser@user:amit.davis",
+   "iam:GetUser@user:amit.larsen",
+   "iam:GetUser@user:amit.patel",
+   "iam:GetUser@user:bela.mehta",
+   "iam:GetUser@user:bela.nguyen",
+   "iam:GetUser@user:carol.cohen",
+   "iam:GetUser@user:chen.haddad",
+   "iam:GetUser@user:chen.novak",
+   "iam:GetUser@user:chen.reddy",
+   "iam:GetUser@user:chen.reddy7712",
+   "iam:GetUser@user:chen.tanaka",
+   "iam:GetUser@user:chen.wong",
+   "iam:GetUser@user:chen.wong7709",
+   "iam:GetUser@user:dara.dubois",
+   "iam:GetUser@user:dara.muller",
+   "iam:GetUser@user:dave.khan",
+   "iam:GetUser@user:dave.kim",
+   "iam:GetUser@user:dave.okafor",
+   "iam:GetUser@user:eli.ali",
+   "iam:GetUser@user:erin.cohen",
+   "iam:GetUser@user:erin.miller",
+   "iam:GetUser@user:erin.silva",
+   "iam:GetUser@user:ext-bela.sato",
+   "iam:GetUser@user:ext-chen.muller",
+   "iam:GetUser@user:ext-chen.okafor",
+   "iam:GetUser@user:ext-judy.davis",
+   "iam:GetUser@user:ext-jun.jones",
+   "iam:GetUser@user:ext-karl.miller",
+   "iam:GetUser@user:ext-leo.nguyen",
+   "iam:GetUser@user:ext-raj.singh",
+   "iam:GetUser@user:ext-sara.wong",
+   "iam:GetUser@user:ext-xia.haddad",
+   "iam:GetUser@user:ext-yara.novak",
+   "iam:GetUser@user:ext-yara.tanaka",
+   "iam:GetUser@user:fay.miller",
+   "iam:GetUser@user:fay.reddy",
+   "iam:GetUser@user:fay.sato",
+   "iam:GetUser@user:frank.chen",
+   "iam:GetUser@user:frank.chen132",
+   "iam:GetUser@user:frank.mehta",
+   "iam:GetUser@user:frank.reddy",
+   "iam:GetUser@user:frank.sato",
+   "iam:GetUser@user:frank.singh",
+   "iam:GetUser@user:grace.lopez",
+   "iam:GetUser@user:grace.patel",
+   "iam:GetUser@user:grace.smith",
+   "iam:GetUser@user:grace.wong",
+   "iam:GetUser@user:gus.garcia",
+   "iam:GetUser@user:gus.tanaka",
+   "iam:GetUser@user:hana.larsen",
+   "iam:GetUser@user:hana.lopez",
+   "iam:GetUser@user:hana.smith",
+   "iam:GetUser@user:heidi.wong",
+   "iam:GetUser@user:ian.khan",
+   "iam:GetUser@user:ian.rossi",
+   "iam:GetUser@user:ivan.kim",
+   "iam:GetUser@user:ivan.smith",
+   "iam:GetUser@user:judy.brown",
+   "iam:GetUser@user:judy.haddad",
+   "iam:GetUser@user:judy.haddad6532",
+   "iam:GetUser@user:judy.jones",
+   "iam:GetUser@user:judy.novak",
+   "iam:GetUser@user:judy.wong",
+   "iam:GetUser@user:jun.cohen",
+   "iam:GetUser@user:jun.dubois",
+   "iam:GetUser@user:jun.dubois243",
+   "iam:GetUser@user:jun.novak",
+   "iam:GetUser@user:jun.novak5250",
+   "iam:GetUser@user:jun.silva",
+   "iam:GetUser@user:karl.davis",
+   "iam:GetUser@user:karl.silva",
+   "iam:GetUser@user:karl.tanaka",
+   "iam:GetUser@user:kia.nguyen",
+   "iam:GetUser@user:lena.cohen",
+   "iam:GetUser@user:lena.khan",
+   "iam:GetUser@user:lena.larsen",
+   "iam:GetUser@user:lena.miller",
+   "iam:GetUser@user:lena.okafor",
+   "iam:GetUser@user:leo.brown",
+   "iam:GetUser@user:leo.cohen",
+   "iam:GetUser@user:leo.dubois",
+   "iam:GetUser@user:mei.garcia",
+   "iam:GetUser@user:mei.smith",
+   "iam:GetUser@user:mike.mehta",
+   "iam:GetUser@user:mike.silva",
+   "iam:GetUser@user:nina.silva",
+   "iam:GetUser@user:omar.haddad",
+   "iam:GetUser@user:omar.kim",
+   "iam:GetUser@user:omar.muller",
+   "iam:GetUser@user:omar.reddy",
+   "iam:GetUser@user:priya.davis",
+   "iam:GetUser@user:priya.dubois",
+   "iam:GetUser@user:priya.gupta",
+   "iam:GetUser@user:priya.larsen",
+   "iam:GetUser@user:priya.miller",
+   "iam:GetUser@user:priya.smith",
+   "iam:GetUser@user:quinn.kim",
+   "iam:GetUser@user:quinn.patel",
+   "iam:GetUser@user:raj.khan",
+   "iam:GetUser@user:raj.miller",
+   "iam:GetUser@user:raj.novak",
+   "iam:GetUser@user:raj.novak6903",
+   "iam:GetUser@user:sara.brown",
+   "iam:GetUser@user:sara.muller",
+   "iam:GetUser@user:sara.okafor",
+   "iam:GetUser@user:tom.ali",
+   "iam:GetUser@user:tom.lopez",
+   "iam:GetUser@user:uma.khan",
+   "iam:GetUser@user:uma.silva",
+   "iam:GetUser@user:vik.patel",
+   "iam:GetUser@user:wen.kim",
+   "iam:GetUser@user:wen.okafor",
+   "iam:GetUser@user:wen.silva",
+   "iam:GetUser@user:xia.chen",
+   "iam:GetUser@user:xia.davis",
+   "iam:GetUser@user:xia.miller",
+   "iam:GetUser@user:yara.brown",
+   "iam:GetUser@user:yara.mehta",
+   "iam:GetUser@user:zed.ivanov",
+   "iam:GetUser@user:zed.ivanov731",
+   "iam:GetUser@user:zed.larsen",
+   "iam:GetUser@user:zed.novak",
+   "iam:ListAccessKeys@user:adm-alice.novak",
+   "iam:ListAccessKeys@user:adm-karl.smith",
+   "iam:ListAccessKeys@user:adm-leo.chen",
+   "iam:ListAccessKeys@user:alice.jones",
+   "iam:ListAccessKeys@user:alice.reddy",
+   "iam:ListAccessKeys@user:alice.wong",
+   "iam:ListAccessKeys@user:amit.chen",
+   "iam:ListAccessKeys@user:amit.davis",
+   "iam:ListAccessKeys@user:amit.larsen",
+   "iam:ListAccessKeys@user:amit.patel",
+   "iam:ListAccessKeys@user:bela.mehta",
+   "iam:ListAccessKeys@user:bela.nguyen",
+   "iam:ListAccessKeys@user:carol.cohen",
+   "iam:ListAccessKeys@user:chen.haddad",
+   "iam:ListAccessKeys@user:chen.novak",
+   "iam:ListAccessKeys@user:chen.reddy",
+   "iam:ListAccessKeys@user:chen.reddy7712",
+   "iam:ListAccessKeys@user:chen.tanaka",
+   "iam:ListAccessKeys@user:chen.wong",
+   "iam:ListAccessKeys@user:chen.wong7709",
+   "iam:ListAccessKeys@user:dara.dubois",
+   "iam:ListAccessKeys@user:dara.muller",
+   "iam:ListAccessKeys@user:dave.khan",
+   "iam:ListAccessKeys@user:dave.kim",
+   "iam:ListAccessKeys@user:dave.okafor",
+   "iam:ListAccessKeys@user:eli.ali",
+   "iam:ListAccessKeys@user:erin.cohen",
+   "iam:ListAccessKeys@user:erin.miller",
+   "iam:ListAccessKeys@user:erin.silva",
+   "iam:ListAccessKeys@user:ext-bela.sato",
+   "iam:ListAccessKeys@user:ext-chen.muller",
+   "iam:ListAccessKeys@user:ext-chen.okafor",
+   "iam:ListAccessKeys@user:ext-judy.davis",
+   "iam:ListAccessKeys@user:ext-jun.jones",
+   "iam:ListAccessKeys@user:ext-karl.miller",
+   "iam:ListAccessKeys@user:ext-leo.nguyen",
+   "iam:ListAccessKeys@user:ext-raj.singh",
+   "iam:ListAccessKeys@user:ext-sara.wong",
+   "iam:ListAccessKeys@user:ext-xia.haddad",
+   "iam:ListAccessKeys@user:ext-yara.novak",
+   "iam:ListAccessKeys@user:ext-yara.tanaka",
+   "iam:ListAccessKeys@user:fay.miller",
+   "iam:ListAccessKeys@user:fay.reddy",
+   "iam:ListAccessKeys@user:fay.sato",
+   "iam:ListAccessKeys@user:frank.chen",
+   "iam:ListAccessKeys@user:frank.chen132",
+   "iam:ListAccessKeys@user:frank.mehta",
+   "iam:ListAccessKeys@user:frank.reddy",
+   "iam:ListAccessKeys@user:frank.sato",
+   "iam:ListAccessKeys@user:frank.singh",
+   "iam:ListAccessKeys@user:grace.lopez",
+   "iam:ListAccessKeys@user:grace.patel",
+   "iam:ListAccessKeys@user:grace.smith",
+   "iam:ListAccessKeys@user:grace.wong",
+   "iam:ListAccessKeys@user:gus.garcia",
+   "iam:ListAccessKeys@user:gus.tanaka",
+   "iam:ListAccessKeys@user:hana.larsen",
+   "iam:ListAccessKeys@user:hana.lopez",
+   "iam:ListAccessKeys@user:hana.smith",
+   "iam:ListAccessKeys@user:heidi.wong",
+   "iam:ListAccessKeys@user:ian.khan",
+   "iam:ListAccessKeys@user:ian.rossi",
+   "iam:ListAccessKeys@user:ivan.kim",
+   "iam:ListAccessKeys@user:ivan.smith",
+   "iam:ListAccessKeys@user:judy.brown",
+   "iam:ListAccessKeys@user:judy.haddad",
+   "iam:ListAccessKeys@user:judy.haddad6532",
+   "iam:ListAccessKeys@user:judy.jones",
+   "iam:ListAccessKeys@user:judy.novak",
+   "iam:ListAccessKeys@user:judy.wong",
+   "iam:ListAccessKeys@user:jun.cohen",
+   "iam:ListAccessKeys@user:jun.dubois",
+   "iam:ListAccessKeys@user:jun.dubois243",
+   "iam:ListAccessKeys@user:jun.novak",
+   "iam:ListAccessKeys@user:jun.novak5250",
+   "iam:ListAccessKeys@user:jun.silva",
+   "iam:ListAccessKeys@user:karl.davis",
+   "iam:ListAccessKeys@user:karl.silva",
+   "iam:ListAccessKeys@user:karl.tanaka",
+   "iam:ListAccessKeys@user:kia.nguyen",
+   "iam:ListAccessKeys@user:lena.cohen",
+   "iam:ListAccessKeys@user:lena.khan",
+   "iam:ListAccessKeys@user:lena.larsen",
+   "iam:ListAccessKeys@user:lena.miller",
+   "iam:ListAccessKeys@user:lena.okafor",
+   "iam:ListAccessKeys@user:leo.brown",
+   "iam:ListAccessKeys@user:leo.cohen",
+   "iam:ListAccessKeys@user:leo.dubois",
+   "iam:ListAccessKeys@user:mei.garcia",
+   "iam:ListAccessKeys@user:mei.smith",
+   "iam:ListAccessKeys@user:mike.mehta",
+   "iam:ListAccessKeys@user:mike.silva",
+   "iam:ListAccessKeys@user:nina.silva",
+   "iam:ListAccessKeys@user:omar.haddad",
+   "iam:ListAccessKeys@user:omar.kim",
+   "iam:ListAccessKeys@user:omar.muller",
+   "iam:ListAccessKeys@user:omar.reddy",
+   "iam:ListAccessKeys@user:priya.davis",
+   "iam:ListAccessKeys@user:priya.dubois",
+   "iam:ListAccessKeys@user:priya.gupta",
+   "iam:ListAccessKeys@user:priya.larsen",
+   "iam:ListAccessKeys@user:priya.miller",
+   "iam:ListAccessKeys@user:priya.smith",
+   "iam:ListAccessKeys@user:quinn.kim",
+   "iam:ListAccessKeys@user:quinn.patel",
+   "iam:ListAccessKeys@user:raj.khan",
+   "iam:ListAccessKeys@user:raj.miller",
+   "iam:ListAccessKeys@user:raj.novak",
+   "iam:ListAccessKeys@user:raj.novak6903",
+   "iam:ListAccessKeys@user:sara.brown",
+   "iam:ListAccessKeys@user:sara.muller",
+   "iam:ListAccessKeys@user:sara.okafor",
+   "iam:ListAccessKeys@user:tom.ali",
+   "iam:ListAccessKeys@user:tom.lopez",
+   "iam:ListAccessKeys@user:uma.khan",
+   "iam:ListAccessKeys@user:uma.silva",
+   "iam:ListAccessKeys@user:vik.patel",
+   "iam:ListAccessKeys@user:wen.kim",
+   "iam:ListAccessKeys@user:wen.okafor",
+   "iam:ListAccessKeys@user:wen.silva",
+   "iam:ListAccessKeys@user:xia.chen",
+   "iam:ListAccessKeys@user:xia.davis",
+   "iam:ListAccessKeys@user:xia.miller",
+   "iam:ListAccessKeys@user:yara.brown",
+   "iam:ListAccessKeys@user:yara.mehta",
+   "iam:ListAccessKeys@user:zed.ivanov",
+   "iam:ListAccessKeys@user:zed.ivanov731",
+   "iam:ListAccessKeys@user:zed.larsen",
+   "iam:ListAccessKeys@user:zed.novak",
+   "iam:ListMFADevices@user:adm-alice.novak",
+   "iam:ListMFADevices@user:adm-karl.smith",
+   "iam:ListMFADevices@user:adm-leo.chen",
+   "iam:ListMFADevices@user:alice.jones",
+   "iam:ListMFADevices@user:alice.reddy",
+   "iam:ListMFADevices@user:alice.wong",
+   "iam:ListMFADevices@user:amit.chen",
+   "iam:ListMFADevices@user:amit.davis",
+   "iam:ListMFADevices@user:amit.larsen",
+   "iam:ListMFADevices@user:amit.patel",
+   "iam:ListMFADevices@user:bela.mehta",
+   "iam:ListMFADevices@user:bela.nguyen",
+   "iam:ListMFADevices@user:carol.cohen",
+   "iam:ListMFADevices@user:chen.haddad",
+   "iam:ListMFADevices@user:chen.novak",
+   "iam:ListMFADevices@user:chen.reddy",
+   "iam:ListMFADevices@user:chen.reddy7712",
+   "iam:ListMFADevices@user:chen.tanaka",
+   "iam:ListMFADevices@user:chen.wong",
+   "iam:ListMFADevices@user:chen.wong7709",
+   "iam:ListMFADevices@user:dara.dubois",
+   "iam:ListMFADevices@user:dara.muller",
+   "iam:ListMFADevices@user:dave.khan",
+   "iam:ListMFADevices@user:dave.kim",
+   "iam:ListMFADevices@user:dave.okafor",
+   "iam:ListMFADevices@user:eli.ali",
+   "iam:ListMFADevices@user:erin.cohen",
+   "iam:ListMFADevices@user:erin.miller",
+   "iam:ListMFADevices@user:erin.silva",
+   "iam:ListMFADevices@user:ext-bela.sato",
+   "iam:ListMFADevices@user:ext-chen.muller",
+   "iam:ListMFADevices@user:ext-chen.okafor",
+   "iam:ListMFADevices@user:ext-judy.davis",
+   "iam:ListMFADevices@user:ext-jun.jones",
+   "iam:ListMFADevices@user:ext-karl.miller",
+   "iam:ListMFADevices@user:ext-leo.nguyen",
+   "iam:ListMFADevices@user:ext-raj.singh",
+   "iam:ListMFADevices@user:ext-sara.wong",
+   "iam:ListMFADevices@user:ext-xia.haddad",
+   "iam:ListMFADevices@user:ext-yara.novak",
+   "iam:ListMFADevices@user:ext-yara.tanaka",
+   "iam:ListMFADevices@user:fay.miller",
+   "iam:ListMFADevices@user:fay.reddy",
+   "iam:ListMFADevices@user:fay.sato",
+   "iam:ListMFADevices@user:frank.chen",
+   "iam:ListMFADevices@user:frank.chen132",
+   "iam:ListMFADevices@user:frank.mehta",
+   "iam:ListMFADevices@user:frank.reddy",
+   "iam:ListMFADevices@user:frank.sato",
+   "iam:ListMFADevices@user:frank.singh",
+   "iam:ListMFADevices@user:grace.lopez",
+   "iam:ListMFADevices@user:grace.patel",
+   "iam:ListMFADevices@user:grace.smith",
+   "iam:ListMFADevices@user:grace.wong",
+   "iam:ListMFADevices@user:gus.garcia",
+   "iam:ListMFADevices@user:gus.tanaka",
+   "iam:ListMFADevices@user:hana.larsen",
+   "iam:ListMFADevices@user:hana.lopez",
+   "iam:ListMFADevices@user:hana.smith",
+   "iam:ListMFADevices@user:heidi.wong",
+   "iam:ListMFADevices@user:ian.khan",
+   "iam:ListMFADevices@user:ian.rossi",
+   "iam:ListMFADevices@user:ivan.kim",
+   "iam:ListMFADevices@user:ivan.smith",
+   "iam:ListMFADevices@user:judy.brown",
+   "iam:ListMFADevices@user:judy.haddad",
+   "iam:ListMFADevices@user:judy.haddad6532",
+   "iam:ListMFADevices@user:judy.jones",
+   "iam:ListMFADevices@user:judy.novak",
+   "iam:ListMFADevices@user:judy.wong",
+   "iam:ListMFADevices@user:jun.cohen",
+   "iam:ListMFADevices@user:jun.dubois",
+   "iam:ListMFADevices@user:jun.dubois243",
+   "iam:ListMFADevices@user:jun.novak",
+   "iam:ListMFADevices@user:jun.novak5250",
+   "iam:ListMFADevices@user:jun.silva",
+   "iam:ListMFADevices@user:karl.davis",
+   "iam:ListMFADevices@user:karl.silva",
+   "iam:ListMFADevices@user:karl.tanaka",
+   "iam:ListMFADevices@user:kia.nguyen",
+   "iam:ListMFADevices@user:lena.cohen",
+   "iam:ListMFADevices@user:lena.khan",
+   "iam:ListMFADevices@user:lena.larsen",
+   "iam:ListMFADevices@user:lena.miller",
+   "iam:ListMFADevices@user:lena.okafor",
+   "iam:ListMFADevices@user:leo.brown",
+   "iam:ListMFADevices@user:leo.cohen",
+   "iam:ListMFADevices@user:leo.dubois",
+   "iam:ListMFADevices@user:mei.garcia",
+   "iam:ListMFADevices@user:mei.smith",
+   "iam:ListMFADevices@user:mike.mehta",
+   "iam:ListMFADevices@user:mike.silva",
+   "iam:ListMFADevices@user:nina.silva",
+   "iam:ListMFADevices@user:omar.haddad",
+   "iam:ListMFADevices@user:omar.kim",
+   "iam:ListMFADevices@user:omar.muller",
+   "iam:ListMFADevices@user:omar.reddy",
+   "iam:ListMFADevices@user:priya.davis",
+   "iam:ListMFADevices@user:priya.dubois",
+   "iam:ListMFADevices@user:priya.gupta",
+   "iam:ListMFADevices@user:priya.larsen",
+   "iam:ListMFADevices@user:priya.miller",
+   "iam:ListMFADevices@user:priya.smith",
+   "iam:ListMFADevices@user:quinn.kim",
+   "iam:ListMFADevices@user:quinn.patel",
+   "iam:ListMFADevices@user:raj.khan",
+   "iam:ListMFADevices@user:raj.miller",
+   "iam:ListMFADevices@user:raj.novak",
+   "iam:ListMFADevices@user:raj.novak6903",
+   "iam:ListMFADevices@user:sara.brown",
+   "iam:ListMFADevices@user:sara.muller",
+   "iam:ListMFADevices@user:sara.okafor",
+   "iam:ListMFADevices@user:tom.ali",
+   "iam:ListMFADevices@user:tom.lopez",
+   "iam:ListMFADevices@user:uma.khan",
+   "iam:ListMFADevices@user:uma.silva",
+   "iam:ListMFADevices@user:vik.patel",
+   "iam:ListMFADevices@user:wen.kim",
+   "iam:ListMFADevices@user:wen.okafor",
+   "iam:ListMFADevices@user:wen.silva",
+   "iam:ListMFADevices@user:xia.chen",
+   "iam:ListMFADevices@user:xia.davis",
+   "iam:ListMFADevices@user:xia.miller",
+   "iam:ListMFADevices@user:yara.brown",
+   "iam:ListMFADevices@user:yara.mehta",
+   "iam:ListMFADevices@user:zed.ivanov",
+   "iam:ListMFADevices@user:zed.ivanov731",
+   "iam:ListMFADevices@user:zed.larsen",
+   "iam:ListMFADevices@user:zed.novak"
+  ],
+  "policy:telehealth-2-data-rw": [
+   "dynamodb:BatchGetItem@dynamodb:table/arifen-15ocxf-telehealth-2-phi",
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-telehealth-2-phi",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-telehealth-2-phi",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-telehealth-2-phi",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-telehealth-2-phi",
+   "sns:Publish@sns:telehealth-2-ehr",
+   "sns:Subscribe@sns:telehealth-2-ehr",
+   "sqs:DeleteMessage@sqs:telehealth-2-ehr",
+   "sqs:GetQueueAttributes@sqs:telehealth-2-ehr",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/telehealth-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/telehealth-2/*"
+  ],
+  "policy:telehealth-2-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:telehealth-2-*",
+   "iam:PassRole@role:telehealth-2-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:telehealth-2-claims-fn18",
+   "lambda:CreateFunction@function:telehealth-2-phi-fn4",
+   "lambda:CreateFunction@function:telehealth-2-phi-fn7",
+   "lambda:GetFunction@function:telehealth-2-claims-fn18",
+   "lambda:GetFunction@function:telehealth-2-phi-fn4",
+   "lambda:GetFunction@function:telehealth-2-phi-fn7",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:telehealth-2-claims-fn18",
+   "lambda:InvokeFunction@function:telehealth-2-phi-fn4",
+   "lambda:InvokeFunction@function:telehealth-2-phi-fn7",
+   "lambda:UpdateFunctionCode@function:telehealth-2-claims-fn18",
+   "lambda:UpdateFunctionCode@function:telehealth-2-phi-fn4",
+   "lambda:UpdateFunctionCode@function:telehealth-2-phi-fn7",
+   "lambda:UpdateFunctionConfiguration@function:telehealth-2-claims-fn18",
+   "lambda:UpdateFunctionConfiguration@function:telehealth-2-phi-fn4",
+   "lambda:UpdateFunctionConfiguration@function:telehealth-2-phi-fn7"
+  ],
+  "policy:telehealth-2-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/telehealth-2/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/telehealth-2/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/telehealth-2/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/telehealth-2/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/telehealth-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/telehealth-2/*"
+  ],
+  "policy:telehealth-2-read": [
+   "dynamodb:DescribeTable@dynamodb:table/arifen-15ocxf-telehealth-2-claims",
+   "dynamodb:GetItem@dynamodb:table/arifen-15ocxf-telehealth-2-claims",
+   "dynamodb:Query@dynamodb:table/arifen-15ocxf-telehealth-2-claims",
+   "dynamodb:Scan@dynamodb:table/arifen-15ocxf-telehealth-2-claims",
+   "sns:GetTopicAttributes@sns:telehealth-2-claims",
+   "sqs:GetQueueAttributes@sqs:telehealth-2-claims",
+   "sqs:ReceiveMessage@sqs:telehealth-2-claims",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/telehealth-2/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/telehealth-2/*"
+  ],
+  "policy:telehealth-data-rw": [
+   "s3:AbortMultipartUpload@s3:telehealth-audit",
+   "s3:AbortMultipartUpload@s3:telehealth-audit/*",
+   "s3:DeleteObject@s3:telehealth-audit",
+   "s3:DeleteObject@s3:telehealth-audit/*",
+   "s3:GetBucketLocation@s3:telehealth-audit",
+   "s3:GetBucketLocation@s3:telehealth-audit/*",
+   "s3:GetObject@*",
+   "s3:GetObjectVersion@s3:telehealth-audit",
+   "s3:GetObjectVersion@s3:telehealth-audit/*",
+   "s3:ListBucket@s3:telehealth-audit",
+   "s3:ListBucket@s3:telehealth-audit/*",
+   "s3:PutObject@s3:telehealth-audit",
+   "s3:PutObject@s3:telehealth-audit/*",
+   "sns:GetTopicAttributes@sns:telehealth-audit",
+   "sns:Publish@sns:telehealth-audit",
+   "sns:Subscribe@sns:telehealth-audit"
+  ],
+  "policy:telehealth-deploy-perms": [
+   "cloudformation:DescribeStacks@workload:telehealth-ec25",
+   "cloudformation:UpdateStack@workload:telehealth-ec25",
+   "iam:PassRole@role:telehealth-svc",
+   "lambda:CreateFunction@*",
+   "lambda:CreateFunction@function:telehealth-2-claims-fn18",
+   "lambda:CreateFunction@function:telehealth-2-phi-fn4",
+   "lambda:CreateFunction@function:telehealth-2-phi-fn7",
+   "lambda:CreateFunction@function:telehealth-audit-fn16",
+   "lambda:GetFunction@function:telehealth-2-claims-fn18",
+   "lambda:GetFunction@function:telehealth-2-phi-fn4",
+   "lambda:GetFunction@function:telehealth-2-phi-fn7",
+   "lambda:GetFunction@function:telehealth-audit-fn16",
+   "lambda:InvokeFunction@*",
+   "lambda:InvokeFunction@function:telehealth-2-claims-fn18",
+   "lambda:InvokeFunction@function:telehealth-2-phi-fn4",
+   "lambda:InvokeFunction@function:telehealth-2-phi-fn7",
+   "lambda:InvokeFunction@function:telehealth-audit-fn16",
+   "lambda:UpdateFunctionCode@function:telehealth-2-claims-fn18",
+   "lambda:UpdateFunctionCode@function:telehealth-2-phi-fn4",
+   "lambda:UpdateFunctionCode@function:telehealth-2-phi-fn7",
+   "lambda:UpdateFunctionCode@function:telehealth-audit-fn16",
+   "lambda:UpdateFunctionConfiguration@function:telehealth-2-claims-fn18",
+   "lambda:UpdateFunctionConfiguration@function:telehealth-2-phi-fn4",
+   "lambda:UpdateFunctionConfiguration@function:telehealth-2-phi-fn7",
+   "lambda:UpdateFunctionConfiguration@function:telehealth-audit-fn16",
+   "sagemaker:CreatePresignedNotebookInstanceUrl@workload:telehealth-ec25"
+  ],
+  "policy:telehealth-ops": [
+   "cloudwatch:PutMetricData@*",
+   "logs:CreateLogStream@logs:log-group:/arifen-15ocxf/telehealth/*",
+   "logs:DescribeLogStreams@logs:log-group:/arifen-15ocxf/telehealth/*",
+   "logs:GetLogEvents@logs:log-group:/arifen-15ocxf/telehealth/*",
+   "logs:PutLogEvents@logs:log-group:/arifen-15ocxf/telehealth/*",
+   "ssm:GetParameter@ssm:parameter/arifen-15ocxf/telehealth/*",
+   "ssm:GetParameters@ssm:parameter/arifen-15ocxf/telehealth/*",
+   "ssm:GetParametersByPath@ssm:parameter/arifen-15ocxf/telehealth/*"
+  ],
+  "policy:telehealth-read": [
+   "s3:GetBucketLocation@s3:telehealth-audit",
+   "s3:GetBucketLocation@s3:telehealth-audit/*",
+   "s3:GetObjectVersion@s3:telehealth-audit",
+   "s3:GetObjectVersion@s3:telehealth-audit/*",
+   "sns:GetTopicAttributes@sns:telehealth-audit"
+  ],
+  "role:ci-runner": [
+   "sts:AssumeRole@role:analytics-deploy",
+   "sts:AssumeRole@role:billing-2-deploy",
+   "sts:AssumeRole@role:clinical-data-deploy",
+   "sts:AssumeRole@role:compliance-2-deploy",
+   "sts:AssumeRole@role:imaging-2-deploy",
+   "sts:AssumeRole@role:imaging-deploy",
+   "sts:AssumeRole@role:lab-systems-deploy",
+   "sts:AssumeRole@role:patient-portal-2-deploy",
+   "sts:AssumeRole@role:patient-portal-deploy",
+   "sts:AssumeRole@role:pharmacy-deploy",
+   "sts:AssumeRole@role:research-2-deploy",
+   "sts:AssumeRole@role:scheduling-2-deploy",
+   "sts:AssumeRole@role:scheduling-deploy",
+   "sts:AssumeRole@role:telehealth-2-deploy",
+   "sts:AssumeRole@role:telehealth-deploy"
+  ],
+  "user:adm-alice.novak": [
+   "sts:AssumeRole@role:org-admin"
+  ],
+  "user:adm-karl.smith": [
+   "sts:AssumeRole@role:org-admin"
+  ],
+  "user:adm-leo.chen": [
+   "sts:AssumeRole@role:org-admin"
+  ],
+  "user:alice.reddy": [
+   "sts:AssumeRole@role:patient-portal-2-deploy"
+  ],
+  "user:amit.davis": [
+   "sts:AssumeRole@role:claims-deploy"
+  ],
+  "user:amit.patel": [
+   "sts:AssumeRole@role:telehealth-deploy"
+  ],
+  "user:carol.cohen": [
+   "sts:AssumeRole@role:analytics-2-deploy"
+  ],
+  "user:chen.haddad": [
+   "sts:AssumeRole@role:compliance-2-deploy"
+  ],
+  "user:chen.novak": [
+   "sts:AssumeRole@role:lab-systems-deploy"
+  ],
+  "user:chen.reddy": [
+   "sts:AssumeRole@role:lab-systems-deploy"
+  ],
+  "user:chen.reddy7712": [
+   "sts:AssumeRole@role:imaging-2-deploy"
+  ],
+  "user:dara.muller": [
+   "sts:AssumeRole@role:patient-portal-deploy"
+  ],
+  "user:dave.khan": [
+   "sts:AssumeRole@role:billing-deploy"
+  ],
+  "user:dave.kim": [
+   "sts:AssumeRole@role:imaging-deploy"
+  ],
+  "user:dave.okafor": [
+   "sts:AssumeRole@role:imaging-deploy"
+  ],
+  "user:erin.cohen": [
+   "sts:AssumeRole@role:billing-2-deploy"
+  ],
+  "user:erin.miller": [
+   "sts:AssumeRole@role:scheduling-deploy"
+  ],
+  "user:erin.silva": [
+   "sts:AssumeRole@role:research-deploy"
+  ],
+  "user:fay.reddy": [
+   "sts:AssumeRole@role:billing-2-deploy"
+  ],
+  "user:fay.sato": [
+   "sts:AssumeRole@role:claims-deploy"
+  ],
+  "user:frank.chen": [
+   "sts:AssumeRole@role:clinical-data-2-deploy"
+  ],
+  "user:frank.mehta": [
+   "sts:AssumeRole@role:compliance-2-deploy"
+  ],
+  "user:grace.lopez": [
+   "sts:AssumeRole@role:compliance-2-deploy"
+  ],
+  "user:grace.smith": [
+   "sts:AssumeRole@role:claims-2-deploy"
+  ],
+  "user:grace.wong": [
+   "sts:AssumeRole@role:clinical-data-2-deploy"
+  ],
+  "user:hana.lopez": [
+   "sts:AssumeRole@role:pharmacy-deploy"
+  ],
+  "user:ian.khan": [
+   "sts:AssumeRole@role:billing-2-deploy"
+  ],
+  "user:ivan.kim": [
+   "sts:AssumeRole@role:analytics-deploy"
+  ],
+  "user:judy.brown": [
+   "sts:AssumeRole@role:pharmacy-2-deploy"
+  ],
+  "user:judy.haddad": [
+   "sts:AssumeRole@role:clinical-data-2-deploy"
+  ],
+  "user:judy.novak": [
+   "sts:AssumeRole@role:pharmacy-deploy"
+  ],
+  "user:jun.cohen": [
+   "sts:AssumeRole@role:billing-deploy"
+  ],
+  "user:jun.dubois": [
+   "sts:AssumeRole@role:analytics-deploy"
+  ],
+  "user:jun.dubois243": [
+   "sts:AssumeRole@role:compliance-deploy"
+  ],
+  "user:jun.novak": [
+   "sts:AssumeRole@role:compliance-deploy"
+  ],
+  "user:jun.novak5250": [
+   "sts:AssumeRole@role:claims-2-deploy"
+  ],
+  "user:jun.silva": [
+   "sts:AssumeRole@role:claims-2-deploy"
+  ],
+  "user:karl.davis": [
+   "sts:AssumeRole@role:telehealth-deploy"
+  ],
+  "user:karl.silva": [
+   "sts:AssumeRole@role:clinical-data-deploy"
+  ],
+  "user:karl.tanaka": [
+   "sts:AssumeRole@role:scheduling-deploy"
+  ],
+  "user:kia.nguyen": [
+   "sts:AssumeRole@role:telehealth-deploy"
+  ],
+  "user:lena.khan": [
+   "sts:AssumeRole@role:telehealth-2-deploy"
+  ],
+  "user:lena.miller": [
+   "sts:AssumeRole@role:research-2-deploy"
+  ],
+  "user:lena.okafor": [
+   "sts:AssumeRole@role:clinical-data-2-deploy"
+  ],
+  "user:leo.brown": [
+   "sts:AssumeRole@role:claims-deploy"
+  ],
+  "user:leo.cohen": [
+   "sts:AssumeRole@role:claims-2-deploy"
+  ],
+  "user:leo.dubois": [
+   "sts:AssumeRole@role:research-2-deploy"
+  ],
+  "user:mei.garcia": [
+   "sts:AssumeRole@role:imaging-2-deploy"
+  ],
+  "user:mei.smith": [
+   "sts:AssumeRole@role:research-2-deploy"
+  ],
+  "user:mike.silva": [
+   "sts:AssumeRole@role:telehealth-2-deploy"
+  ],
+  "user:nina.silva": [
+   "sts:AssumeRole@role:analytics-deploy"
+  ],
+  "user:omar.haddad": [
+   "sts:AssumeRole@role:clinical-data-deploy"
+  ],
+  "user:omar.kim": [
+   "sts:AssumeRole@role:imaging-2-deploy"
+  ],
+  "user:priya.davis": [
+   "sts:AssumeRole@role:billing-deploy"
+  ],
+  "user:priya.dubois": [
+   "sts:AssumeRole@role:analytics-deploy"
+  ],
+  "user:priya.gupta": [
+   "sts:AssumeRole@role:imaging-deploy"
+  ],
+  "user:priya.larsen": [
+   "sts:AssumeRole@role:telehealth-deploy"
+  ],
+  "user:quinn.kim": [
+   "sts:AssumeRole@role:compliance-deploy"
+  ],
+  "user:quinn.patel": [
+   "sts:AssumeRole@role:research-2-deploy"
+  ],
+  "user:sara.brown": [
+   "sts:AssumeRole@role:patient-portal-2-deploy"
+  ],
+  "user:sara.okafor": [
+   "sts:AssumeRole@role:scheduling-deploy"
+  ],
+  "user:tom.ali": [
+   "sts:AssumeRole@role:lab-systems-deploy"
+  ],
+  "user:wen.kim": [
+   "sts:AssumeRole@role:claims-deploy"
+  ],
+  "user:wen.okafor": [
+   "sts:AssumeRole@role:patient-portal-deploy"
+  ],
+  "user:yara.brown": [
+   "sts:AssumeRole@role:compliance-2-deploy"
+  ],
+  "user:yara.mehta": [
+   "sts:AssumeRole@role:pharmacy-deploy"
+  ],
+  "user:zed.ivanov": [
+   "sts:AssumeRole@role:scheduling-2-deploy"
+  ],
+  "user:zed.ivanov731": [
+   "sts:AssumeRole@role:billing-deploy"
+  ],
+  "user:zed.larsen": [
+   "sts:AssumeRole@role:clinical-data-deploy"
+  ],
+  "user:zed.novak": [
+   "sts:AssumeRole@role:lab-systems-deploy"
+  ]
+ },
+ "relations": [
+  {
+   "from": "group:analytics-2-analysts",
+   "to": "user:alice.jones"
+  },
+  {
+   "from": "group:analytics-2-analysts",
+   "to": "user:alice.wong"
+  },
+  {
+   "from": "group:analytics-2-analysts",
+   "to": "user:bela.nguyen"
+  },
+  {
+   "from": "group:analytics-2-analysts",
+   "to": "user:frank.reddy"
+  },
+  {
+   "from": "group:analytics-2-analysts",
+   "to": "user:judy.novak"
+  },
+  {
+   "from": "group:analytics-2-analysts",
+   "to": "user:quinn.kim"
+  },
+  {
+   "from": "group:analytics-2-analysts",
+   "to": "user:xia.miller"
+  },
+  {
+   "from": "group:analytics-2-devs",
+   "to": "user:carol.cohen"
+  },
+  {
+   "from": "group:analytics-analysts",
+   "to": "user:grace.smith"
+  },
+  {
+   "from": "group:analytics-analysts",
+   "to": "user:ian.rossi"
+  },
+  {
+   "from": "group:analytics-analysts",
+   "to": "user:ivan.kim"
+  },
+  {
+   "from": "group:analytics-analysts",
+   "to": "user:judy.haddad6532"
+  },
+  {
+   "from": "group:analytics-devs",
+   "to": "user:gus.garcia"
+  },
+  {
+   "from": "group:analytics-devs",
+   "to": "user:ivan.kim"
+  },
+  {
+   "from": "group:analytics-devs",
+   "to": "user:jun.dubois"
+  },
+  {
+   "from": "group:analytics-devs",
+   "to": "user:nina.silva"
+  },
+  {
+   "from": "group:analytics-devs",
+   "to": "user:priya.dubois"
+  },
+  {
+   "from": "group:billing-2-analysts",
+   "to": "user:ext-leo.nguyen"
+  },
+  {
+   "from": "group:billing-2-analysts",
+   "to": "user:lena.cohen"
+  },
+  {
+   "from": "group:billing-2-devs",
+   "to": "user:erin.cohen"
+  },
+  {
+   "from": "group:billing-2-devs",
+   "to": "user:fay.reddy"
+  },
+  {
+   "from": "group:billing-2-devs",
+   "to": "user:ian.khan"
+  },
+  {
+   "from": "group:billing-analysts",
+   "to": "user:chen.wong"
+  },
+  {
+   "from": "group:billing-analysts",
+   "to": "user:nina.silva"
+  },
+  {
+   "from": "group:billing-analysts",
+   "to": "user:tom.lopez"
+  },
+  {
+   "from": "group:billing-analysts",
+   "to": "user:vik.patel"
+  },
+  {
+   "from": "group:billing-devs",
+   "to": "user:dave.khan"
+  },
+  {
+   "from": "group:billing-devs",
+   "to": "user:ian.rossi"
+  },
+  {
+   "from": "group:billing-devs",
+   "to": "user:jun.cohen"
+  },
+  {
+   "from": "group:billing-devs",
+   "to": "user:mike.mehta"
+  },
+  {
+   "from": "group:billing-devs",
+   "to": "user:priya.davis"
+  },
+  {
+   "from": "group:billing-devs",
+   "to": "user:zed.ivanov731"
+  },
+  {
+   "from": "group:claims-2-analysts",
+   "to": "user:uma.khan"
+  },
+  {
+   "from": "group:claims-2-analysts",
+   "to": "user:wen.silva"
+  },
+  {
+   "from": "group:claims-2-devs",
+   "to": "user:grace.smith"
+  },
+  {
+   "from": "group:claims-2-devs",
+   "to": "user:jun.novak5250"
+  },
+  {
+   "from": "group:claims-2-devs",
+   "to": "user:jun.silva"
+  },
+  {
+   "from": "group:claims-2-devs",
+   "to": "user:leo.cohen"
+  },
+  {
+   "from": "group:claims-2-devs",
+   "to": "user:omar.reddy"
+  },
+  {
+   "from": "group:claims-2-devs",
+   "to": "user:raj.khan"
+  },
+  {
+   "from": "group:claims-analysts",
+   "to": "user:ext-yara.novak"
+  },
+  {
+   "from": "group:claims-analysts",
+   "to": "user:hana.smith"
+  },
+  {
+   "from": "group:claims-analysts",
+   "to": "user:heidi.wong"
+  },
+  {
+   "from": "group:claims-analysts",
+   "to": "user:sara.okafor"
+  },
+  {
+   "from": "group:claims-analysts",
+   "to": "user:xia.chen"
+  },
+  {
+   "from": "group:claims-devs",
+   "to": "user:amit.davis"
+  },
+  {
+   "from": "group:claims-devs",
+   "to": "user:fay.sato"
+  },
+  {
+   "from": "group:claims-devs",
+   "to": "user:leo.brown"
+  },
+  {
+   "from": "group:claims-devs",
+   "to": "user:wen.kim"
+  },
+  {
+   "from": "group:clinical-data-2-analysts",
+   "to": "user:grace.patel"
+  },
+  {
+   "from": "group:clinical-data-2-devs",
+   "to": "user:frank.chen"
+  },
+  {
+   "from": "group:clinical-data-2-devs",
+   "to": "user:grace.wong"
+  },
+  {
+   "from": "group:clinical-data-2-devs",
+   "to": "user:judy.haddad"
+  },
+  {
+   "from": "group:clinical-data-2-devs",
+   "to": "user:lena.okafor"
+  },
+  {
+   "from": "group:clinical-data-analysts",
+   "to": "user:chen.wong7709"
+  },
+  {
+   "from": "group:clinical-data-analysts",
+   "to": "user:lena.larsen"
+  },
+  {
+   "from": "group:clinical-data-analysts",
+   "to": "user:uma.silva"
+  },
+  {
+   "from": "group:clinical-data-devs",
+   "to": "user:karl.silva"
+  },
+  {
+   "from": "group:clinical-data-devs",
+   "to": "user:omar.haddad"
+  },
+  {
+   "from": "group:clinical-data-devs",
+   "to": "user:zed.larsen"
+  },
+  {
+   "from": "group:compliance-2-analysts",
+   "to": "user:chen.tanaka"
+  },
+  {
+   "from": "group:compliance-2-analysts",
+   "to": "user:fay.miller"
+  },
+  {
+   "from": "group:compliance-2-analysts",
+   "to": "user:jun.cohen"
+  },
+  {
+   "from": "group:compliance-2-analysts",
+   "to": "user:raj.novak"
+  },
+  {
+   "from": "group:compliance-2-devs",
+   "to": "user:chen.haddad"
+  },
+  {
+   "from": "group:compliance-2-devs",
+   "to": "user:frank.mehta"
+  },
+  {
+   "from": "group:compliance-2-devs",
+   "to": "user:grace.lopez"
+  },
+  {
+   "from": "group:compliance-2-devs",
+   "to": "user:yara.brown"
+  },
+  {
+   "from": "group:compliance-analysts",
+   "to": "user:dara.dubois"
+  },
+  {
+   "from": "group:compliance-analysts",
+   "to": "user:lena.larsen"
+  },
+  {
+   "from": "group:compliance-devs",
+   "to": "user:jun.dubois243"
+  },
+  {
+   "from": "group:compliance-devs",
+   "to": "user:jun.novak"
+  },
+  {
+   "from": "group:compliance-devs",
+   "to": "user:quinn.kim"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-bela.sato"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-chen.muller"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-chen.okafor"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-judy.davis"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-jun.jones"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-karl.miller"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-leo.nguyen"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-raj.singh"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-sara.wong"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-xia.haddad"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-yara.novak"
+  },
+  {
+   "from": "group:contractors",
+   "to": "user:ext-yara.tanaka"
+  },
+  {
+   "from": "group:imaging-2-analysts",
+   "to": "user:erin.miller"
+  },
+  {
+   "from": "group:imaging-2-analysts",
+   "to": "user:fay.miller"
+  },
+  {
+   "from": "group:imaging-2-analysts",
+   "to": "user:judy.jones"
+  },
+  {
+   "from": "group:imaging-2-analysts",
+   "to": "user:raj.novak6903"
+  },
+  {
+   "from": "group:imaging-2-devs",
+   "to": "user:chen.reddy7712"
+  },
+  {
+   "from": "group:imaging-2-devs",
+   "to": "user:mei.garcia"
+  },
+  {
+   "from": "group:imaging-2-devs",
+   "to": "user:omar.kim"
+  },
+  {
+   "from": "group:imaging-analysts",
+   "to": "user:chen.tanaka"
+  },
+  {
+   "from": "group:imaging-analysts",
+   "to": "user:frank.mehta"
+  },
+  {
+   "from": "group:imaging-analysts",
+   "to": "user:gus.tanaka"
+  },
+  {
+   "from": "group:imaging-analysts",
+   "to": "user:uma.khan"
+  },
+  {
+   "from": "group:imaging-devs",
+   "to": "user:dave.kim"
+  },
+  {
+   "from": "group:imaging-devs",
+   "to": "user:dave.okafor"
+  },
+  {
+   "from": "group:imaging-devs",
+   "to": "user:priya.gupta"
+  },
+  {
+   "from": "group:lab-systems-devs",
+   "to": "user:chen.novak"
+  },
+  {
+   "from": "group:lab-systems-devs",
+   "to": "user:chen.reddy"
+  },
+  {
+   "from": "group:lab-systems-devs",
+   "to": "user:tom.ali"
+  },
+  {
+   "from": "group:lab-systems-devs",
+   "to": "user:zed.novak"
+  },
+  {
+   "from": "group:patient-portal-2-analysts",
+   "to": "user:ext-xia.haddad"
+  },
+  {
+   "from": "group:patient-portal-2-analysts",
+   "to": "user:raj.khan"
+  },
+  {
+   "from": "group:patient-portal-2-devs",
+   "to": "user:alice.reddy"
+  },
+  {
+   "from": "group:patient-portal-2-devs",
+   "to": "user:sara.brown"
+  },
+  {
+   "from": "group:patient-portal-analysts",
+   "to": "user:bela.mehta"
+  },
+  {
+   "from": "group:patient-portal-analysts",
+   "to": "user:ext-chen.muller"
+  },
+  {
+   "from": "group:patient-portal-devs",
+   "to": "user:dara.muller"
+  },
+  {
+   "from": "group:patient-portal-devs",
+   "to": "user:wen.okafor"
+  },
+  {
+   "from": "group:pharmacy-2-analysts",
+   "to": "user:amit.chen"
+  },
+  {
+   "from": "group:pharmacy-2-analysts",
+   "to": "user:bela.nguyen"
+  },
+  {
+   "from": "group:pharmacy-2-analysts",
+   "to": "user:eli.ali"
+  },
+  {
+   "from": "group:pharmacy-2-analysts",
+   "to": "user:frank.sato"
+  },
+  {
+   "from": "group:pharmacy-2-devs",
+   "to": "user:judy.brown"
+  },
+  {
+   "from": "group:pharmacy-analysts",
+   "to": "user:mei.garcia"
+  },
+  {
+   "from": "group:pharmacy-devs",
+   "to": "user:hana.lopez"
+  },
+  {
+   "from": "group:pharmacy-devs",
+   "to": "user:judy.novak"
+  },
+  {
+   "from": "group:pharmacy-devs",
+   "to": "user:yara.mehta"
+  },
+  {
+   "from": "group:platform-admins",
+   "to": "user:adm-alice.novak"
+  },
+  {
+   "from": "group:platform-admins",
+   "to": "user:adm-karl.smith"
+  },
+  {
+   "from": "group:platform-admins",
+   "to": "user:adm-leo.chen"
+  },
+  {
+   "from": "group:research-2-analysts",
+   "to": "user:amit.larsen"
+  },
+  {
+   "from": "group:research-2-analysts",
+   "to": "user:ivan.smith"
+  },
+  {
+   "from": "group:research-2-analysts",
+   "to": "user:xia.davis"
+  },
+  {
+   "from": "group:research-2-devs",
+   "to": "user:gus.tanaka"
+  },
+  {
+   "from": "group:research-2-devs",
+   "to": "user:lena.miller"
+  },
+  {
+   "from": "group:research-2-devs",
+   "to": "user:leo.dubois"
+  },
+  {
+   "from": "group:research-2-devs",
+   "to": "user:mei.smith"
+  },
+  {
+   "from": "group:research-2-devs",
+   "to": "user:quinn.patel"
+  },
+  {
+   "from": "group:research-2-devs",
+   "to": "user:vik.patel"
+  },
+  {
+   "from": "group:research-analysts",
+   "to": "user:bela.mehta"
+  },
+  {
+   "from": "group:research-analysts",
+   "to": "user:frank.singh"
+  },
+  {
+   "from": "group:research-analysts",
+   "to": "user:sara.muller"
+  },
+  {
+   "from": "group:research-devs",
+   "to": "user:erin.silva"
+  },
+  {
+   "from": "group:scheduling-2-analysts",
+   "to": "user:frank.chen132"
+  },
+  {
+   "from": "group:scheduling-2-devs",
+   "to": "user:zed.ivanov"
+  },
+  {
+   "from": "group:scheduling-analysts",
+   "to": "user:omar.muller"
+  },
+  {
+   "from": "group:scheduling-analysts",
+   "to": "user:zed.novak"
+  },
+  {
+   "from": "group:scheduling-devs",
+   "to": "user:erin.miller"
+  },
+  {
+   "from": "group:scheduling-devs",
+   "to": "user:karl.tanaka"
+  },
+  {
+   "from": "group:scheduling-devs",
+   "to": "user:sara.okafor"
+  },
+  {
+   "from": "group:telehealth-2-analysts",
+   "to": "user:chen.wong7709"
+  },
+  {
+   "from": "group:telehealth-2-analysts",
+   "to": "user:ext-raj.singh"
+  },
+  {
+   "from": "group:telehealth-2-analysts",
+   "to": "user:omar.muller"
+  },
+  {
+   "from": "group:telehealth-2-devs",
+   "to": "user:lena.khan"
+  },
+  {
+   "from": "group:telehealth-2-devs",
+   "to": "user:mike.silva"
+  },
+  {
+   "from": "group:telehealth-analysts",
+   "to": "user:judy.wong"
+  },
+  {
+   "from": "group:telehealth-analysts",
+   "to": "user:priya.miller"
+  },
+  {
+   "from": "group:telehealth-analysts",
+   "to": "user:priya.smith"
+  },
+  {
+   "from": "group:telehealth-analysts",
+   "to": "user:raj.miller"
+  },
+  {
+   "from": "group:telehealth-devs",
+   "to": "user:amit.patel"
+  },
+  {
+   "from": "group:telehealth-devs",
+   "to": "user:hana.larsen"
+  },
+  {
+   "from": "group:telehealth-devs",
+   "to": "user:karl.davis"
+  },
+  {
+   "from": "group:telehealth-devs",
+   "to": "user:kia.nguyen"
+  },
+  {
+   "from": "group:telehealth-devs",
+   "to": "user:priya.larsen"
+  },
+  {
+   "from": "policy:admin-all",
+   "to": "group:platform-admins"
+  },
+  {
+   "from": "policy:admin-all",
+   "to": "role:org-admin"
+  },
+  {
+   "from": "policy:analytics-2-data-rw",
+   "to": "group:analytics-2-devs"
+  },
+  {
+   "from": "policy:analytics-2-data-rw",
+   "to": "role:analytics-2-imaging-svc"
+  },
+  {
+   "from": "policy:analytics-2-data-rw",
+   "to": "role:analytics-2-imaging-svc44"
+  },
+  {
+   "from": "policy:analytics-2-data-rw",
+   "to": "role:analytics-2-svc"
+  },
+  {
+   "from": "policy:analytics-2-deploy-perms",
+   "to": "role:analytics-2-deploy"
+  },
+  {
+   "from": "policy:analytics-2-ops",
+   "to": "group:analytics-2-devs"
+  },
+  {
+   "from": "policy:analytics-2-ops",
+   "to": "role:analytics-2-deploy"
+  },
+  {
+   "from": "policy:analytics-2-ops",
+   "to": "role:analytics-2-svc"
+  },
+  {
+   "from": "policy:analytics-2-read",
+   "to": "group:analytics-2-analysts"
+  },
+  {
+   "from": "policy:analytics-data-rw",
+   "to": "group:analytics-devs"
+  },
+  {
+   "from": "policy:analytics-data-rw",
+   "to": "role:analytics-ehr-svc"
+  },
+  {
+   "from": "policy:analytics-data-rw",
+   "to": "role:analytics-ehr-svc32"
+  },
+  {
+   "from": "policy:analytics-data-rw",
+   "to": "role:analytics-svc"
+  },
+  {
+   "from": "policy:analytics-deploy-perms",
+   "to": "role:analytics-deploy"
+  },
+  {
+   "from": "policy:analytics-ops",
+   "to": "group:analytics-devs"
+  },
+  {
+   "from": "policy:analytics-ops",
+   "to": "role:analytics-deploy"
+  },
+  {
+   "from": "policy:analytics-ops",
+   "to": "role:analytics-svc"
+  },
+  {
+   "from": "policy:analytics-read",
+   "to": "group:analytics-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:analytics-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:analytics-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:analytics-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:analytics-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:billing-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:billing-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:billing-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:billing-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:claims-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:claims-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:claims-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:claims-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:clinical-data-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:clinical-data-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:clinical-data-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:clinical-data-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:compliance-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:compliance-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:compliance-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:compliance-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:contractors"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:imaging-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:imaging-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:imaging-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:imaging-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:lab-systems-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:lab-systems-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:patient-portal-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:patient-portal-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:patient-portal-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:patient-portal-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:pharmacy-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:pharmacy-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:pharmacy-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:pharmacy-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:research-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:research-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:research-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:research-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:scheduling-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:scheduling-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:scheduling-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:scheduling-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:telehealth-2-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:telehealth-2-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:telehealth-analysts"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "group:telehealth-devs"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "role:ci-runner"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:bela.nguyen"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:erin.cohen"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:fay.sato"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:ivan.smith"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:judy.haddad"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:jun.dubois"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:karl.tanaka"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:lena.cohen"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:leo.brown"
+  },
+  {
+   "from": "policy:base-readonly",
+   "to": "user:mike.mehta"
+  },
+  {
+   "from": "policy:billing-2-data-rw",
+   "to": "group:billing-2-devs"
+  },
+  {
+   "from": "policy:billing-2-data-rw",
+   "to": "role:billing-2-audit-svc"
+  },
+  {
+   "from": "policy:billing-2-data-rw",
+   "to": "role:billing-2-imaging-svc"
+  },
+  {
+   "from": "policy:billing-2-data-rw",
+   "to": "role:billing-2-svc"
+  },
+  {
+   "from": "policy:billing-2-deploy-perms",
+   "to": "role:billing-2-deploy"
+  },
+  {
+   "from": "policy:billing-2-ops",
+   "to": "group:billing-2-devs"
+  },
+  {
+   "from": "policy:billing-2-ops",
+   "to": "role:billing-2-deploy"
+  },
+  {
+   "from": "policy:billing-2-ops",
+   "to": "role:billing-2-svc"
+  },
+  {
+   "from": "policy:billing-2-read",
+   "to": "group:billing-2-analysts"
+  },
+  {
+   "from": "policy:billing-data-rw",
+   "to": "group:billing-devs"
+  },
+  {
+   "from": "policy:billing-data-rw",
+   "to": "role:billing-audit-svc"
+  },
+  {
+   "from": "policy:billing-data-rw",
+   "to": "role:billing-ehr-svc"
+  },
+  {
+   "from": "policy:billing-data-rw",
+   "to": "role:billing-reports-svc"
+  },
+  {
+   "from": "policy:billing-data-rw",
+   "to": "role:billing-svc"
+  },
+  {
+   "from": "policy:billing-deploy-perms",
+   "to": "role:billing-deploy"
+  },
+  {
+   "from": "policy:billing-ops",
+   "to": "group:billing-devs"
+  },
+  {
+   "from": "policy:billing-ops",
+   "to": "role:billing-deploy"
+  },
+  {
+   "from": "policy:billing-ops",
+   "to": "role:billing-svc"
+  },
+  {
+   "from": "policy:billing-read",
+   "to": "group:billing-analysts"
+  },
+  {
+   "from": "policy:ci-assume",
+   "to": "role:ci-runner"
+  },
+  {
+   "from": "policy:claims-2-data-rw",
+   "to": "group:claims-2-devs"
+  },
+  {
+   "from": "policy:claims-2-data-rw",
+   "to": "role:claims-2-imaging-svc"
+  },
+  {
+   "from": "policy:claims-2-data-rw",
+   "to": "role:claims-2-reports-svc"
+  },
+  {
+   "from": "policy:claims-2-data-rw",
+   "to": "role:claims-2-svc"
+  },
+  {
+   "from": "policy:claims-2-deploy-perms",
+   "to": "role:claims-2-deploy"
+  },
+  {
+   "from": "policy:claims-2-ops",
+   "to": "group:claims-2-devs"
+  },
+  {
+   "from": "policy:claims-2-ops",
+   "to": "role:claims-2-deploy"
+  },
+  {
+   "from": "policy:claims-2-ops",
+   "to": "role:claims-2-svc"
+  },
+  {
+   "from": "policy:claims-2-read",
+   "to": "group:claims-2-analysts"
+  },
+  {
+   "from": "policy:claims-data-rw",
+   "to": "group:claims-devs"
+  },
+  {
+   "from": "policy:claims-data-rw",
+   "to": "role:claims-audit-svc"
+  },
+  {
+   "from": "policy:claims-data-rw",
+   "to": "role:claims-phi-svc"
+  },
+  {
+   "from": "policy:claims-data-rw",
+   "to": "role:claims-stack-role"
+  },
+  {
+   "from": "policy:claims-data-rw",
+   "to": "role:claims-svc"
+  },
+  {
+   "from": "policy:claims-deploy-perms",
+   "to": "role:claims-deploy"
+  },
+  {
+   "from": "policy:claims-ops",
+   "to": "group:claims-devs"
+  },
+  {
+   "from": "policy:claims-ops",
+   "to": "role:claims-deploy"
+  },
+  {
+   "from": "policy:claims-ops",
+   "to": "role:claims-stack-role"
+  },
+  {
+   "from": "policy:claims-ops",
+   "to": "role:claims-svc"
+  },
+  {
+   "from": "policy:claims-read",
+   "to": "group:claims-analysts"
+  },
+  {
+   "from": "policy:clinical-data-2-data-rw",
+   "to": "group:clinical-data-2-devs"
+  },
+  {
+   "from": "policy:clinical-data-2-data-rw",
+   "to": "role:clinical-data-2-ehr-svc"
+  },
+  {
+   "from": "policy:clinical-data-2-data-rw",
+   "to": "role:clinical-data-2-reports-svc"
+  },
+  {
+   "from": "policy:clinical-data-2-data-rw",
+   "to": "role:clinical-data-2-svc"
+  },
+  {
+   "from": "policy:clinical-data-2-deploy-perms",
+   "to": "role:clinical-data-2-deploy"
+  },
+  {
+   "from": "policy:clinical-data-2-ops",
+   "to": "group:clinical-data-2-devs"
+  },
+  {
+   "from": "policy:clinical-data-2-ops",
+   "to": "role:clinical-data-2-deploy"
+  },
+  {
+   "from": "policy:clinical-data-2-ops",
+   "to": "role:clinical-data-2-svc"
+  },
+  {
+   "from": "policy:clinical-data-2-read",
+   "to": "group:clinical-data-2-analysts"
+  },
+  {
+   "from": "policy:clinical-data-data-rw",
+   "to": "group:clinical-data-devs"
+  },
+  {
+   "from": "policy:clinical-data-data-rw",
+   "to": "role:clinical-data-audit-svc"
+  },
+  {
+   "from": "policy:clinical-data-data-rw",
+   "to": "role:clinical-data-reports-svc"
+  },
+  {
+   "from": "policy:clinical-data-data-rw",
+   "to": "role:clinical-data-reports-svc46"
+  },
+  {
+   "from": "policy:clinical-data-data-rw",
+   "to": "role:clinical-data-stack-role"
+  },
+  {
+   "from": "policy:clinical-data-data-rw",
+   "to": "role:clinical-data-svc"
+  },
+  {
+   "from": "policy:clinical-data-deploy-perms",
+   "to": "role:clinical-data-deploy"
+  },
+  {
+   "from": "policy:clinical-data-ops",
+   "to": "group:clinical-data-devs"
+  },
+  {
+   "from": "policy:clinical-data-ops",
+   "to": "role:clinical-data-deploy"
+  },
+  {
+   "from": "policy:clinical-data-ops",
+   "to": "role:clinical-data-stack-role"
+  },
+  {
+   "from": "policy:clinical-data-ops",
+   "to": "role:clinical-data-svc"
+  },
+  {
+   "from": "policy:clinical-data-read",
+   "to": "group:clinical-data-analysts"
+  },
+  {
+   "from": "policy:compliance-2-data-rw",
+   "to": "group:compliance-2-devs"
+  },
+  {
+   "from": "policy:compliance-2-data-rw",
+   "to": "role:compliance-2-claims-svc"
+  },
+  {
+   "from": "policy:compliance-2-data-rw",
+   "to": "role:compliance-2-phi-svc"
+  },
+  {
+   "from": "policy:compliance-2-data-rw",
+   "to": "role:compliance-2-svc"
+  },
+  {
+   "from": "policy:compliance-2-deploy-perms",
+   "to": "role:compliance-2-deploy"
+  },
+  {
+   "from": "policy:compliance-2-ops",
+   "to": "group:compliance-2-devs"
+  },
+  {
+   "from": "policy:compliance-2-ops",
+   "to": "role:compliance-2-deploy"
+  },
+  {
+   "from": "policy:compliance-2-ops",
+   "to": "role:compliance-2-svc"
+  },
+  {
+   "from": "policy:compliance-2-read",
+   "to": "group:compliance-2-analysts"
+  },
+  {
+   "from": "policy:compliance-data-rw",
+   "to": "group:compliance-devs"
+  },
+  {
+   "from": "policy:compliance-data-rw",
+   "to": "role:compliance-claims-svc"
+  },
+  {
+   "from": "policy:compliance-data-rw",
+   "to": "role:compliance-phi-svc"
+  },
+  {
+   "from": "policy:compliance-data-rw",
+   "to": "role:compliance-svc"
+  },
+  {
+   "from": "policy:compliance-deploy-perms",
+   "to": "role:compliance-deploy"
+  },
+  {
+   "from": "policy:compliance-ops",
+   "to": "group:compliance-devs"
+  },
+  {
+   "from": "policy:compliance-ops",
+   "to": "role:compliance-deploy"
+  },
+  {
+   "from": "policy:compliance-ops",
+   "to": "role:compliance-svc"
+  },
+  {
+   "from": "policy:compliance-read",
+   "to": "group:compliance-analysts"
+  },
+  {
+   "from": "policy:imaging-2-data-rw",
+   "to": "group:imaging-2-devs"
+  },
+  {
+   "from": "policy:imaging-2-data-rw",
+   "to": "role:imaging-2-phi-svc"
+  },
+  {
+   "from": "policy:imaging-2-data-rw",
+   "to": "role:imaging-2-reports-svc"
+  },
+  {
+   "from": "policy:imaging-2-data-rw",
+   "to": "role:imaging-2-svc"
+  },
+  {
+   "from": "policy:imaging-2-deploy-perms",
+   "to": "role:imaging-2-deploy"
+  },
+  {
+   "from": "policy:imaging-2-ops",
+   "to": "group:imaging-2-devs"
+  },
+  {
+   "from": "policy:imaging-2-ops",
+   "to": "role:imaging-2-deploy"
+  },
+  {
+   "from": "policy:imaging-2-ops",
+   "to": "role:imaging-2-svc"
+  },
+  {
+   "from": "policy:imaging-2-read",
+   "to": "group:imaging-2-analysts"
+  },
+  {
+   "from": "policy:imaging-data-rw",
+   "to": "group:imaging-devs"
+  },
+  {
+   "from": "policy:imaging-data-rw",
+   "to": "role:imaging-imaging-svc"
+  },
+  {
+   "from": "policy:imaging-data-rw",
+   "to": "role:imaging-nb-role"
+  },
+  {
+   "from": "policy:imaging-data-rw",
+   "to": "role:imaging-phi-svc"
+  },
+  {
+   "from": "policy:imaging-data-rw",
+   "to": "role:imaging-svc"
+  },
+  {
+   "from": "policy:imaging-deploy-perms",
+   "to": "role:imaging-deploy"
+  },
+  {
+   "from": "policy:imaging-ops",
+   "to": "group:imaging-devs"
+  },
+  {
+   "from": "policy:imaging-ops",
+   "to": "role:imaging-deploy"
+  },
+  {
+   "from": "policy:imaging-ops",
+   "to": "role:imaging-nb-role"
+  },
+  {
+   "from": "policy:imaging-ops",
+   "to": "role:imaging-svc"
+  },
+  {
+   "from": "policy:imaging-read",
+   "to": "group:imaging-analysts"
+  },
+  {
+   "from": "policy:inj-pol-p1",
+   "to": "user:ext-raj.singh"
+  },
+  {
+   "from": "policy:inj-pol-p10",
+   "to": "user:alice.reddy"
+  },
+  {
+   "from": "policy:inj-pol-p2",
+   "to": "user:ext-raj.singh"
+  },
+  {
+   "from": "policy:inj-pol-p4",
+   "to": "user:ext-raj.singh"
+  },
+  {
+   "from": "policy:inj-pol-p5",
+   "to": "user:ext-raj.singh"
+  },
+  {
+   "from": "policy:inj-pol-p7",
+   "to": "user:ext-raj.singh"
+  },
+  {
+   "from": "policy:inj-pol-p8",
+   "to": "user:ext-raj.singh"
+  },
+  {
+   "from": "policy:inj-pol-p9",
+   "to": "user:grace.smith"
+  },
+  {
+   "from": "policy:lab-systems-data-rw",
+   "to": "group:lab-systems-devs"
+  },
+  {
+   "from": "policy:lab-systems-data-rw",
+   "to": "role:lab-systems-claims-svc"
+  },
+  {
+   "from": "policy:lab-systems-data-rw",
+   "to": "role:lab-systems-phi-svc"
+  },
+  {
+   "from": "policy:lab-systems-data-rw",
+   "to": "role:lab-systems-svc"
+  },
+  {
+   "from": "policy:lab-systems-deploy-perms",
+   "to": "role:lab-systems-deploy"
+  },
+  {
+   "from": "policy:lab-systems-ops",
+   "to": "group:lab-systems-devs"
+  },
+  {
+   "from": "policy:lab-systems-ops",
+   "to": "role:lab-systems-deploy"
+  },
+  {
+   "from": "policy:lab-systems-ops",
+   "to": "role:lab-systems-svc"
+  },
+  {
+   "from": "policy:lab-systems-read",
+   "to": "group:lab-systems-analysts"
+  },
+  {
+   "from": "policy:patient-portal-2-data-rw",
+   "to": "group:patient-portal-2-devs"
+  },
+  {
+   "from": "policy:patient-portal-2-data-rw",
+   "to": "role:patient-portal-2-audit-svc"
+  },
+  {
+   "from": "policy:patient-portal-2-data-rw",
+   "to": "role:patient-portal-2-audit-svc36"
+  },
+  {
+   "from": "policy:patient-portal-2-data-rw",
+   "to": "role:patient-portal-2-svc"
+  },
+  {
+   "from": "policy:patient-portal-2-deploy-perms",
+   "to": "role:patient-portal-2-deploy"
+  },
+  {
+   "from": "policy:patient-portal-2-ops",
+   "to": "group:patient-portal-2-devs"
+  },
+  {
+   "from": "policy:patient-portal-2-ops",
+   "to": "role:patient-portal-2-deploy"
+  },
+  {
+   "from": "policy:patient-portal-2-ops",
+   "to": "role:patient-portal-2-svc"
+  },
+  {
+   "from": "policy:patient-portal-2-read",
+   "to": "group:patient-portal-2-analysts"
+  },
+  {
+   "from": "policy:patient-portal-data-rw",
+   "to": "group:patient-portal-devs"
+  },
+  {
+   "from": "policy:patient-portal-data-rw",
+   "to": "role:patient-portal-claims-svc"
+  },
+  {
+   "from": "policy:patient-portal-data-rw",
+   "to": "role:patient-portal-ehr-svc"
+  },
+  {
+   "from": "policy:patient-portal-data-rw",
+   "to": "role:patient-portal-phi-svc"
+  },
+  {
+   "from": "policy:patient-portal-data-rw",
+   "to": "role:patient-portal-svc"
+  },
+  {
+   "from": "policy:patient-portal-deploy-perms",
+   "to": "role:patient-portal-deploy"
+  },
+  {
+   "from": "policy:patient-portal-ops",
+   "to": "group:patient-portal-devs"
+  },
+  {
+   "from": "policy:patient-portal-ops",
+   "to": "role:patient-portal-deploy"
+  },
+  {
+   "from": "policy:patient-portal-ops",
+   "to": "role:patient-portal-svc"
+  },
+  {
+   "from": "policy:patient-portal-read",
+   "to": "group:patient-portal-analysts"
+  },
+  {
+   "from": "policy:pharmacy-2-data-rw",
+   "to": "group:pharmacy-2-devs"
+  },
+  {
+   "from": "policy:pharmacy-2-data-rw",
+   "to": "role:pharmacy-2-audit-svc"
+  },
+  {
+   "from": "policy:pharmacy-2-data-rw",
+   "to": "role:pharmacy-2-imaging-svc"
+  },
+  {
+   "from": "policy:pharmacy-2-data-rw",
+   "to": "role:pharmacy-2-svc"
+  },
+  {
+   "from": "policy:pharmacy-2-deploy-perms",
+   "to": "role:pharmacy-2-deploy"
+  },
+  {
+   "from": "policy:pharmacy-2-ops",
+   "to": "group:pharmacy-2-devs"
+  },
+  {
+   "from": "policy:pharmacy-2-ops",
+   "to": "role:pharmacy-2-deploy"
+  },
+  {
+   "from": "policy:pharmacy-2-ops",
+   "to": "role:pharmacy-2-svc"
+  },
+  {
+   "from": "policy:pharmacy-2-read",
+   "to": "group:pharmacy-2-analysts"
+  },
+  {
+   "from": "policy:pharmacy-data-rw",
+   "to": "group:pharmacy-devs"
+  },
+  {
+   "from": "policy:pharmacy-data-rw",
+   "to": "role:pharmacy-audit-svc"
+  },
+  {
+   "from": "policy:pharmacy-data-rw",
+   "to": "role:pharmacy-audit-svc27"
+  },
+  {
+   "from": "policy:pharmacy-data-rw",
+   "to": "role:pharmacy-svc"
+  },
+  {
+   "from": "policy:pharmacy-deploy-perms",
+   "to": "role:pharmacy-deploy"
+  },
+  {
+   "from": "policy:pharmacy-ops",
+   "to": "group:pharmacy-devs"
+  },
+  {
+   "from": "policy:pharmacy-ops",
+   "to": "role:pharmacy-deploy"
+  },
+  {
+   "from": "policy:pharmacy-ops",
+   "to": "role:pharmacy-svc"
+  },
+  {
+   "from": "policy:pharmacy-read",
+   "to": "group:pharmacy-analysts"
+  },
+  {
+   "from": "policy:research-2-data-rw",
+   "to": "group:research-2-devs"
+  },
+  {
+   "from": "policy:research-2-data-rw",
+   "to": "role:research-2-ehr-svc"
+  },
+  {
+   "from": "policy:research-2-data-rw",
+   "to": "role:research-2-ehr-svc41"
+  },
+  {
+   "from": "policy:research-2-data-rw",
+   "to": "role:research-2-svc"
+  },
+  {
+   "from": "policy:research-2-deploy-perms",
+   "to": "role:research-2-deploy"
+  },
+  {
+   "from": "policy:research-2-ops",
+   "to": "group:research-2-devs"
+  },
+  {
+   "from": "policy:research-2-ops",
+   "to": "role:research-2-deploy"
+  },
+  {
+   "from": "policy:research-2-ops",
+   "to": "role:research-2-svc"
+  },
+  {
+   "from": "policy:research-2-read",
+   "to": "group:research-2-analysts"
+  },
+  {
+   "from": "policy:research-data-rw",
+   "to": "group:research-devs"
+  },
+  {
+   "from": "policy:research-data-rw",
+   "to": "role:research-claims-svc"
+  },
+  {
+   "from": "policy:research-data-rw",
+   "to": "role:research-ehr-svc"
+  },
+  {
+   "from": "policy:research-data-rw",
+   "to": "role:research-nb-role"
+  },
+  {
+   "from": "policy:research-data-rw",
+   "to": "role:research-svc"
+  },
+  {
+   "from": "policy:research-deploy-perms",
+   "to": "role:research-deploy"
+  },
+  {
+   "from": "policy:research-ops",
+   "to": "group:research-devs"
+  },
+  {
+   "from": "policy:research-ops",
+   "to": "role:research-deploy"
+  },
+  {
+   "from": "policy:research-ops",
+   "to": "role:research-nb-role"
+  },
+  {
+   "from": "policy:research-ops",
+   "to": "role:research-svc"
+  },
+  {
+   "from": "policy:research-read",
+   "to": "group:research-analysts"
+  },
+  {
+   "from": "policy:scheduling-2-data-rw",
+   "to": "group:scheduling-2-devs"
+  },
+  {
+   "from": "policy:scheduling-2-data-rw",
+   "to": "role:scheduling-2-ehr-svc"
+  },
+  {
+   "from": "policy:scheduling-2-data-rw",
+   "to": "role:scheduling-2-phi-svc"
+  },
+  {
+   "from": "policy:scheduling-2-data-rw",
+   "to": "role:scheduling-2-svc"
+  },
+  {
+   "from": "policy:scheduling-2-deploy-perms",
+   "to": "role:scheduling-2-deploy"
+  },
+  {
+   "from": "policy:scheduling-2-ops",
+   "to": "group:scheduling-2-devs"
+  },
+  {
+   "from": "policy:scheduling-2-ops",
+   "to": "role:scheduling-2-deploy"
+  },
+  {
+   "from": "policy:scheduling-2-ops",
+   "to": "role:scheduling-2-svc"
+  },
+  {
+   "from": "policy:scheduling-2-read",
+   "to": "group:scheduling-2-analysts"
+  },
+  {
+   "from": "policy:scheduling-data-rw",
+   "to": "group:scheduling-devs"
+  },
+  {
+   "from": "policy:scheduling-data-rw",
+   "to": "role:scheduling-imaging-svc"
+  },
+  {
+   "from": "policy:scheduling-data-rw",
+   "to": "role:scheduling-imaging-svc31"
+  },
+  {
+   "from": "policy:scheduling-data-rw",
+   "to": "role:scheduling-nb-role"
+  },
+  {
+   "from": "policy:scheduling-data-rw",
+   "to": "role:scheduling-svc"
+  },
+  {
+   "from": "policy:scheduling-deploy-perms",
+   "to": "role:scheduling-deploy"
+  },
+  {
+   "from": "policy:scheduling-ops",
+   "to": "group:scheduling-devs"
+  },
+  {
+   "from": "policy:scheduling-ops",
+   "to": "role:scheduling-deploy"
+  },
+  {
+   "from": "policy:scheduling-ops",
+   "to": "role:scheduling-nb-role"
+  },
+  {
+   "from": "policy:scheduling-ops",
+   "to": "role:scheduling-svc"
+  },
+  {
+   "from": "policy:scheduling-read",
+   "to": "group:scheduling-analysts"
+  },
+  {
+   "from": "policy:security-audit",
+   "to": "role:security-audit-role"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:analytics-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:analytics-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:billing-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:billing-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:claims-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:claims-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:clinical-data-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:clinical-data-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:compliance-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:compliance-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:imaging-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:imaging-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:lab-systems-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:patient-portal-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:patient-portal-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:pharmacy-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:pharmacy-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:research-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:research-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:scheduling-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:scheduling-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:telehealth-2-devs"
+  },
+  {
+   "from": "policy:self-service",
+   "to": "group:telehealth-devs"
+  },
+  {
+   "from": "policy:telehealth-2-data-rw",
+   "to": "group:telehealth-2-devs"
+  },
+  {
+   "from": "policy:telehealth-2-data-rw",
+   "to": "role:telehealth-2-ehr-svc"
+  },
+  {
+   "from": "policy:telehealth-2-data-rw",
+   "to": "role:telehealth-2-phi-svc"
+  },
+  {
+   "from": "policy:telehealth-2-data-rw",
+   "to": "role:telehealth-2-svc"
+  },
+  {
+   "from": "policy:telehealth-2-deploy-perms",
+   "to": "role:telehealth-2-deploy"
+  },
+  {
+   "from": "policy:telehealth-2-ops",
+   "to": "group:telehealth-2-devs"
+  },
+  {
+   "from": "policy:telehealth-2-ops",
+   "to": "role:telehealth-2-deploy"
+  },
+  {
+   "from": "policy:telehealth-2-ops",
+   "to": "role:telehealth-2-svc"
+  },
+  {
+   "from": "policy:telehealth-2-read",
+   "to": "group:telehealth-2-analysts"
+  },
+  {
+   "from": "policy:telehealth-data-rw",
+   "to": "group:telehealth-devs"
+  },
+  {
+   "from": "policy:telehealth-data-rw",
+   "to": "role:telehealth-audit-svc"
+  },
+  {
+   "from": "policy:telehealth-data-rw",
+   "to": "role:telehealth-audit-svc28"
+  },
+  {
+   "from": "policy:telehealth-data-rw",
+   "to": "role:telehealth-svc"
+  },
+  {
+   "from": "policy:telehealth-deploy-perms",
+   "to": "role:telehealth-deploy"
+  },
+  {
+   "from": "policy:telehealth-ops",
+   "to": "group:telehealth-devs"
+  },
+  {
+   "from": "policy:telehealth-ops",
+   "to": "role:telehealth-deploy"
+  },
+  {
+   "from": "policy:telehealth-ops",
+   "to": "role:telehealth-svc"
+  },
+  {
+   "from": "policy:telehealth-read",
+   "to": "group:telehealth-analysts"
+  },
+  {
+   "from": "role:analytics-2-svc",
+   "to": "function:analytics-2-imaging-fn0"
+  },
+  {
+   "from": "role:analytics-2-svc",
+   "to": "function:analytics-2-imaging-fn13"
+  },
+  {
+   "from": "role:analytics-2-svc",
+   "to": "function:research-2-ehr-fn8"
+  },
+  {
+   "from": "role:analytics-svc",
+   "to": "workload:analytics-ec29"
+  },
+  {
+   "from": "role:billing-2-audit-svc",
+   "to": "function:telehealth-audit-fn16"
+  },
+  {
+   "from": "role:billing-reports-svc",
+   "to": "function:claims-phi-fn23"
+  },
+  {
+   "from": "role:billing-svc",
+   "to": "function:billing-ehr-fn19"
+  },
+  {
+   "from": "role:billing-svc",
+   "to": "function:billing-reports-fn27"
+  },
+  {
+   "from": "role:billing-svc",
+   "to": "workload:billing-ec22"
+  },
+  {
+   "from": "role:claims-phi-svc",
+   "to": "function:pharmacy-audit-fn14"
+  },
+  {
+   "from": "role:claims-stack-role",
+   "to": "workload:claims-stack7"
+  },
+  {
+   "from": "role:clinical-data-2-ehr-svc",
+   "to": "function:claims-2-imaging-fn17"
+  },
+  {
+   "from": "role:clinical-data-2-svc",
+   "to": "function:clinical-data-2-ehr-fn6"
+  },
+  {
+   "from": "role:clinical-data-2-svc",
+   "to": "function:clinical-data-2-ehr-fn9"
+  },
+  {
+   "from": "role:clinical-data-2-svc",
+   "to": "function:clinical-data-2-reports-fn3"
+  },
+  {
+   "from": "role:clinical-data-stack-role",
+   "to": "workload:clinical-data-stack0"
+  },
+  {
+   "from": "role:clinical-data-svc",
+   "to": "function:clinical-data-audit-fn24"
+  },
+  {
+   "from": "role:compliance-svc",
+   "to": "function:imaging-2-phi-fn10"
+  },
+  {
+   "from": "role:compliance-svc",
+   "to": "workload:compliance-ec210"
+  },
+  {
+   "from": "role:imaging-2-svc",
+   "to": "function:imaging-2-claims-fn1"
+  },
+  {
+   "from": "role:imaging-nb-role",
+   "to": "workload:imaging-nb3"
+  },
+  {
+   "from": "role:imaging-phi-svc",
+   "to": "function:imaging-phi-fn5"
+  },
+  {
+   "from": "role:imaging-svc",
+   "to": "function:imaging-reports-fn12"
+  },
+  {
+   "from": "role:lab-systems-claims-svc",
+   "to": "function:scheduling-2-ehr-fn15"
+  },
+  {
+   "from": "role:lab-systems-svc",
+   "to": "function:lab-systems-claims-fn21"
+  },
+  {
+   "from": "role:lab-systems-svc",
+   "to": "function:lab-systems-phi-fn22"
+  },
+  {
+   "from": "role:patient-portal-2-svc",
+   "to": "function:patient-portal-2-audit-fn2"
+  },
+  {
+   "from": "role:patient-portal-svc",
+   "to": "workload:patient-portal-ec21"
+  },
+  {
+   "from": "role:pharmacy-svc",
+   "to": "function:pharmacy-audit-fn26"
+  },
+  {
+   "from": "role:pharmacy-svc",
+   "to": "workload:pharmacy-ec24"
+  },
+  {
+   "from": "role:research-2-svc",
+   "to": "function:research-2-ehr-fn20"
+  },
+  {
+   "from": "role:research-nb-role",
+   "to": "workload:research-nb6"
+  },
+  {
+   "from": "role:research-svc",
+   "to": "function:lab-systems-claims-fn25"
+  },
+  {
+   "from": "role:scheduling-nb-role",
+   "to": "workload:scheduling-nb8"
+  },
+  {
+   "from": "role:telehealth-2-ehr-svc",
+   "to": "function:clinical-data-2-ehr-fn11"
+  },
+  {
+   "from": "role:telehealth-2-svc",
+   "to": "function:telehealth-2-claims-fn18"
+  },
+  {
+   "from": "role:telehealth-2-svc",
+   "to": "function:telehealth-2-phi-fn4"
+  },
+  {
+   "from": "role:telehealth-2-svc",
+   "to": "function:telehealth-2-phi-fn7"
+  },
+  {
+   "from": "role:telehealth-svc",
+   "to": "workload:telehealth-ec25"
+  }
+ ]
+}
