@@ -2,7 +2,7 @@
 
 My own code imports only from this module. Nothing in external/ is modified; adaptations live here.
 
-    e = load_config("arifen-15ocxf")            # dataset name (external/data/) or a path to TAC JSON
+    e = load_config("arifen-15ocxf")            # dataset name (converted from Terraform) or a .json path
     o = e.make_oracle(budget=100)              # A's view: entity-permission queries
     o.ask(Query.of("user:ext-raj.singh", "*@*"))
     e.reachable().found                         # whitebox check on the full (hidden) config
@@ -26,7 +26,8 @@ if str(EXTERNAL) not in sys.path:
     sys.path.insert(0, str(EXTERNAL))
 
 from iam_detector.tac.engine import Result, WitnessStep, enumerate_paths, relax  # noqa: E402
-from iam_detector.tac.model import ADMIN, Perm, TacConfig, load_tac_config, parse_perm  # noqa: E402
+from iam_detector.tac.model import (ADMIN, Perm, TacConfig, build_tac_config, load_tac_config,  # noqa: E402
+                                     parse_perm)
 from iam_detector.tac.templates import Template, load_templates  # noqa: E402
 
 
@@ -71,9 +72,10 @@ def _as_perm(p: Perm | str) -> Perm:
 class Env:
     """One loaded config: the hidden full graph plus helpers for querying, checking and cutting."""
 
-    def __init__(self, config: TacConfig, name: str = ""):
+    def __init__(self, config: TacConfig, name: str = "", warnings: dict | None = None):
         self.config = config
         self.name = name
+        self.warnings = warnings or {}   # converter warnings (Terraform-converted configs only)
         self._reach: dict[str, Result] = {}
 
     # ---------------------------------------------------------------- view of the config
@@ -138,19 +140,45 @@ class Env:
             new_assign[entity] = [p for p in new_assign[entity] if p != perm]
         cfg = dataclasses.replace(self.config, assignments=new_assign,
                                   relations=[r for r in self.config.relations if r not in drop_rel])
-        return Env(cfg, self.name)
+        return Env(cfg, self.name, self.warnings)
 
 
-def load_config(name_or_path: str | Path, untrusted: str | None = None, target: str | None = None) -> Env:
-    """Load a TAC-JSON config by dataset name (external/data/<name>.json) or by path."""
+def action_specs() -> dict[str, dict]:
+    """Escalation-relevant actions from the templates: which entity types each targets, and whether
+    some template needs it on `*` (an action that creates a new resource). Input to the converter."""
+    specs: dict[str, dict] = {}
+    for t in templates():
+        for op in t.ops:
+            s = specs.setdefault(op.action, {"types": set(), "on_star": False})
+            if op.on == "*":
+                s["on_star"] = True
+            else:
+                s["types"] |= (t.src_types if op.on == "src" else t.sink_types) - {"AnyPolicy"}
+    return specs
+
+
+def load_config(name_or_path: str | Path, untrusted: str | None = None, target: str | None = None,
+                use_cache: bool = True) -> Env:
+    """Load a config.
+
+    A dataset name (e.g. "kasol-zq0qg") is converted from its Terraform directory by
+    iampe.parser.to_tac. A path to a .json file is loaded as TAC JSON as-is (e.g. the team's
+    external/data/arifen-15ocxf.json).
+    """
+    from iampe.data.index import get_config
+    from iampe.parser.to_tac import convert
+
     p = Path(name_or_path)
-    if not p.suffix:
-        p = DATA_DIR / f"{p}.json"
-    return Env(load_tac_config(str(p), untrusted, target), p.stem)
+    if p.suffix == ".json":
+        return Env(load_tac_config(str(p), untrusted, target), p.stem)
+    root = convert(get_config(str(name_or_path)).path, action_specs(), use_cache=use_cache)
+    return Env(build_tac_config(root, untrusted, target), str(name_or_path), root["_source"]["warnings"])
 
 
 def available_configs() -> list[str]:
-    return sorted(f.stem for f in DATA_DIR.glob("*.json"))
+    from iampe.data.index import list_configs
+
+    return [r.org for r in list_configs()]
 
 
 __all__ = ["ADMIN", "Answer", "BudgetExhausted", "Env", "InvalidQuery", "Oracle", "Perm", "Query",
