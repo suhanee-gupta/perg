@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import torch
 from torch import nn
-from torch_geometric.nn import GATv2Conv
+from torch_geometric.data import Batch
+from torch_geometric.nn import GATv2Conv, global_max_pool, global_mean_pool
 
 from iampe.env.features import EDGE_DIM, NODE_DIM_A, NODE_DIM_B, finder_graph, remover_graph
 
@@ -28,11 +29,24 @@ class _Encoder(nn.Module):
         return h
 
 
-def _pool(h):
-    return torch.cat([h.mean(0), h.max(0).values]) if h.shape[0] else torch.zeros(2 * h.shape[1])
+class _GraphPolicy(nn.Module):
+    """Shared batching: `forward_batch(datas)` encodes many observation graphs at once and returns
+    one logit vector per graph (its candidates, then the terminal action) and a value per graph."""
+
+    def _prep(self, datas):
+        dev = next(self.parameters()).device
+        b = Batch.from_data_list(datas).to(dev)
+        h = self.enc(b)
+        g = torch.cat([global_mean_pool(h, b.batch, len(datas)), global_max_pool(h, b.batch, len(datas)), b.glob], dim=-1)
+        ncand = [int(d.cand.numel()) for d in datas]
+        return b, h, g, ncand
+
+    def forward(self, data):
+        logits, v = self.forward_batch([data])
+        return logits[0], v[0]
 
 
-class FinderPolicy(nn.Module):
+class FinderPolicy(_GraphPolicy):
     def __init__(self, hidden: int = 64):
         super().__init__()
         self.enc = _Encoder(NODE_DIM_A, hidden)
@@ -40,14 +54,15 @@ class FinderPolicy(nn.Module):
         self.end_head = nn.Sequential(nn.Linear(2 * hidden + 2, hidden), nn.ReLU(), nn.Linear(hidden, 1))
         self.value = nn.Sequential(nn.Linear(2 * hidden + 2, hidden), nn.ReLU(), nn.Linear(hidden, 1))
 
-    def forward(self, data):
-        h = self.enc(data)
-        g = torch.cat([_pool(h), data.glob[0]])
-        logits = torch.cat([self.node_head(h[data.cand]).squeeze(-1), self.end_head(g)])
-        return logits, self.value(g).squeeze(-1)
+    def forward_batch(self, datas):
+        b, h, g, ncand = self._prep(datas)
+        offs = b.ptr[:-1].repeat_interleave(torch.tensor(ncand, device=h.device))
+        node_logits = self.node_head(h[b.cand + offs]).squeeze(-1).split(ncand)
+        end = self.end_head(g).squeeze(-1)
+        return [torch.cat([nl, end[i:i + 1]]) for i, nl in enumerate(node_logits)], self.value(g).squeeze(-1)
 
 
-class RemediatorPolicy(nn.Module):
+class RemediatorPolicy(_GraphPolicy):
     def __init__(self, hidden: int = 64):
         super().__init__()
         self.enc = _Encoder(NODE_DIM_B, hidden)
@@ -55,18 +70,21 @@ class RemediatorPolicy(nn.Module):
         self.stop_head = nn.Sequential(nn.Linear(2 * hidden + 2, hidden), nn.ReLU(), nn.Linear(hidden, 1))
         self.value = nn.Sequential(nn.Linear(2 * hidden + 2, hidden), nn.ReLU(), nn.Linear(hidden, 1))
 
-    def forward(self, data):
-        h = self.enc(data)
-        g = torch.cat([_pool(h), data.glob[0]])
-        ei = data.edge_index[:, data.cand]
-        feats = torch.cat([h[ei[0]], h[ei[1]], data.edge_attr[data.cand]], dim=-1)
-        logits = torch.cat([self.edge_head(feats).squeeze(-1), self.stop_head(g)])
-        return logits, self.value(g).squeeze(-1)
+    def forward_batch(self, datas):
+        b, h, g, ncand = self._prep(datas)
+        e_off = torch.tensor([0] + [int(d.edge_index.shape[1]) for d in datas[:-1]], device=h.device).cumsum(0)
+        cg = b.cand + e_off.repeat_interleave(torch.tensor(ncand, device=h.device))
+        ei = b.edge_index[:, cg]
+        feats = torch.cat([h[ei[0]], h[ei[1]], b.edge_attr[cg]], dim=-1)
+        edge_logits = self.edge_head(feats).squeeze(-1).split(ncand)
+        stop = self.stop_head(g).squeeze(-1)
+        return [torch.cat([el, stop[i:i + 1]]) for i, el in enumerate(edge_logits)], self.value(g).squeeze(-1)
 
 
 def _sample(policy, data, greedy: bool, allow_last: bool = True):
     with torch.no_grad():
         logits, v = policy(data)
+        logits, v = logits.cpu(), v.cpu()
     if not allow_last:
         logits = logits.clone()
         logits[-1] = -1e9

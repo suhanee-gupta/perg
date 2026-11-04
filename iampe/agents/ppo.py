@@ -31,23 +31,22 @@ def ppo_update(policy, opt, steps: list[dict], epochs: int = 4, clip: float = 0.
     advs = torch.tensor([s["adv"] for s in steps])
     mean, std = advs.mean(), advs.std() + 1e-8
     stats = {"loss": 0.0, "n": 0}
+    dev = next(policy.parameters()).device
     for _ in range(epochs):
         order = list(range(len(steps)))
         rng.shuffle(order)
         for i in range(0, len(order), minibatch):
+            mb = [steps[j] for j in order[i:i + minibatch]]
+            logits, values = policy.forward_batch([s["data"] for s in mb])
             losses = []
-            for j in order[i:i + minibatch]:
-                s = steps[j]
-                logits, v = policy(s["data"])
+            for s, lg, v in zip(mb, logits, values):
                 if s.get("mask_last"):
-                    logits = torch.cat([logits[:-1], logits.new_full((1,), -1e9)])
-                dist = torch.distributions.Categorical(logits=logits)
-                a = torch.tensor(s["a"])
-                ratio = torch.exp(dist.log_prob(a) - s["logp"])
-                adv = (s["adv"] - mean) / std
+                    lg = torch.cat([lg[:-1], lg.new_full((1,), -1e9)])
+                dist = torch.distributions.Categorical(logits=lg)
+                ratio = torch.exp(dist.log_prob(torch.tensor(s["a"], device=dev)) - s["logp"])
+                adv = float((s["adv"] - mean) / std)
                 pg = -torch.min(ratio * adv, torch.clamp(ratio, 1 - clip, 1 + clip) * adv)
-                vl = (v - s["ret"]) ** 2
-                losses.append(pg + vf_coef * vl - ent_coef * dist.entropy())
+                losses.append(pg + vf_coef * (v - s["ret"]) ** 2 - ent_coef * dist.entropy())
             loss = torch.stack(losses).mean()
             opt.zero_grad()
             loss.backward()
@@ -67,8 +66,11 @@ def bc_update(policy, opt, pairs: list[tuple], epochs: int = 5, minibatch: int =
         rng.shuffle(pairs)
         tot, n = 0.0, 0
         for i in range(0, len(pairs), minibatch):
-            loss = torch.stack([torch.nn.functional.cross_entropy(policy(d)[0][None], torch.tensor([y]))
-                                for d, y in pairs[i:i + minibatch]]).mean()
+            mb = pairs[i:i + minibatch]
+            logits, _ = policy.forward_batch([d for d, _ in mb])
+            dev = logits[0].device
+            loss = torch.stack([torch.nn.functional.cross_entropy(lg[None], torch.tensor([y], device=dev))
+                                for lg, (_, y) in zip(logits, mb)]).mean()
             opt.zero_grad()
             loss.backward()
             opt.step()
