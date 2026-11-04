@@ -1,0 +1,101 @@
+{
+  "org": "kasol-zq0qg",
+  "archetype": "education",
+  "seed": 60000568,
+  "untrusted_entity": "user:ext-fay.wong",
+  "untrusted_type": "contractor-user",
+  "stats": {
+    "n_entities": 53,
+    "n_users": 23,
+    "n_groups": 10,
+    "n_roles": 20,
+    "n_policies": 22,
+    "n_functions": 5,
+    "n_workloads": 2,
+    "n_connections": 138
+  },
+  "ground_truth": {
+    "has_pe": true,
+    "min_len": 1,
+    "witness": [
+      {
+        "prim": "put_user_policy",
+        "via": [
+          "user:ext-fay.wong"
+        ],
+        "to": "admin:*"
+      }
+    ]
+  },
+  "injection_plan": {
+    "planted": [
+      {
+        "start": "user:ext-fay.wong",
+        "length": 1,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "put_user_policy",
+            "category": "permission_request",
+            "from": "user:ext-fay.wong",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p1"
+          }
+        ]
+      }
+    ],
+    "decoys": [
+      {
+        "start": "user:ext-fay.wong",
+        "length": 1,
+        "reaches_admin": false,
+        "broken_at": 0,
+        "hops": [
+          {
+            "prim": "assume_role",
+            "category": "role_assumption",
+            "from": "user:ext-fay.wong",
+            "to": "role:inj-assume-r2",
+            "decoy": true,
+            "decoy_style": "wrong_resource"
+          }
+        ]
+      },
+      {
+        "start": "user:ext-fay.wong",
+        "length": 1,
+        "reaches_admin": false,
+        "broken_at": 0,
+        "hops": [
+          {
+            "prim": "assume_role",
+            "category": "role_assumption",
+            "from": "user:ext-fay.wong",
+            "to": "role:inj-assume-r3",
+            "decoy": true,
+            "decoy_style": "wrong_resource"
+          }
+        ]
+      }
+    ],
+    "dead_ends": [],
+    "expected_pe": true
+  },
+  "dfs": {
+    "n_paths": 1,
+    "capped": false,
+    "min_len": 1,
+    "paths": [
+      [
+        {
+          "prim": "put_user_policy",
+          "src": "user:ext-fay.wong",
+          "dst": "admin:*"
+        }
+      ]
+    ]
+  },
+  "consistency_ok": true
+}

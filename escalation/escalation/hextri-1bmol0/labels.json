@@ -1,0 +1,121 @@
+{
+  "org": "hextri-1bmol0",
+  "archetype": "government",
+  "seed": 80000244,
+  "untrusted_entity": "user:ext-mei.kim",
+  "untrusted_type": "contractor-user",
+  "stats": {
+    "n_entities": 1143,
+    "n_users": 556,
+    "n_groups": 162,
+    "n_roles": 425,
+    "n_policies": 332,
+    "n_functions": 114,
+    "n_workloads": 45,
+    "n_connections": 3060
+  },
+  "ground_truth": {
+    "has_pe": true,
+    "min_len": 2,
+    "witness": [
+      {
+        "prim": "create_login_profile",
+        "via": [
+          "user:ext-mei.kim"
+        ],
+        "to": "user:inj-svc-u1"
+      },
+      {
+        "prim": "put_user_policy",
+        "via": [
+          "user:inj-svc-u1"
+        ],
+        "to": "admin:*"
+      }
+    ]
+  },
+  "injection_plan": {
+    "planted": [
+      {
+        "start": "user:ext-mei.kim",
+        "length": 2,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "create_login_profile",
+            "category": "credential_takeover",
+            "from": "user:ext-mei.kim",
+            "to": "user:inj-svc-u1",
+            "decoy": false,
+            "policy": "inj-pol-p2"
+          },
+          {
+            "prim": "put_user_policy",
+            "category": "permission_request",
+            "from": "user:inj-svc-u1",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p3"
+          }
+        ]
+      }
+    ],
+    "decoys": [
+      {
+        "start": "user:ext-mei.kim",
+        "length": 2,
+        "reaches_admin": false,
+        "broken_at": 1,
+        "hops": [
+          {
+            "prim": "pass_role_glue",
+            "category": "permission_delegation",
+            "from": "user:ext-mei.kim",
+            "to": "role:inj-glue-exec-r4",
+            "decoy": false,
+            "policy": "inj-pol-p5",
+            "policies": [
+              "inj-pol-p5",
+              "inj-pol-p6"
+            ],
+            "recipe": [
+              "glue:CreateDevEndpoint"
+            ]
+          },
+          {
+            "prim": "set_default_policy_version",
+            "category": "permission_request",
+            "from": "role:inj-glue-exec-r4",
+            "to": "admin",
+            "decoy": true,
+            "policy": "inj-pol-p8",
+            "decoy_style": "wrong_resource",
+            "legacy_policy": "inj-legacy-p7"
+          }
+        ]
+      }
+    ],
+    "dead_ends": [
+      {
+        "start": "role:it-ops-3-deploy",
+        "length": 1,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "create_policy_version",
+            "category": "permission_request",
+            "from": "role:it-ops-3-deploy",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p9"
+          }
+        ]
+      }
+    ],
+    "expected_pe": true
+  },
+  "dfs": null,
+  "consistency_ok": true
+}

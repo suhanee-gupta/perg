@@ -1,0 +1,204 @@
+{
+  "org": "lumzen-15ocuk",
+  "archetype": "saas",
+  "seed": 70000652,
+  "untrusted_entity": "user:ext-dara.smith",
+  "untrusted_type": "contractor-user",
+  "stats": {
+    "n_entities": 290,
+    "n_users": 133,
+    "n_groups": 50,
+    "n_roles": 107,
+    "n_policies": 105,
+    "n_functions": 29,
+    "n_workloads": 11,
+    "n_connections": 775
+  },
+  "ground_truth": {
+    "has_pe": true,
+    "min_len": 1,
+    "witness": [
+      {
+        "prim": "attach_group_policy",
+        "via": [
+          "user:ext-dara.smith"
+        ],
+        "to": "admin:*"
+      }
+    ]
+  },
+  "injection_plan": {
+    "planted": [
+      {
+        "start": "user:ext-dara.smith",
+        "length": 2,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "add_user_to_group",
+            "category": "permission_inheritance",
+            "from": "user:ext-dara.smith",
+            "to": "group:inj-grp-g1",
+            "decoy": false,
+            "policy": "inj-pol-p2"
+          },
+          {
+            "prim": "put_group_policy",
+            "category": "permission_request",
+            "from": "group:inj-grp-g1",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p3"
+          }
+        ]
+      },
+      {
+        "start": "user:ext-dara.smith",
+        "length": 2,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "add_user_to_group",
+            "category": "permission_inheritance",
+            "from": "user:ext-dara.smith",
+            "to": "group:inj-grp-g4",
+            "decoy": false,
+            "policy": "inj-pol-p5"
+          },
+          {
+            "prim": "set_default_policy_version",
+            "category": "permission_request",
+            "from": "group:inj-grp-g4",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p7",
+            "legacy_policy": "inj-legacy-p6"
+          }
+        ]
+      }
+    ],
+    "decoys": [
+      {
+        "start": "user:ext-dara.smith",
+        "length": 1,
+        "reaches_admin": false,
+        "broken_at": 0,
+        "hops": [
+          {
+            "prim": "update_assume_role_policy",
+            "category": "permission_request",
+            "from": "user:ext-dara.smith",
+            "to": "role:inj-trust-edit-r8",
+            "decoy": true,
+            "policy": "inj-pol-p9",
+            "decoy_style": "condition"
+          }
+        ]
+      },
+      {
+        "start": "user:ext-dara.smith",
+        "length": 1,
+        "reaches_admin": false,
+        "broken_at": 0,
+        "hops": [
+          {
+            "prim": "update_function_code",
+            "category": "code_execution",
+            "from": "user:ext-dara.smith",
+            "to": "role:inj-fn-exec-r10",
+            "decoy": true,
+            "policy": "inj-pol-p12",
+            "decoy_style": "wrong_resource",
+            "workload": "inj-fn-f11"
+          }
+        ]
+      }
+    ],
+    "dead_ends": [
+      {
+        "start": "role:notifications-svc",
+        "length": 1,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "attach_role_policy",
+            "category": "permission_request",
+            "from": "role:notifications-svc",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p13"
+          }
+        ]
+      }
+    ],
+    "expected_pe": true
+  },
+  "dfs": {
+    "n_paths": 6,
+    "capped": false,
+    "min_len": 1,
+    "paths": [
+      [
+        {
+          "prim": "attach_group_policy",
+          "src": "user:ext-dara.smith",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "put_group_policy",
+          "src": "user:ext-dara.smith",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "set_default_policy_version",
+          "src": "user:ext-dara.smith",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "add_user_to_group",
+          "src": "user:ext-dara.smith",
+          "dst": "group:inj-grp-g1"
+        },
+        {
+          "prim": "attach_group_policy",
+          "src": "group:inj-grp-g1",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "add_user_to_group",
+          "src": "user:ext-dara.smith",
+          "dst": "group:inj-grp-g1"
+        },
+        {
+          "prim": "put_group_policy",
+          "src": "group:inj-grp-g1",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "add_user_to_group",
+          "src": "user:ext-dara.smith",
+          "dst": "group:inj-grp-g4"
+        },
+        {
+          "prim": "set_default_policy_version",
+          "src": "group:inj-grp-g4",
+          "dst": "admin:*"
+        }
+      ]
+    ]
+  },
+  "consistency_ok": true
+}

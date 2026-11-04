@@ -1,0 +1,151 @@
+{
+  "org": "ariari-15ocx0",
+  "archetype": "healthcare",
+  "seed": 70000740,
+  "untrusted_entity": "user:ext-eli.tanaka",
+  "untrusted_type": "contractor-user",
+  "stats": {
+    "n_entities": 216,
+    "n_users": 101,
+    "n_groups": 37,
+    "n_roles": 78,
+    "n_policies": 82,
+    "n_functions": 21,
+    "n_workloads": 8,
+    "n_connections": 583
+  },
+  "ground_truth": {
+    "has_pe": false,
+    "min_len": null,
+    "witness": []
+  },
+  "injection_plan": {
+    "planted": [
+      {
+        "start": "user:ext-eli.tanaka",
+        "length": 1,
+        "reaches_admin": false,
+        "broken_at": 0,
+        "hops": [
+          {
+            "prim": "put_user_policy",
+            "category": "permission_request",
+            "from": "user:ext-eli.tanaka",
+            "to": "admin",
+            "decoy": true,
+            "policy": "inj-pol-p1",
+            "decoy_style": "deny_same"
+          }
+        ]
+      },
+      {
+        "start": "user:ext-eli.tanaka",
+        "length": 1,
+        "reaches_admin": false,
+        "broken_at": 0,
+        "hops": [
+          {
+            "prim": "set_default_policy_version",
+            "category": "permission_request",
+            "from": "user:ext-eli.tanaka",
+            "to": "admin",
+            "decoy": true,
+            "policy": "inj-pol-p3",
+            "policies": [
+              "inj-pol-p3",
+              "inj-pol-p4"
+            ],
+            "decoy_style": "deny_separate",
+            "legacy_policy": "inj-legacy-p2"
+          }
+        ]
+      }
+    ],
+    "decoys": [
+      {
+        "start": "user:ext-eli.tanaka",
+        "length": 2,
+        "reaches_admin": false,
+        "broken_at": 1,
+        "hops": [
+          {
+            "prim": "add_user_to_group",
+            "category": "permission_inheritance",
+            "from": "user:ext-eli.tanaka",
+            "to": "group:inj-grp-g5",
+            "decoy": false,
+            "policy": "inj-pol-p6"
+          },
+          {
+            "prim": "put_group_policy",
+            "category": "permission_request",
+            "from": "group:inj-grp-g5",
+            "to": "admin",
+            "decoy": true,
+            "policy": "inj-pol-p7",
+            "decoy_style": "condition"
+          }
+        ]
+      },
+      {
+        "start": "user:ext-eli.tanaka",
+        "length": 1,
+        "reaches_admin": false,
+        "broken_at": 0,
+        "hops": [
+          {
+            "prim": "create_policy_version",
+            "category": "permission_request",
+            "from": "user:ext-eli.tanaka",
+            "to": "admin",
+            "decoy": true,
+            "policy": "inj-pol-p8",
+            "decoy_style": "wrong_resource"
+          }
+        ]
+      }
+    ],
+    "dead_ends": [
+      {
+        "start": "user:jun.lopez",
+        "length": 1,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "put_group_policy",
+            "category": "permission_request",
+            "from": "user:jun.lopez",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p9"
+          }
+        ]
+      },
+      {
+        "start": "user:dara.brown",
+        "length": 1,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "attach_user_policy",
+            "category": "permission_request",
+            "from": "user:dara.brown",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p10"
+          }
+        ]
+      }
+    ],
+    "expected_pe": false
+  },
+  "dfs": {
+    "n_paths": 0,
+    "capped": false,
+    "min_len": null,
+    "paths": []
+  },
+  "consistency_ok": true
+}

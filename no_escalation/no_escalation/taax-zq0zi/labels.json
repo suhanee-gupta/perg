@@ -1,0 +1,87 @@
+{
+  "org": "taax-zq0zi",
+  "archetype": "government",
+  "seed": 60000894,
+  "untrusted_entity": "user:ext-nina.dubois",
+  "untrusted_type": "contractor-user",
+  "stats": {
+    "n_entities": 22,
+    "n_users": 8,
+    "n_groups": 6,
+    "n_roles": 8,
+    "n_policies": 17,
+    "n_functions": 2,
+    "n_workloads": 2,
+    "n_connections": 59
+  },
+  "ground_truth": {
+    "has_pe": false,
+    "min_len": null,
+    "witness": []
+  },
+  "injection_plan": {
+    "planted": [
+      {
+        "start": "user:ext-nina.dubois",
+        "length": 1,
+        "reaches_admin": false,
+        "broken_at": 0,
+        "hops": [
+          {
+            "prim": "put_user_policy",
+            "category": "permission_request",
+            "from": "user:ext-nina.dubois",
+            "to": "admin",
+            "decoy": true,
+            "policy": "inj-pol-p1",
+            "decoy_style": "wrong_resource"
+          }
+        ]
+      }
+    ],
+    "decoys": [],
+    "dead_ends": [
+      {
+        "start": "role:ci-runner",
+        "length": 1,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "put_role_policy",
+            "category": "permission_request",
+            "from": "role:ci-runner",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p2"
+          }
+        ]
+      },
+      {
+        "start": "user:amit.singh",
+        "length": 1,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "set_default_policy_version",
+            "category": "permission_request",
+            "from": "user:amit.singh",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p4",
+            "legacy_policy": "inj-legacy-p3"
+          }
+        ]
+      }
+    ],
+    "expected_pe": false
+  },
+  "dfs": {
+    "n_paths": 0,
+    "capped": false,
+    "min_len": null,
+    "paths": []
+  },
+  "consistency_ok": true
+}

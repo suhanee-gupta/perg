@@ -1,0 +1,2066 @@
+{
+  "org": "rynor-zq0uj",
+  "archetype": "healthcare",
+  "seed": 60000715,
+  "untrusted_entity": "user:ext-mei.cohen",
+  "untrusted_type": "contractor-user",
+  "stats": {
+    "n_entities": 62,
+    "n_users": 27,
+    "n_groups": 11,
+    "n_roles": 24,
+    "n_policies": 27,
+    "n_functions": 5,
+    "n_workloads": 2,
+    "n_connections": 154
+  },
+  "ground_truth": {
+    "has_pe": true,
+    "min_len": 3,
+    "witness": [
+      {
+        "prim": "assume_role",
+        "via": [
+          "user:ext-mei.cohen"
+        ],
+        "to": "role:inj-assume-r1"
+      },
+      {
+        "prim": "assume_role",
+        "via": [
+          "role:inj-assume-r1"
+        ],
+        "to": "role:inj-assume-r2"
+      },
+      {
+        "prim": "update_assume_role_policy",
+        "via": [
+          "role:inj-assume-r2"
+        ],
+        "to": "role:org-admin"
+      }
+    ]
+  },
+  "injection_plan": {
+    "planted": [
+      {
+        "start": "user:ext-mei.cohen",
+        "length": 4,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "assume_role",
+            "category": "role_assumption",
+            "from": "user:ext-mei.cohen",
+            "to": "role:inj-assume-r1",
+            "decoy": false
+          },
+          {
+            "prim": "assume_role",
+            "category": "role_assumption",
+            "from": "role:inj-assume-r1",
+            "to": "role:inj-assume-r2",
+            "decoy": false
+          },
+          {
+            "prim": "update_assume_role_policy",
+            "category": "permission_request",
+            "from": "role:inj-assume-r2",
+            "to": "role:inj-trust-edit-r3",
+            "decoy": false,
+            "policy": "inj-pol-p4"
+          },
+          {
+            "prim": "set_default_policy_version",
+            "category": "permission_request",
+            "from": "role:inj-trust-edit-r3",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p6",
+            "legacy_policy": "inj-legacy-p5"
+          }
+        ]
+      }
+    ],
+    "decoys": [],
+    "dead_ends": [
+      {
+        "start": "user:wen.okafor",
+        "length": 3,
+        "reaches_admin": true,
+        "broken_at": null,
+        "hops": [
+          {
+            "prim": "add_user_to_group",
+            "category": "permission_inheritance",
+            "from": "user:wen.okafor",
+            "to": "group:inj-grp-g7",
+            "decoy": false,
+            "policy": "inj-pol-p8"
+          },
+          {
+            "prim": "create_access_key",
+            "category": "credential_takeover",
+            "from": "group:inj-grp-g7",
+            "to": "user:inj-svc-u9",
+            "decoy": false,
+            "policy": "inj-pol-p10"
+          },
+          {
+            "prim": "put_user_policy",
+            "category": "permission_request",
+            "from": "user:inj-svc-u9",
+            "to": "admin",
+            "decoy": false,
+            "policy": "inj-pol-p11"
+          }
+        ]
+      }
+    ],
+    "expected_pe": true
+  },
+  "dfs": {
+    "n_paths": 300,
+    "capped": true,
+    "min_len": 3,
+    "paths": [
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r2",
+          "dst": "role:inj-trust-edit-r3"
+        },
+        {
+          "prim": "set_default_policy_version",
+          "src": "role:inj-trust-edit-r3",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "holds_admin",
+          "src": "role:org-admin",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "attach_role_policy",
+          "src": "role:org-admin",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "put_role_policy",
+          "src": "role:org-admin",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "role:org-admin",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "holds_admin",
+          "src": "user:adm-yara.reddy",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:adm-yara.reddy",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:adm-yara.reddy",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "attach_group_policy",
+          "src": "user:adm-yara.reddy",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "put_group_policy",
+          "src": "user:adm-yara.reddy",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "user:adm-yara.reddy",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "holds_admin",
+          "src": "group:platform-admins",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "attach_group_policy",
+          "src": "group:platform-admins",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "put_group_policy",
+          "src": "group:platform-admins",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "group:platform-admins",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "holds_admin",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "attach_group_policy",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "put_group_policy",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-ian.patel",
+          "dst": "group:inj-grp-g7"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:inj-grp-g7",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-ian.patel",
+          "dst": "group:inj-grp-g7"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:inj-grp-g7",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-ian.patel",
+          "dst": "group:inj-grp-g7"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:inj-grp-g7",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:adm-ian.patel",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:adm-ian.patel",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:adm-ian.patel",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:adm-ian.patel",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:adm-ian.patel",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:adm-ian.patel",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:adm-ian.patel",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "role:inj-trust-edit-r3"
+        },
+        {
+          "prim": "set_default_policy_version",
+          "src": "role:inj-trust-edit-r3",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "update_login_profile",
+          "src": "user:adm-ian.patel",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "update_login_profile",
+          "src": "user:adm-ian.patel",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "update_login_profile",
+          "src": "user:adm-ian.patel",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "update_login_profile",
+          "src": "user:adm-ian.patel",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "update_login_profile",
+          "src": "user:adm-ian.patel",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "update_login_profile",
+          "src": "user:adm-ian.patel",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "update_login_profile",
+          "src": "user:adm-ian.patel",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "role:inj-trust-edit-r3"
+        },
+        {
+          "prim": "set_default_policy_version",
+          "src": "role:inj-trust-edit-r3",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "user:adm-ian.patel",
+          "dst": "role:inj-trust-edit-r3"
+        },
+        {
+          "prim": "set_default_policy_version",
+          "src": "role:inj-trust-edit-r3",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:wen.okafor",
+          "dst": "group:inj-grp-g7"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:inj-grp-g7",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:wen.okafor",
+          "dst": "group:inj-grp-g7"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:inj-grp-g7",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:wen.okafor",
+          "dst": "group:inj-grp-g7"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:inj-grp-g7",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_policy_version",
+          "src": "user:inj-svc-u9",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:inj-svc-u9",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "holds_admin",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:inj-svc-u9",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "attach_user_policy",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:inj-svc-u9",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "put_user_policy",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:inj-svc-u9",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "attach_group_policy",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ],
+      [
+        {
+          "prim": "assume_role",
+          "src": "user:ext-mei.cohen",
+          "dst": "role:inj-assume-r1"
+        },
+        {
+          "prim": "assume_role",
+          "src": "role:inj-assume-r1",
+          "dst": "role:inj-assume-r2"
+        },
+        {
+          "prim": "update_assume_role_policy",
+          "src": "role:inj-assume-r2",
+          "dst": "role:org-admin"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "role:org-admin",
+          "dst": "user:adm-yara.reddy"
+        },
+        {
+          "prim": "add_user_to_group",
+          "src": "user:adm-yara.reddy",
+          "dst": "group:platform-admins"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "group:platform-admins",
+          "dst": "user:wen.okafor"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:wen.okafor",
+          "dst": "user:inj-svc-u9"
+        },
+        {
+          "prim": "create_access_key",
+          "src": "user:inj-svc-u9",
+          "dst": "user:adm-ian.patel"
+        },
+        {
+          "prim": "put_group_policy",
+          "src": "user:adm-ian.patel",
+          "dst": "admin:*"
+        }
+      ]
+    ]
+  },
+  "consistency_ok": true
+}
