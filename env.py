@@ -157,7 +157,14 @@ def action_specs() -> dict[str, dict]:
                 s["on_star"] = True
             else:
                 s["types"] |= (t.src_types if op.on == "src" else t.sink_types) - {"AnyPolicy"}
+    for alias, canon in ACTION_ALIASES.items():
+        if canon in specs:
+            specs[alias] = specs[canon]
     return specs
+
+
+# actions the templates do not list but that work the same way as a template op (graph builder maps them)
+ACTION_ALIASES = {"ec2-instance-connect:SendSerialConsoleSSHPublicKey": "ec2-instance-connect:SendSSHPublicKey"}
 
 
 def load_config(name_or_path: str | Path, untrusted: str | None = None, target: str | None = None,

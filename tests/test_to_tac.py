@@ -1,7 +1,12 @@
 import json
 
+import pytest
+
 import env
+from iampe.data.index import list_configs
 from iampe.parser.policy import match_action, match_resource, parse_statements
+
+HAVE_V1 = bool(list_configs("v1"))
 
 
 def test_policy_matching_and_conditions():
@@ -21,6 +26,7 @@ def _perms(e, entity):
     return {str(p) for p in e.assignments.get(entity, [])}
 
 
+@pytest.mark.skipif(not HAVE_V1, reason="v1 dataset (arifen) not present")
 def test_arifen_matches_team_structure_and_drops_decoys():
     mine = env.load_config("arifen-15ocxf")
     team = env.load_config(env.DATA_DIR / "arifen-15ocxf.json")
@@ -35,13 +41,14 @@ def test_arifen_matches_team_structure_and_drops_decoys():
 
 
 def test_reachability_matches_labels_on_small_configs():
-    for org, has_pe in [("taax-zq0zi", False), ("kasol-zq0qg", True), ("zenax-zq111", False)]:
+    # team relax() is cheap below ~100 entities; the generator's own config.json gets dyntri/kalum wrong
+    for org, has_pe in [("iv00u", True), ("iv13r", False), ("dyntri-100q3n", False), ("kalum-100q3l", False)]:
         assert env.load_config(org).is_reachable() == has_pe, org
 
 
 def test_converted_root_is_valid_json():
     from iampe.data.index import get_config
     from iampe.parser.to_tac import convert
-    root = convert(get_config("taax-zq0zi").path, env.action_specs())
+    root = convert(get_config("iv00u").path, env.action_specs())
     json.dumps(root)
-    assert root["target"] == "*@*" and root["untrusted"] == "user:ext-nina.dubois"
+    assert root["target"] == "*@*" and root["untrusted"] == "user:privesc1-user"

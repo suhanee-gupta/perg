@@ -13,7 +13,7 @@ import time
 import env
 from iampe.checker.mincut import min_cut
 from iampe.checker.validate import check
-from iampe.data.index import ROOT, list_configs, load_labels
+from iampe.data.index import ROOT, list_configs, load_labels, splits
 from iampe.graph.build import build_graph, sources
 
 
@@ -56,4 +56,5 @@ def main(orgs):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:] or [r.org for r in list_configs()]))
+    s = splits()
+    sys.exit(main(sys.argv[1:] or s["train"] + s["test"] + s["bench"]))

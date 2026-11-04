@@ -42,6 +42,8 @@ PRIM_TEMPLATES: dict[str, tuple[str, ...]] = {
     "ec2_instance_connect": ("ec2instanceconnect-003",),
     "glue_update_dev_endpoint": ("glue-002",),
     "cfn_update_stack": ("cloudformation-002",),
+    "pass_role_codebuild": ("codebuild-001", "codebuild-004"),
+    "sagemaker_presigned_url": ("sagemaker-004",),
 }
 
 
@@ -75,6 +77,8 @@ def check(G: nx.MultiDiGraph, labels: dict) -> dict:
             for i, h in enumerate(p["hops"]):
                 if broken is not None and i > broken:
                     break
+                if G.nodes.get(_node(h["from"]), {}).get("is_admin"):
+                    continue                      # admin principals only get holds_admin edges
                 should = not h.get("decoy") and (broken is None or i < broken)
                 if has_hop(G, h["from"], h["prim"], h["to"]) != should:
                     out["hop_errors"].append((kind, i, h["prim"], h["from"], h["to"], "missing" if should else "present"))

@@ -176,7 +176,7 @@ def build_graph(e: "env.Env", w_mode: str = "shared") -> nx.MultiDiGraph:
             if p.action == "*":
                 all_on[p.resource] = org
             else:
-                by_act[p.action][p.resource] = org
+                by_act[env.ACTION_ALIASES.get(p.action, p.action)][p.resource] = org
 
         def held(action, res):
             d = by_act.get(action, {})

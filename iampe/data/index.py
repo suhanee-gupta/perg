@@ -1,4 +1,13 @@
-"""Discover the provided Terraform configs and their labels."""
+"""Discover the provided Terraform configs and their labels.
+
+Two datasets:
+  v2  data/raw/{esc,no_esc}/<org>/   the current one (18 configs; also ships the generator's
+                                     config.json, which is NOT used as ground truth: see docs/HANDOFF.md)
+  v1  escalation/escalation, no_escalation/no_escalation   the earlier 14 configs (optional extra data)
+
+Splits (v2): train / test are small enough to convert on a laptop; `bench` are the four IAM Vulnerable
+scenarios; `deferred` are the large configs whose graphs are built elsewhere (experiments/build_graphs.py).
+"""
 from __future__ import annotations
 
 import json
@@ -6,13 +15,18 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-RAW_DIRS = [ROOT / "escalation" / "escalation", ROOT / "no_escalation" / "no_escalation"]
+DATASETS = {
+    "v2": [ROOT / "data" / "raw" / "esc", ROOT / "data" / "raw" / "no_esc"],
+    "v1": [ROOT / "escalation" / "escalation", ROOT / "no_escalation" / "no_escalation"],
+}
 CACHE_DIR = ROOT / "data" / "cache"
+GRAPH_DIR = ROOT / "data" / "graphs"
 ADMIN = "admin:*"
 
-# Held-out configs (2 PE + 2 no-PE) and the two very large ones used only for generalisation.
-TEST = {"lumzen-15ocuk", "rynor-zq0uj", "zenax-zq111", "axtri-1bmokt"}
-LARGE = {"arior-1njchw", "solor-1njchy"}
+TRAIN = ["linost-zq0as", "mavsol-zq0ao", "mercor-15occh", "dyntri-100q3n", "kalum-100q3l", "hexsol-15z25m"]
+TEST = ["orqua-15occg", "ormav-15z25c"]
+BENCH = ["iv00u", "iv12u", "iv13r", "iv19r"]
+DEFERRED = ["arimer-1bmoea", "axnor-1bmoe8", "corpyr-1bxe7c", "delnor-1bxe74", "linlin-1nu2ao", "mermer-1njcht"]
 
 
 @dataclass(frozen=True)
@@ -20,17 +34,21 @@ class ConfigRef:
     org: str
     path: Path
     has_pe: bool
+    dataset: str = "v2"
 
 
-def list_configs() -> list[ConfigRef]:
+def list_configs(dataset: str | None = None) -> list[ConfigRef]:
     refs = []
-    for raw in RAW_DIRS:
-        if not raw.is_dir():
+    for name, dirs in DATASETS.items():
+        if dataset is not None and name != dataset:
             continue
-        for d in sorted(raw.iterdir()):
-            lab = d / "labels.json"
-            if d.is_dir() and lab.exists() and "__MACOSX" not in d.parts:
-                refs.append(ConfigRef(d.name, d, bool(json.loads(lab.read_text())["ground_truth"]["has_pe"])))
+        for raw in dirs:
+            if not raw.is_dir():
+                continue
+            for d in sorted(raw.iterdir()):
+                lab = d / "labels.json"
+                if d.is_dir() and lab.exists() and "__MACOSX" not in d.parts:
+                    refs.append(ConfigRef(d.name, d, bool(json.loads(lab.read_text())["ground_truth"]["has_pe"]), name))
     return refs
 
 
@@ -42,7 +60,10 @@ def get_config(org: str) -> ConfigRef:
 
 
 def load_labels(ref: ConfigRef) -> dict:
-    return json.loads((ref.path / "labels.json").read_text())
+    """Labels; configs without an injection plan (IAM Vulnerable scenarios) get an empty one."""
+    labels = json.loads((ref.path / "labels.json").read_text())
+    labels.setdefault("injection_plan", {"planted": [], "dead_ends": [], "decoys": []})
+    return labels
 
 
 def node_id(label_node: str) -> str:
@@ -60,15 +81,11 @@ def label_paths(labels: dict) -> dict[str, list[list[tuple[str, str, str]]]]:
         for p in labels["dfs"]["paths"]:
             out["dfs"].append([(node_id(h["src"]), h["prim"], node_id(h["dst"])) for h in p])
     for k in ("planted", "dead_ends", "decoys"):
-        for p in labels["injection_plan"][k]:
+        for p in labels.get("injection_plan", {}).get(k, []):
             out[k].append([(node_id(h["from"]), h["prim"], node_id(h["to"]), h) for h in p["hops"]])
     return out
 
 
 def splits() -> dict[str, list[str]]:
-    orgs = [r.org for r in list_configs()]
-    return {
-        "train": [o for o in orgs if o not in TEST | LARGE],
-        "test": [o for o in orgs if o in TEST],
-        "large": [o for o in orgs if o in LARGE],
-    }
+    return {"train": list(TRAIN), "test": list(TEST), "bench": list(BENCH), "deferred": list(DEFERRED),
+            "v1": [r.org for r in list_configs("v1")]}

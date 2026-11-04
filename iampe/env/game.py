@@ -1,0 +1,251 @@
+"""Two-player greybox remediation game (Phase 4).
+
+Hidden full graph G_k. Each round k:
+  A phase   Finder A spends up to Q queries. query(u) reveals u's live out-edges. A source s is
+            proven (reported) as soon as A's revealed live edges contain a path s -> admin; the
+            path is the proof. Reporting is automatic (assumption: a rational A always reports a
+            proof it holds), so A's only decisions are which node to query and when to stop.
+  B phase   Remover B sees the union of proof paths reported so far (all rounds) and w(e), and cuts
+            seen live cuttable edges within the round's cut budget (count or weight).
+  G_{k+1} = G_k - C_k. If reveal_cuts_to_A, cut edges also disappear from A's view.
+Rewards:
+  r_A(k) = #sources proven in round k - mu * #queries in round k
+  r_B(k) = -|R(G_{k+1})| - lam * sum_{e in C_k} w(e)       R on the full graph (b_reward="full")
+                                                           or on the seen edges (b_reward="seen")
+S = every source that truly reaches admin, plus random closed non-admin users up to max_sources
+(assumption: keeps every game non-trivial; A is told S but not which are open).
+"""
+from __future__ import annotations
+
+import random
+from collections import deque
+from dataclasses import dataclass, field
+
+import networkx as nx
+
+from iampe.checker.reach import Edge, LiveGraph
+from iampe.graph.build import ADMIN, sources
+
+
+@dataclass
+class GameConfig:
+    Q: int = 50                  # queries per round
+    K: int = 4                   # rounds
+    lam: float = 0.05            # B: weight of cut cost
+    mu: float = 0.01             # A: cost per query
+    cut_budget: float = 2        # per round, in edges (count) or summed w(e) (weight)
+    budget_mode: str = "count"   # "count" | "weight"
+    max_sources: int = 20
+    reveal_cuts_to_A: bool = True
+    b_reward: str = "full"       # "full" | "seen"
+    w_const: bool = False        # ablation: treat every w(e) as 1
+    seed: int = 0
+
+
+@dataclass
+class RoundLog:
+    k: int
+    queries: int
+    proven: list[str]
+    new_routes: int              # proofs that use an edge B had not seen before
+    cut: list[Edge]
+    cut_cost: float
+    open_before: int
+    open_after: int
+    r_A: float
+    r_B: float
+
+
+@dataclass
+class AObs:
+    sources: list[str]
+    queried: set[str]
+    revealed: dict[Edge, dict]   # revealed live edges -> attrs
+    proven: set[str]             # proven this round
+    queries_left: int
+    known: set[str]              # nodes A can name (sources + endpoints of revealed edges)
+
+
+@dataclass
+class BObs:
+    seen: dict[Edge, dict]       # seen live edges -> attrs (incl. w)
+    proven_ever: set[str]
+    proofs: list[list[Edge]]     # proofs reported this round
+    budget: float
+    budget_mode: str
+
+
+class Game:
+    def __init__(self, G: nx.MultiDiGraph, cfg: GameConfig, rng: random.Random | None = None):
+        self.G, self.cfg = G, cfg
+        self.rng = rng or random.Random(cfg.seed)
+        self.reset()
+
+    # ---------------------------------------------------------------- setup
+    def reset(self) -> None:
+        self.lg = LiveGraph(self.G)
+        all_src = sources(self.G)
+        reach = self.lg.can_reach_admin()
+        opened = [s for s in all_src if s in reach]
+        closed = [s for s in all_src if s not in reach]
+        n_fill = max(0, self.cfg.max_sources - len(opened))
+        S = opened + self.rng.sample(closed, min(n_fill, len(closed)))
+        self.rng.shuffle(S)
+        u = self.G.graph["untrusted"]
+        self.S = [u] + [s for s in S if s != u]
+        self.k = 0
+        self.queried_ever: set[str] = set()
+        self.revealed: set[Edge] = set()
+        self.seen: set[Edge] = set()
+        self.proven_ever: set[str] = set()
+        self.log: list[RoundLog] = []
+        self._start_round()
+
+    def _start_round(self) -> None:
+        self.queries = 0
+        self.queried: set[str] = set()
+        self.proven: set[str] = set()
+        self.proofs: list[list[Edge]] = []
+        self.a_done = False
+
+    def w(self, e: Edge) -> float:
+        d = self.G.edges[e]
+        if not d.get("cuttable", True):
+            return float("inf")
+        return 1.0 if self.cfg.w_const else float(d["w"])
+
+    @property
+    def done(self) -> bool:
+        return self.k >= self.cfg.K
+
+    # ---------------------------------------------------------------- A side
+    def known_nodes(self) -> set[str]:
+        return set(self.S) | {e[1] for e in self.revealed}
+
+    def a_observe(self) -> AObs:
+        rev = {e: self.G.edges[e] for e in self.revealed}
+        return AObs(list(self.S), set(self.queried), rev, set(self.proven), self.cfg.Q - self.queries,
+                    self.known_nodes())
+
+    def revealed_attrs(self) -> dict[Edge, dict]:
+        return {e: self.G.edges[e] for e in self.revealed}
+
+    def query_candidates(self) -> list[str]:
+        return sorted(n for n in self.known_nodes() if n not in self.queried and n != ADMIN)
+
+    def a_query(self, u: str) -> int:
+        """Reveal u's live out-edges; return how many sources became proven."""
+        assert not self.a_done and self.queries < self.cfg.Q, "A phase is over"
+        if u not in self.known_nodes():
+            raise ValueError(f"{u} is not known to A")
+        self.queries += 1
+        self.queried.add(u)
+        self.queried_ever.add(u)
+        self.revealed.update(self.lg.out_edges(u))
+        n = self._auto_report()
+        if self.queries >= self.cfg.Q:
+            self.a_done = True
+        return n
+
+    def a_end(self) -> None:
+        self.a_done = True
+
+    def _proof(self, s: str) -> list[Edge] | None:
+        prev, q = {s: None}, deque([s])
+        adj: dict[str, list[Edge]] = {}
+        for e in self.revealed:
+            if self.lg.live(e):
+                adj.setdefault(e[0], []).append(e)
+        while q:
+            u = q.popleft()
+            if u == ADMIN:
+                path = []
+                while prev[u] is not None:
+                    path.append(prev[u])
+                    u = prev[u][0]
+                return path[::-1]
+            for e in adj.get(u, ()):
+                if e[1] not in prev:
+                    prev[e[1]] = e
+                    q.append(e[1])
+        return None
+
+    def _auto_report(self) -> int:
+        pred: dict[str, list[str]] = {}
+        for e in self.revealed:
+            if self.lg.live(e):
+                pred.setdefault(e[1], []).append(e[0])
+        reach, q = {ADMIN}, deque([ADMIN])
+        while q:
+            for u in pred.get(q.popleft(), ()):
+                if u not in reach:
+                    reach.add(u)
+                    q.append(u)
+        n = 0
+        for s in self.S:
+            if s in self.proven or s not in reach:
+                continue
+            p = self._proof(s)
+            if p is not None:
+                self.proven.add(s)
+                self.proven_ever.add(s)
+                self.proofs.append(p)
+                n += 1
+        return n
+
+    # ---------------------------------------------------------------- B side
+    def b_observe(self) -> BObs:
+        seen = {e: self.G.edges[e] for e in self.seen | {e for p in self.proofs for e in p} if self.lg.live(e)}
+        return BObs(seen, set(self.proven_ever), [list(p) for p in self.proofs], self.cfg.cut_budget,
+                    self.cfg.budget_mode)
+
+    def cut_cost(self, edges) -> float:
+        return sum(1.0 if self.cfg.budget_mode == "count" else self.w(e) for e in edges)
+
+    def b_cut(self, edges: list[Edge], unrestricted: bool = False) -> RoundLog:
+        """Apply B's cuts, close the round, and return its log (with both rewards).
+        `unrestricted` lets a cheating ceiling (FullB) cut edges it has not seen."""
+        assert self.a_done or self.queries >= self.cfg.Q
+        obs = self.b_observe()
+        edges = [e for e in dict.fromkeys(edges) if (unrestricted or e in obs.seen) and self.lg.live(e)
+                 and self.w(e) < float("inf")]
+        if self.cut_cost(edges) > self.cfg.cut_budget + 1e-9:
+            raise ValueError("cut exceeds the round budget")
+        new_routes = sum(any(e not in self.seen for e in p) for p in self.proofs)
+        self.seen.update(e for p in self.proofs for e in p)
+        open_before = len(self.lg.open_pairs(self.S))
+        self.lg.remove(edges)
+        if self.cfg.reveal_cuts_to_A:
+            self.revealed -= set(edges)
+        if self.cfg.b_reward == "seen":
+            seen_live = LiveGraph(self.G.edge_subgraph([e for e in self.seen if self.lg.live(e)]).copy()
+                                  if self.seen else nx.MultiDiGraph())
+            open_after = len(seen_live.open_pairs(self.S)) if self.seen else 0
+        else:
+            open_after = len(self.lg.open_pairs(self.S))
+        cost = sum(self.w(e) for e in edges)
+        r_A = len(self.proven) - self.cfg.mu * self.queries
+        r_B = -open_after - self.cfg.lam * cost
+        log = RoundLog(self.k, self.queries, sorted(self.proven), new_routes, edges, cost,
+                       open_before, len(self.lg.open_pairs(self.S)), r_A, r_B)
+        self.log.append(log)
+        self.k += 1
+        self._start_round()
+        return log
+
+    # ---------------------------------------------------------------- full game
+    def play(self, A, B) -> list[RoundLog]:
+        """A: .reset(game) optional, .act(game) -> node or None (end). B: .cut(game) -> [edges]."""
+        for agent in (A, B):
+            if hasattr(agent, "reset"):
+                agent.reset(self)
+        while not self.done:
+            while not self.a_done and self.queries < self.cfg.Q:
+                u = A.act(self)
+                if u is None:
+                    self.a_end()
+                else:
+                    self.a_query(u)
+            self.a_done = True
+            self.b_cut(B.cut(self), unrestricted=getattr(B, "cheats", False))
+        return self.log

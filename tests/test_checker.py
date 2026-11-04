@@ -44,7 +44,15 @@ def test_budgeted_cut_monotone():
     assert opened == sorted(opened, reverse=True) and opened[0] == 2 and opened[-1] == 0
 
 
-@pytest.mark.parametrize("org", ["taax-zq0zi", "kasol-zq0qg", "zenax-zq111", "rynor-zq0uj", "arifen-15ocxf"])
+@pytest.mark.parametrize("org", ["iv00u", "iv13r", "dyntri-100q3n", "kalum-100q3l", "linost-zq0as", "mavsol-zq0ao"])
 def test_graph_matches_labels(org):
     res = check(build_graph(env.load_config(org)), load_labels(get_config(org)))
     assert res["ok"], res
+
+
+def test_saved_graph_roundtrip():
+    from iampe.graph.io import load_graph
+    G = load_graph("linost-zq0as")
+    H = build_graph(env.load_config("linost-zq0as"))
+    assert set(G.edges(keys=True)) == set(H.edges(keys=True))
+    assert reachable_pairs(G, ["user:ext-bela.brown"]) == {"user:ext-bela.brown"}

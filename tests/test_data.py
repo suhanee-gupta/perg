@@ -2,19 +2,20 @@ from iampe.data.index import label_paths, list_configs, load_labels, splits
 
 
 def test_configs_found():
-    refs = list_configs()
-    assert len(refs) == 14
-    assert sum(r.has_pe for r in refs) == 8
+    refs = list_configs("v2")
+    assert len(refs) == 18
+    assert sum(r.has_pe for r in refs) == 9
 
 
 def test_splits_disjoint():
     s = splits()
-    allo = s["train"] + s["test"] + s["large"]
-    assert len(allo) == len(set(allo)) == 14
+    allo = s["train"] + s["test"] + s["bench"] + s["deferred"]
+    assert len(allo) == len(set(allo)) == 18
+    assert set(allo) == {r.org for r in list_configs("v2")}
 
 
 def test_label_paths_normalised():
-    for r in list_configs():
+    for r in list_configs("v2"):
         lp = label_paths(load_labels(r))
         assert bool(lp["witness"]) == r.has_pe
         for p in lp["witness"] + lp["dfs"]:

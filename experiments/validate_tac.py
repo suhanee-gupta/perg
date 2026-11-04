@@ -1,5 +1,8 @@
 """Check the Terraform -> TAC converter against the dataset labels using the team's whitebox checker.
 
+WARNING: the team's relax() keeps every derivation and needs GBs of RAM above ~500 entities (it crashed
+the laptop). This script refuses configs with more than 100 entities; use experiments.validate_graphs.
+
 For each config:  converted reachability of the untrusted entity == labels.ground_truth.has_pe,
 and every planted path / dead end in the injection plan is reachable from its start entity.
 
@@ -11,13 +14,15 @@ import sys
 import time
 
 import env
-from iampe.data.index import LARGE, list_configs, load_labels
+from iampe.data.index import list_configs, load_labels, splits
 
 
 def validate(org: str) -> dict:
     labels = load_labels(next(r for r in list_configs() if r.org == org))
     t0 = time.time()
     e = env.load_config(org)
+    if len(e.entity_types) > 100:
+        raise SystemExit(f"{org}: {len(e.entity_types)} entities > 100; team relax() would need GBs of RAM")
     t_conv = time.time() - t0
     row = {"org": org, "entities": len(e.entity_types), "convert_s": round(t_conv, 1),
            "has_pe": labels["ground_truth"]["has_pe"]}
@@ -53,6 +58,5 @@ def main(orgs: list[str]) -> int:
 
 
 if __name__ == "__main__":
-    args = sys.argv[1:] or [r.org for r in sorted(list_configs(), key=lambda r: r.path.stat().st_size)
-                            if r.org not in LARGE]
+    args = sys.argv[1:] or splits()["bench"] + ["dyntri-100q3n", "kalum-100q3l", "mavsol-zq0ao", "linost-zq0as"]
     sys.exit(main(args))
