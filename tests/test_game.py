@@ -31,7 +31,7 @@ class Script:
 
 
 def test_rewards_match_hand_calculation():
-    cfg = GameConfig(Q=3, K=2, mu=0.1, lam=0.5, cut_budget=1, max_sources=3)
+    cfg = GameConfig(Q=3, K=2, mu=0.1, lam=0.5, cut_budget=1, max_sources=3, source_kinds=("User",))
     g = Game(toy(), cfg, random.Random(0))
     assert set(g.S) == {"s1", "s2", "s3"}
     A = Script(["s1", "r", "s2", "s1", "s3", "r"])
@@ -47,7 +47,7 @@ def test_rewards_match_hand_calculation():
 
 
 def test_b_cannot_cut_unseen_edges():
-    g = Game(toy(), GameConfig(Q=1, K=1, cut_budget=5, max_sources=3), random.Random(0))
+    g = Game(toy(), GameConfig(Q=1, K=1, cut_budget=5, max_sources=3, source_kinds=("User",)), random.Random(0))
     log = g.play(Script(["s2"]), Script([[("r", ADMIN, "p"), ("s2", ADMIN, "p")]]))[0]
     assert log.cut == [("s2", ADMIN, "p")]
 

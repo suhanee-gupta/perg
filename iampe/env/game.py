@@ -16,7 +16,7 @@ Rewards:
   r_A(k) = #sources proven in round k - sum of query costs in round k
   r_B(k) = -|R(G_{k+1})| - lam * sum_{e in C_k} w(e)       R on the full graph (b_reward="full")
                                                            or on the seen edges (b_reward="seen")
-S = every source that truly reaches admin, plus random closed non-admin users up to max_sources
+S = every source that truly reaches admin, plus random closed non-admin users/roles up to max_sources
 (assumption: keeps every game non-trivial; A is told S but not which are open).
 """
 from __future__ import annotations
@@ -41,6 +41,7 @@ class GameConfig:
     cut_budget: float = 2        # per round, in edges (count) or summed w(e) (weight)
     budget_mode: str = "count"   # "count" | "weight"
     max_sources: int = 20
+    source_kinds: tuple = ("User", "Role")   # which non-admin principals can be sources
     reveal_cuts_to_A: bool = True
     b_reward: str = "full"       # "full" | "seen"
     w_const: bool = False        # ablation: treat every w(e) as 1
@@ -90,7 +91,7 @@ class Game:
     # ---------------------------------------------------------------- setup
     def reset(self) -> None:
         self.lg = LiveGraph(self.G)
-        all_src = sources(self.G)
+        all_src = sources(self.G, kinds=tuple(self.cfg.source_kinds))
         reach = self.lg.can_reach_admin()
         opened = [s for s in all_src if s in reach]
         closed = [s for s in all_src if s not in reach]

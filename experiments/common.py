@@ -32,11 +32,13 @@ def load_policy(kind: str, path: str | Path):
 
 def make_finder(spec: str, seed: int = 0, allow_end: bool = True):
     """random | bfs | greedy | oracle | bfs:p10 / greedy:p10 (END after 10 idle queries) |
-    bandit:<model.npz> | ckpt:<policy.pt>. allow_end=False forces fixed-budget play (FNR@Q)."""
+    bandit:<model.npz> | bandit+end:<model.npz> | ckpt:<policy.pt>. allow_end=False forces fixed-budget play (FNR@Q)."""
     if spec.startswith("ckpt:"):
         return GNNFinder(load_policy("finder", spec[5:]), greedy=True, allow_end=allow_end)
-    if spec.startswith("bandit:"):
-        return BanditFinder(LinUCB.load(spec[7:]), allow_end=allow_end)
+    if spec.startswith("bandit:"):                 # choose-only: the game's cost rule ends its turn
+        return BanditFinder(LinUCB.load(spec[7:]), allow_end=False)
+    if spec.startswith("bandit+end:"):             # with its own one-step END rule (stops far too early)
+        return BanditFinder(LinUCB.load(spec[11:]), allow_end=allow_end)
     name, _, opt = spec.partition(":")
     patience = int(opt[1:]) if opt.startswith("p") and allow_end else None
     if name in ("bfs", "greedy"):

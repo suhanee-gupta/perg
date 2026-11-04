@@ -251,10 +251,11 @@ def build_hub_any(t, op, build_hub, valid_src):
     return build_hub(tt, [op.action])
 
 
-def sources(G: nx.MultiDiGraph, mode: str = "users") -> list[str]:
-    """S: the untrusted entity plus every non-admin user (mode="users"), or only the untrusted one."""
+def sources(G: nx.MultiDiGraph, mode: str = "users", kinds: tuple[str, ...] = ("User",)) -> list[str]:
+    """S: the untrusted entity plus every non-admin principal of the given kinds (mode="users"),
+    or only the untrusted one (mode="untrusted")."""
     u = G.graph["untrusted"]
     if mode == "untrusted":
         return [u]
     return [u] + sorted(n for n, d in G.nodes(data=True)
-                        if d.get("kind") == "User" and not d.get("is_admin") and n != u)
+                        if d.get("kind") in kinds and not d.get("is_admin") and n != u)

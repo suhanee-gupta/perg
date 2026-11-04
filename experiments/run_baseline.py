@@ -1,7 +1,7 @@
 """Phase 6: A vs each B for K rounds; per-round open pairs, cut cost, r_A, r_B, new routes.
 
-    python -m experiments.run_baseline [--finder greedy|ckpt:...] [--removers random minseen full]
-                                       [--split train] [--rounds 5] [--Q 10] [--budget 1] [--name baseline]
+    python -m experiments.run_baseline [--finder greedy|bandit:...|ckpt:...] [--removers random minseen full]
+                                       [--split train test] [--rounds 5] [--mu 0.3] [--budget 1] [--name baseline]
 
 Writes runs/<name>/metrics.jsonl and runs/<name>/curves.png.
 """
@@ -60,15 +60,17 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--finder", default="greedy")
     ap.add_argument("--removers", nargs="+", default=["none", "random", "minseen", "full"])
-    ap.add_argument("--split", default="train")
+    ap.add_argument("--split", nargs="+", default=["train"])
     ap.add_argument("--rounds", type=int, default=5)
-    ap.add_argument("--Q", type=int, default=25)
+    ap.add_argument("--Q", type=int, default=0, help="safety cap on queries per round (0 = none)")
+    ap.add_argument("--mu", type=float, default=0.3)
     ap.add_argument("--budget", type=float, default=1)
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--name", default="baseline")
     a = ap.parse_args()
-    cfg = GameConfig(Q=a.Q, K=a.rounds, cut_budget=a.budget)
-    rows = run(a.finder, a.removers, split_orgs(a.split), cfg, range(a.seeds), a.name)
+    cfg = GameConfig(Q=a.Q or None, K=a.rounds, mu=a.mu, cut_budget=a.budget)
+    orgs = [o for sp in a.split for o in split_orgs(sp)]
+    rows = run(a.finder, a.removers, orgs, cfg, range(a.seeds), a.name)
     s = summarize(rows, a.removers, a.rounds)
     for rem in a.removers:
         print(f"{rem:12} open/round {['%.2f' % v for v in s[(rem, 'open_after')]]}  "
