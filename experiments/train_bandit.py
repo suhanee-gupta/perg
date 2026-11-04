@@ -3,7 +3,7 @@
     python -m experiments.train_bandit [--episodes 300] [--mu 0.02] [--alpha 0.5] [--beta 0.2]
 
 The reward model does not depend on mu (mu only sets when the finder ENDs), so one model serves
-every mu. Saves runs/bandit/linucb.npz.
+every mu. Saves runs/bandit/linucb.npz (the evaluated copy is committed as models/linucb.npz).
 """
 from __future__ import annotations
 

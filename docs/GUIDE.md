@@ -1,3 +1,5 @@
+> **Superseded.** This was the first build guide (v1 data, Phases 0-7). The current state is in `docs/STATUS.md`.
+
 # Step-by-step implementation guide (Phases 0–7)
 
 This is the exact build plan for the greybox IAM privilege-escalation (PE) remediation game.

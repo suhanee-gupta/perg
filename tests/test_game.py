@@ -77,3 +77,18 @@ def test_cost_rule_ends_turn_without_a_cap():
             g.a_query(A.act(g))
         runs[growth] = g.queries
     assert runs[1.1] < runs[1.0]
+
+
+def test_admin_first_and_exp3():
+    from experiments.cotrain import EXP3
+    from iampe.agents.remediator_baselines import AdminFirstB
+    g = Game(toy(), GameConfig(Q=3, K=1, cut_budget=1, max_sources=3, source_kinds=("User",)), random.Random(0))
+    log = g.play(Script(["s1", "r", "s2"]), AdminFirstB())[0]
+    assert len(log.cut) == 1 and log.cut[0][1] == ADMIN          # budget respected, cuts into admin first
+    ex = EXP3(["a", "b"], gamma=0.2)
+    assert abs(sum(ex.probs()) - 1) < 1e-9
+    ex.last_p = ex.probs()
+    class L:                                                      # B left everything open against "b"
+        open_before, open_after = 2, 2
+    ex.observe("b", [L()])
+    assert ex.probs()[1] > ex.probs()[0]

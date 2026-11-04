@@ -4,7 +4,7 @@
                   FNR and queries actually used
   fixed budget    END disabled, exactly Q queries (equal-query comparison; Q=100 is TAC-comparable)
 
-    python -m experiments.eval_finder [--split test] [--finders bfs greedy bfs:p10 bandit:runs/bandit/linucb.npz]
+    python -m experiments.eval_finder [--split test] [--finders bfs greedy bfs:p10 bandit:models/linucb.npz]
                                       [--mus 0.005 0.02 0.05 0.1] [--budgets 10 20 40 100]
 """
 from __future__ import annotations
@@ -14,7 +14,7 @@ import json
 
 from experiments.common import RUNS, fnr, load_graph, make_finder, split_orgs
 
-DEFAULT = ["random", "bfs", "greedy", "bfs:p10", "greedy:p10", "bandit:runs/bandit/linucb.npz", "oracle"]
+DEFAULT = ["random", "bfs", "greedy", "bfs:p10", "greedy:p10", "bandit:models/linucb.npz", "oracle"]
 
 
 def mean(rows, key):

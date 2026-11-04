@@ -10,7 +10,7 @@ import torch
 from iampe.agents.bandit import BanditFinder, LinUCB
 from iampe.agents.finder_heuristic import BFSFinder, GreedyFinder, OracleFinder, RandomFinder
 from iampe.agents.gnn import FinderPolicy, GNNFinder, GNNRemover, RemediatorPolicy
-from iampe.agents.remediator_baselines import FullB, MinSeenB, NoB, RandomB
+from iampe.agents.remediator_baselines import AdminFirstB, FullB, MinSeenB, NoB, RandomB
 from iampe.data.index import ROOT, splits
 from iampe.env.game import Game, GameConfig
 from iampe.graph.io import load_graph  # noqa: F401  (graphs come from data/graphs/, built by build_graphs.py)
@@ -21,6 +21,13 @@ torch.set_num_threads(4)          # keep CPU use modest
 
 def split_orgs(name: str) -> list[str]:
     return splits()[name]
+
+
+def device(name: str = "auto") -> torch.device:
+    """`auto` picks CUDA when available, else CPU."""
+    if name == "auto":
+        name = "cuda" if torch.cuda.is_available() else "cpu"
+    return torch.device(name)
 
 
 def load_policy(kind: str, path: str | Path):
@@ -49,7 +56,8 @@ def make_finder(spec: str, seed: int = 0, allow_end: bool = True):
 def make_remover(spec: str, seed: int = 0):
     if spec.startswith("ckpt:"):
         return GNNRemover(load_policy("remover", spec[5:]), greedy=True)
-    return {"none": NoB, "random": lambda: RandomB(seed), "minseen": MinSeenB, "full": FullB}[spec]()
+    return {"none": NoB, "random": lambda: RandomB(seed), "minseen": MinSeenB, "full": FullB,
+            "adminfirst": AdminFirstB}[spec]()
 
 
 def fnr(G, finder, mu: float = 0.02, Q: int | None = None, seeds=(0, 1, 2), max_sources: int = 20,

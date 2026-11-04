@@ -101,7 +101,8 @@ def remover_graph(game, spent: float, chosen: set) -> tuple[Data, list]:
         for e in p:
             times[e] = times.get(e, 0) + 1
     left = obs.budget - spent
-    ea = [_edge_feat(G.edges[e], [min(times.get(e, 0), 5) / 5, float(e in chosen)]) for e in seen]
+    # w comes from the game (1 under the w_const ablation), not straight from the graph
+    ea = [_edge_feat(G.edges[e] | {"w": game.w(e)}, [min(times.get(e, 0), 5) / 5, float(e in chosen)]) for e in seen]
     cands = [e for e in seen if e not in chosen and game.w(e) < float("inf")
              and game.cut_cost([e]) <= left + 1e-9]
     pos = {e: i for i, e in enumerate(seen)}

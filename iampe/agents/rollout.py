@@ -39,7 +39,8 @@ def finder_episode(G, cfg, policy, B, rng: random.Random) -> tuple[list[dict], l
 
 
 def remover_episode(G, cfg, policy, A, rng: random.Random) -> tuple[list[dict], list]:
-    """B learns; A is a fixed opponent. B's round reward r_B goes on its last decision that round."""
+    """B learns; A is a fixed opponent. B's round reward r_B / |S| goes on its last decision that
+    round (scaled so returns are comparable across configs with different numbers of sources)."""
     game = Game(G, cfg, rng)
     rec: list[dict] = []
     B = GNNRemover(policy, record=rec)
@@ -50,7 +51,7 @@ def remover_episode(G, cfg, policy, A, rng: random.Random) -> tuple[list[dict], 
         n0 = len(rec)
         log = game.b_cut(B.cut(game))
         if len(rec) > n0:
-            rec[-1]["r"] += log.r_B
+            rec[-1]["r"] += log.r_B / max(1, len(game.S))
     if rec:
         rec[-1]["done"] = True
     return rec, game.log

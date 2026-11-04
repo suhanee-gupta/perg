@@ -62,3 +62,18 @@ class FullB:
 
     def cut(self, game):
         return budgeted_cut(game.G, game.S, game.cfg.cut_budget, _weight(game), removed=game.lg.removed)
+
+
+class AdminFirstB:
+    """Hand-written rule: cut seen edges into admin first (most-used by reported proofs first), then
+    other seen edges by how many proofs use them. A check on what learned B actually learned."""
+
+    def cut(self, game):
+        from iampe.graph.build import ADMIN
+        obs = game.b_observe()
+        uses = {}
+        for p in obs.proofs + [[e] for e in obs.seen]:
+            for e in p:
+                uses[e] = uses.get(e, 0) + 1
+        es = sorted(_cuttable_seen(game), key=lambda e: (e[1] != ADMIN, -uses.get(e, 0), e))
+        return _fit(game, es)
