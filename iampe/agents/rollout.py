@@ -11,8 +11,8 @@ from iampe.env.game import Game
 
 
 def _a_phase(game, A, rec: list | None):
-    """Run A's phase. If rec is given (A is learning), credit each query with proven - mu."""
-    while not game.a_done and game.queries < game.cfg.Q:
+    """Run A's phase. If rec is given (A is learning), credit each query with proven - its cost."""
+    while game.a_can_query():
         n0 = len(rec) if rec is not None else 0
         u = A.act(game)
         stepped = rec is not None and len(rec) > n0
@@ -21,7 +21,7 @@ def _a_phase(game, A, rec: list | None):
         else:
             n = game.a_query(u)
             if stepped:
-                rec[-1]["r"] += n - game.cfg.mu
+                rec[-1]["r"] += n - game.last_cost
     game.a_done = True
 
 
@@ -60,7 +60,7 @@ def finder_bc_pairs(G, cfg, rng: random.Random) -> list[tuple]:
     """(observation, oracle action index) pairs from single-round oracle play."""
     game = Game(G, cfg, rng)
     oracle, pairs = OracleFinder(), []
-    while not game.a_done and game.queries < cfg.Q:
+    while game.a_can_query():
         data, cands = finder_graph(game)
         if not cands:
             break

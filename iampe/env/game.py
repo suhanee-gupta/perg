@@ -1,15 +1,19 @@
 """Two-player greybox remediation game (Phase 4).
 
 Hidden full graph G_k. Each round k:
-  A phase   Finder A spends up to Q queries. query(u) reveals u's live out-edges. A source s is
+  A phase   Finder A queries until it ends its turn. query(u) reveals u's live out-edges. A source s is
             proven (reported) as soon as A's revealed live edges contain a path s -> admin; the
             path is the proof. Reporting is automatic (assumption: a rational A always reports a
             proof it holds), so A's only decisions are which node to query and when to stop.
   B phase   Remover B sees the union of proof paths reported so far (all rounds) and w(e), and cuts
             seen live cuttable edges within the round's cut budget (count or weight).
   G_{k+1} = G_k - C_k. If reveal_cuts_to_A, cut edges also disappear from A's view.
+Query cost: the t-th query of a round (t = 0, 1, ...) costs mu * cost_growth**t (cost_growth = 1:
+constant cost, the default; > 1: the exponential-cost ablation). A's turn ends when it chooses END,
+when nothing is left to query, when the optional safety cap Q is hit, or when the round's query cost
+reaches the most A could still gain (the number of unproven sources): beyond that no query can pay off.
 Rewards:
-  r_A(k) = #sources proven in round k - mu * #queries in round k
+  r_A(k) = #sources proven in round k - sum of query costs in round k
   r_B(k) = -|R(G_{k+1})| - lam * sum_{e in C_k} w(e)       R on the full graph (b_reward="full")
                                                            or on the seen edges (b_reward="seen")
 S = every source that truly reaches admin, plus random closed non-admin users up to max_sources
@@ -29,10 +33,11 @@ from iampe.graph.build import ADMIN, sources
 
 @dataclass
 class GameConfig:
-    Q: int = 50                  # queries per round
+    Q: int | None = None         # optional safety cap on queries per round (None = only the cost rule)
     K: int = 4                   # rounds
     lam: float = 0.05            # B: weight of cut cost
-    mu: float = 0.01             # A: cost per query
+    mu: float = 0.02             # A: cost per query
+    cost_growth: float = 1.0     # query t costs mu * cost_growth**t (1 = constant)
     cut_budget: float = 2        # per round, in edges (count) or summed w(e) (weight)
     budget_mode: str = "count"   # "count" | "weight"
     max_sources: int = 20
@@ -46,6 +51,7 @@ class GameConfig:
 class RoundLog:
     k: int
     queries: int
+    query_cost: float
     proven: list[str]
     new_routes: int              # proofs that use an edge B had not seen before
     cut: list[Edge]
@@ -62,7 +68,7 @@ class AObs:
     queried: set[str]
     revealed: dict[Edge, dict]   # revealed live edges -> attrs
     proven: set[str]             # proven this round
-    queries_left: int
+    budget_left: float           # most A could still gain minus what it has spent this round
     known: set[str]              # nodes A can name (sources + endpoints of revealed edges)
 
 
@@ -103,6 +109,8 @@ class Game:
 
     def _start_round(self) -> None:
         self.queries = 0
+        self.query_cost = 0.0
+        self.last_cost = 0.0
         self.queried: set[str] = set()
         self.proven: set[str] = set()
         self.proofs: list[list[Edge]] = []
@@ -124,8 +132,19 @@ class Game:
 
     def a_observe(self) -> AObs:
         rev = {e: self.G.edges[e] for e in self.revealed}
-        return AObs(list(self.S), set(self.queried), rev, set(self.proven), self.cfg.Q - self.queries,
+        return AObs(list(self.S), set(self.queried), rev, set(self.proven), self.budget_left(),
                     self.known_nodes())
+
+    def next_cost(self) -> float:
+        return self.cfg.mu * self.cfg.cost_growth ** self.queries
+
+    def budget_left(self) -> float:
+        return (len(self.S) - len(self.proven)) - self.query_cost
+
+    def a_can_query(self) -> bool:
+        """A may query again: turn not ended, cap not hit, something to query, and the next query can still pay off."""
+        return (not self.a_done and (self.cfg.Q is None or self.queries < self.cfg.Q)
+                and self.next_cost() <= self.budget_left() and bool(self.query_candidates()))
 
     def revealed_attrs(self) -> dict[Edge, dict]:
         return {e: self.G.edges[e] for e in self.revealed}
@@ -134,16 +153,18 @@ class Game:
         return sorted(n for n in self.known_nodes() if n not in self.queried and n != ADMIN)
 
     def a_query(self, u: str) -> int:
-        """Reveal u's live out-edges; return how many sources became proven."""
-        assert not self.a_done and self.queries < self.cfg.Q, "A phase is over"
+        """Reveal u's live out-edges; return how many sources became proven (cost in self.last_cost)."""
+        assert self.a_can_query(), "A phase is over"
         if u not in self.known_nodes():
             raise ValueError(f"{u} is not known to A")
+        self.last_cost = self.next_cost()
+        self.query_cost += self.last_cost
         self.queries += 1
         self.queried.add(u)
         self.queried_ever.add(u)
         self.revealed.update(self.lg.out_edges(u))
         n = self._auto_report()
-        if self.queries >= self.cfg.Q:
+        if not self.a_can_query():
             self.a_done = True
         return n
 
@@ -205,7 +226,7 @@ class Game:
     def b_cut(self, edges: list[Edge], unrestricted: bool = False) -> RoundLog:
         """Apply B's cuts, close the round, and return its log (with both rewards).
         `unrestricted` lets a cheating ceiling (FullB) cut edges it has not seen."""
-        assert self.a_done or self.queries >= self.cfg.Q
+        assert self.a_done or not self.a_can_query()
         obs = self.b_observe()
         edges = [e for e in dict.fromkeys(edges) if (unrestricted or e in obs.seen) and self.lg.live(e)
                  and self.w(e) < float("inf")]
@@ -224,9 +245,9 @@ class Game:
         else:
             open_after = len(self.lg.open_pairs(self.S))
         cost = sum(self.w(e) for e in edges)
-        r_A = len(self.proven) - self.cfg.mu * self.queries
+        r_A = len(self.proven) - self.query_cost
         r_B = -open_after - self.cfg.lam * cost
-        log = RoundLog(self.k, self.queries, sorted(self.proven), new_routes, edges, cost,
+        log = RoundLog(self.k, self.queries, self.query_cost, sorted(self.proven), new_routes, edges, cost,
                        open_before, len(self.lg.open_pairs(self.S)), r_A, r_B)
         self.log.append(log)
         self.k += 1
@@ -240,7 +261,7 @@ class Game:
             if hasattr(agent, "reset"):
                 agent.reset(self)
         while not self.done:
-            while not self.a_done and self.queries < self.cfg.Q:
+            while self.a_can_query():
                 u = A.act(self)
                 if u is None:
                     self.a_end()

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import torch
 
+from iampe.agents.bandit import BanditFinder, LinUCB
 from iampe.agents.finder_heuristic import BFSFinder, GreedyFinder, OracleFinder, RandomFinder
 from iampe.agents.gnn import FinderPolicy, GNNFinder, GNNRemover, RemediatorPolicy
 from iampe.agents.remediator_baselines import FullB, MinSeenB, NoB, RandomB
@@ -29,11 +30,18 @@ def load_policy(kind: str, path: str | Path):
     return pol
 
 
-def make_finder(spec: str, seed: int = 0):
+def make_finder(spec: str, seed: int = 0, allow_end: bool = True):
+    """random | bfs | greedy | oracle | bfs:p10 / greedy:p10 (END after 10 idle queries) |
+    bandit:<model.npz> | ckpt:<policy.pt>. allow_end=False forces fixed-budget play (FNR@Q)."""
     if spec.startswith("ckpt:"):
-        return GNNFinder(load_policy("finder", spec[5:]), greedy=True)
-    return {"random": lambda: RandomFinder(seed), "bfs": BFSFinder, "greedy": GreedyFinder,
-            "oracle": OracleFinder}[spec]()
+        return GNNFinder(load_policy("finder", spec[5:]), greedy=True, allow_end=allow_end)
+    if spec.startswith("bandit:"):
+        return BanditFinder(LinUCB.load(spec[7:]), allow_end=allow_end)
+    name, _, opt = spec.partition(":")
+    patience = int(opt[1:]) if opt.startswith("p") and allow_end else None
+    if name in ("bfs", "greedy"):
+        return (BFSFinder if name == "bfs" else GreedyFinder)(patience)
+    return {"random": lambda: RandomFinder(seed), "oracle": OracleFinder}[name]()
 
 
 def make_remover(spec: str, seed: int = 0):
@@ -42,13 +50,20 @@ def make_remover(spec: str, seed: int = 0):
     return {"none": NoB, "random": lambda: RandomB(seed), "minseen": MinSeenB, "full": FullB}[spec]()
 
 
-def fnr(G, finder, Q: int, seeds=(0, 1, 2), max_sources: int = 20) -> dict:
-    """Single round, no B: share of truly open sources A fails to prove within Q queries."""
+def fnr(G, finder, mu: float = 0.02, Q: int | None = None, seeds=(0, 1, 2), max_sources: int = 20,
+        cost_growth: float = 1.0) -> dict:
+    """Single round, no B: share of truly open sources A fails to prove, and the queries it used.
+
+    With Q=None A stops by itself (END) or by the game's cost rule; with a Q and a finder that
+    never ends, this is FNR at a fixed budget (e.g. Q=100 for the TAC comparison)."""
     missed = total = used = 0
     for sd in seeds:
-        g = Game(G, GameConfig(Q=Q, K=1, max_sources=max_sources, seed=sd), random.Random(sd))
+        cfg = GameConfig(Q=Q, K=1, mu=mu, max_sources=max_sources, cost_growth=cost_growth, seed=sd)
+        g = Game(G, cfg, random.Random(sd))
+        if hasattr(finder, "reset"):
+            finder.reset(g)
         opened = g.lg.open_pairs(g.S)
-        while not g.a_done and g.queries < Q:
+        while g.a_can_query():
             u = finder.act(g)
             if u is None:
                 break

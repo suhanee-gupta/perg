@@ -76,10 +76,10 @@ def _sample(policy, data, greedy: bool, allow_last: bool = True):
 
 
 class GNNFinder:
-    """`allow_end=False` (default) masks END: a query costs little and FNR is measured at budget Q."""
+    """`allow_end=False` masks END (used for fixed-budget evaluation, e.g. FNR@100)."""
 
     def __init__(self, policy: FinderPolicy, greedy: bool = False, record: list | None = None,
-                 allow_end: bool = False):
+                 allow_end: bool = True):
         self.policy, self.greedy, self.record, self.allow_end = policy, greedy, record, allow_end
 
     def act(self, game):

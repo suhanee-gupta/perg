@@ -22,10 +22,40 @@ class RandomFinder:
         return self.rng.choice(c) if c else None
 
 
-class BFSFinder:
+class _Patience:
+    """END after `patience` queries in a row that proved nothing and revealed no new role, compute
+    or admin node (None = never END; the game's cost rule still ends the turn)."""
+
+    patience: int | None = None
+
+    def reset(self, game):
+        self._seen, self._idle, self._last = set(), 0, (0, 0)
+
+    def _stop(self, game) -> bool:
+        if self.patience is None:
+            return False
+        if not hasattr(self, "_seen"):
+            self.reset(game)
+        if game.queries == 0:
+            self.reset(game)
+        new = {v for (_, v, _) in game.revealed
+               if game.G.nodes[v].get("kind") in ("Role", "Service", "Admin", "Hub")} - self._seen
+        progress = len(game.proven) > self._last[0] or bool(new)
+        self._seen |= new
+        self._idle = 0 if progress else self._idle + (game.queries > self._last[1])
+        self._last = (len(game.proven), game.queries)
+        return self._idle >= self.patience
+
+
+class BFSFinder(_Patience):
     """Query sources (untrusted first), then revealed nodes in breadth-first order from S."""
 
+    def __init__(self, patience: int | None = None):
+        self.patience = patience
+
     def act(self, game):
+        if self._stop(game):
+            return None
         dist = _dist_from_sources(game)
         cand = [n for n in game.query_candidates() if n in dist]
         if not cand:
@@ -34,11 +64,16 @@ class BFSFinder:
         return min(cand, key=lambda n: (n != u, dist[n], n))
 
 
-class GreedyFinder:
+class GreedyFinder(_Patience):
     """Best-first: hop distance from S plus priors on node kind and on the revealing rule's category;
     sources already proven this round are skipped."""
 
+    def __init__(self, patience: int | None = None):
+        self.patience = patience
+
     def act(self, game):
+        if self._stop(game):
+            return None
         dist = _dist_from_sources(game, skip=game.proven)
         best, score = None, None
         via = {}

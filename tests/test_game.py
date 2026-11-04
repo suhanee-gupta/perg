@@ -56,3 +56,24 @@ def test_random_players_finish_on_real_graphs():
     for org in ["linost-zq0as", "orqua-15occg", "iv00u"]:
         logs = play(load_graph(org), make_finder("random"), make_remover("random"), GameConfig(Q=10, K=3), 0)
         assert len(logs) == 3 and all(l["open_after"] <= l["open_before"] for l in logs)
+
+
+def test_cost_rule_ends_turn_without_a_cap():
+    """A random A never chooses END; the turn still ends once spent cost reaches what it could gain."""
+    G = load_graph("hexsol-15z25m")
+    for mu, growth in [(0.05, 1.0), (0.05, 1.05)]:
+        g = Game(G, GameConfig(Q=None, K=1, mu=mu, cost_growth=growth, max_sources=10), random.Random(0))
+        A = make_finder("random")
+        while g.a_can_query():
+            g.a_query(A.act(g))
+        assert g.query_cost <= len(g.S)            # spent cost never exceeds the most A could gain
+        assert g.queries <= len(g.S) / mu
+    # growing cost stops much earlier than constant cost
+    runs = {}
+    for growth in (1.0, 1.1):
+        g = Game(G, GameConfig(Q=None, K=1, mu=0.05, cost_growth=growth, max_sources=10), random.Random(0))
+        A = make_finder("random")
+        while g.a_can_query():
+            g.a_query(A.act(g))
+        runs[growth] = g.queries
+    assert runs[1.1] < runs[1.0]

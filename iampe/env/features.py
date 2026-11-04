@@ -80,7 +80,7 @@ def finder_graph(game) -> tuple[Data, list[str]]:
                 edge_index=torch.tensor(ei, dtype=torch.long).t().reshape(2, -1),
                 edge_attr=torch.tensor(ea, dtype=torch.float32).reshape(-1, EDGE_DIM),
                 cand=torch.tensor([idx[c] for c in cands], dtype=torch.long),
-                glob=torch.tensor([[game.queries / max(1, game.cfg.Q), len(game.proven) / max(1, len(game.S))]],
+                glob=torch.tensor([[game.query_cost / max(1, len(game.S)), len(game.proven) / max(1, len(game.S))]],
                                   dtype=torch.float32))
     return data, cands
 
