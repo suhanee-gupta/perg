@@ -51,7 +51,8 @@ def _node(n: str) -> str:
     return ADMIN if n in ("admin", "admin:*") else n
 
 
-def has_hop(G: nx.MultiDiGraph, src: str, prim: str, dst: str, removed=frozenset()) -> bool:
+def has_hop(G: nx.MultiDiGraph, src: str, prim: str, dst: str, removed=frozenset(),
+            policy: str | None = None) -> bool:
     """Edge src -> dst (directly, or via the template's wildcard hub) whose prim implements `prim`."""
     src, dst = _node(src), _node(dst)
     if src not in G:
@@ -59,6 +60,8 @@ def has_hop(G: nx.MultiDiGraph, src: str, prim: str, dst: str, removed=frozenset
     want = set(PRIM_TEMPLATES.get(prim, (prim,)))
     for _, v, k, d in G.out_edges(src, keys=True, data=True):
         if (src, v, k) in removed or d["prim"] not in want:
+            continue
+        if policy is not None and not any(p == f"policy:{policy}" or p == policy for p in d.get("policies", ())):
             continue
         hits = [v] if not v.startswith("any:") else list(G.successors(v))
         if any(x == dst or G.nodes[x].get("role") == dst for x in hits):
@@ -80,7 +83,8 @@ def check(G: nx.MultiDiGraph, labels: dict) -> dict:
                 if G.nodes.get(_node(h["from"]), {}).get("is_admin"):
                     continue                      # admin principals only get holds_admin edges
                 should = not h.get("decoy") and (broken is None or i < broken)
-                if has_hop(G, h["from"], h["prim"], h["to"]) != should:
+                pol = h.get("policy") if h.get("decoy") else None
+                if has_hop(G, h["from"], h["prim"], h["to"], policy=pol) != should:
                     out["hop_errors"].append((kind, i, h["prim"], h["from"], h["to"], "missing" if should else "present"))
             if p["reaches_admin"] and _node(p["start"]) not in reach:
                 out["start_errors"].append((kind, p["start"]))
