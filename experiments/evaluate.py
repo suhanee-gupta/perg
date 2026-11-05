@@ -7,7 +7,8 @@
 Core test: at equal cut budget (1 edge per round, count mode), open sources left by each remover,
 reported as open sources after round 0 and summed over all K rounds ("open-source-rounds").
 Every remover faces the same finders, graphs and seeds. Generalisation rows use the deferred (large)
-graphs when their files exist in data/graphs/, and are skipped otherwise.
+graphs whose files exist in data/graphs/, reported overall and per config. They are the slow part
+(mermer takes 5-35 s per game), so --large-removers can limit which removers run on them.
 """
 from __future__ import annotations
 
@@ -70,6 +71,7 @@ def main():
     ap.add_argument("--rounds", type=int, default=5)
     ap.add_argument("--budget", type=float, default=1)
     ap.add_argument("--seeds", type=int, default=3)
+    ap.add_argument("--large-removers", nargs="+", default=None, help="removers for the large configs (default: --removers)")
     ap.add_argument("--fnr-budgets", nargs="+", type=int, default=[10, 20, 30, 40])
     ap.add_argument("--out", default=str(ROOT / "docs" / "results.md"))
     a = ap.parse_args()
@@ -92,9 +94,18 @@ def main():
     big = [o for o in split_orgs("deferred") if graph_path(o).exists()]
     md += ["## Generalisation to the large configs", ""]
     if big:
-        tab = remover_table(big, a.removers, ["bfs"], cfg, (0,))
-        rows["deferred"] = tab
-        md += md_remover(f"deferred ({', '.join(big)}), finder = bfs", tab, a.removers)
+        large = a.large_removers or a.removers
+        for label, finders in (("training finders", a.finders), ("held-out finders", a.heldout)):
+            per = {o: remover_table([o], large, finders, cfg, seeds) for o in big}
+            tab = {r: {m: sum(per[o][r][m] for o in big) / len(big) for m in ("r0", "rounds", "cost")} for r in large}
+            rows[f"deferred/{label}"] = {"mean": tab, "per_config": per}
+            md += md_remover(f"Large configs ({', '.join(big)}), {label} = {', '.join(map(short, finders))}", tab, large)
+            md += [f"Per config, {label}: open-source-rounds (edges cut)", "",
+                   "| remover | " + " | ".join(o.split("-")[0] for o in big) + " |", "|---|" + "---|" * len(big)]
+            md += [f"| {short(r)} | " + " | ".join(f"{per[o][r]['rounds']:.2f} ({per[o][r]['cost']:.2f})" for o in big) + " |"
+                   for r in large]
+            md += [""]
+            print(f"done large configs, {label}", flush=True)
     else:
         md += ["Not run: the deferred graphs are not in `data/graphs/` yet (see docs/HANDOFF.md).", ""]
 
