@@ -52,7 +52,7 @@ game / Finder A / Remover B / training / evaluation      (not your part; reads d
 | Path | What it does |
 |---|---|
 | `experiments/build_graphs.py` | **The command to run.** Converts, builds, validates and writes each graph; updates `data/graphs/index.json`. Skips configs over 3 MB of Terraform unless `--allow-large`. |
-| `iampe/data/index.py` | Finds configs and labels; defines the splits (`TRAIN`, `TEST`, `BENCH`, `DEFERRED`). Also reads the older v1 dataset if it is present. |
+| `iampe/data/index.py` | Finds configs and labels; defines the splits (`TRAIN`, `TEST`, `BENCH`, `DEFERRED`). |
 | `iampe/parser/hcl.py` | Parses `*.tf` with `python-hcl2`, including the `jsonencode({...})` policy bodies. Caches the result. |
 | `iampe/parser/policy.py` | Policy-statement helpers: `${...}` interpolation, wildcard matching, condition evaluation. |
 | `iampe/parser/to_tac.py` | The converter: Terraform resources to the team's TAC JSON format (entities, permission assignments, relations). Caches the result, keyed on the converter's own source code. |
@@ -133,7 +133,6 @@ Other forms:
 ```bash
 python -m experiments.build_graphs mermer-1njcht --allow-large    # one config
 python -m experiments.build_graphs                                 # rebuild the 12 small ones
-python -m experiments.build_graphs --v1                            # also the older 14-config dataset, if present
 ```
 
 If your machine is tight on memory, cap the process so it fails on its own instead of freezing the
@@ -349,9 +348,6 @@ languages may not; load the files with `iampe.graph.io.load_graph`.
 
 ## 11. Optional, if you have time
 
-- **The older v1 dataset** (14 configs, `escalation/` and `no_escalation/` folders): `python -m
-  experiments.build_graphs --v1` builds the small ones as extra training data. Its two large configs
-  (arior, solor) need `--allow-large`.
 - **New data later:** put each config folder under `data/raw/esc/` or `data/raw/no_esc/`, add its name
   to a split in `iampe/data/index.py`, and run `build_graphs` for it.
 - **Regenerate the dataset report:** `python -m experiments.inspect_dataset` (rewrites

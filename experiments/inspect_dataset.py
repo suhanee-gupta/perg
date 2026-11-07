@@ -18,7 +18,7 @@ from iampe.data.index import ROOT, list_configs, load_labels, splits
 def main():
     refs = list_configs("v2")
     split = splits()
-    where = {o: k for k, os in split.items() if k != "v1" for o in os}
+    where = {o: k for k, os in split.items() for o in os}
     tmpl = {t.id: t for t in env.templates()}
     rows, prim_cfg, prim_n = [], defaultdict(set), Counter()
     for r in refs:

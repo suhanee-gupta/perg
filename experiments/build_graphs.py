@@ -45,12 +45,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("orgs", nargs="*")
     ap.add_argument("--deferred", action="store_true", help="build the large deferred configs")
-    ap.add_argument("--v1", action="store_true", help="also build the earlier 14-config dataset (small ones)")
     ap.add_argument("--allow-large", action="store_true")
     ap.add_argument("--max-mb", type=float, default=3.0, help="skip Terraform larger than this (MB)")
     a = ap.parse_args()
     s = splits()
-    orgs = a.orgs or (s["deferred"] if a.deferred else s["train"] + s["test"] + s["bench"] + (s["v1"] if a.v1 else []))
+    orgs = a.orgs or (s["deferred"] if a.deferred else s["train"] + s["test"] + s["bench"])
     idx_path = GRAPH_DIR / "index.json"
     index = json.loads(idx_path.read_text()) if idx_path.exists() else {}
     bad = 0

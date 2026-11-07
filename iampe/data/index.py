@@ -1,11 +1,9 @@
 """Discover the provided Terraform configs and their labels.
 
-Two datasets:
-  v2  data/raw/{esc,no_esc}/<org>/   the current one (18 configs; also ships the generator's
-                                     config.json, which is NOT used as ground truth: see docs/HANDOFF.md)
-  v1  escalation/escalation, no_escalation/no_escalation   the earlier 14 configs (optional extra data)
+Dataset: data/raw/{esc,no_esc}/<org>/, 18 configs (from esc.zip and no_esc.zip). Each also ships the
+generator's config.json, which is NOT used as ground truth: see docs/HANDOFF.md.
 
-Splits (v2): train / test are small enough to convert on a laptop; `bench` are the four IAM Vulnerable
+Splits: train / test are small enough to convert on a laptop; `bench` are the four IAM Vulnerable
 scenarios; `deferred` are the large configs whose graphs are built elsewhere (experiments/build_graphs.py).
 """
 from __future__ import annotations
@@ -17,7 +15,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DATASETS = {
     "v2": [ROOT / "data" / "raw" / "esc", ROOT / "data" / "raw" / "no_esc"],
-    "v1": [ROOT / "escalation" / "escalation", ROOT / "no_escalation" / "no_escalation"],
 }
 CACHE_DIR = ROOT / "data" / "cache"
 GRAPH_DIR = ROOT / "data" / "graphs"
@@ -87,5 +84,4 @@ def label_paths(labels: dict) -> dict[str, list[list[tuple[str, str, str]]]]:
 
 
 def splits() -> dict[str, list[str]]:
-    return {"train": list(TRAIN), "test": list(TEST), "bench": list(BENCH), "deferred": list(DEFERRED),
-            "v1": [r.org for r in list_configs("v1")]}
+    return {"train": list(TRAIN), "test": list(TEST), "bench": list(BENCH), "deferred": list(DEFERRED)}

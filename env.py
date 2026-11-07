@@ -2,11 +2,11 @@
 
 My own code imports only from this module. Nothing in external/ is modified; adaptations live here.
 
-    e = load_config("arifen-15ocxf")            # dataset name (converted from Terraform) or a .json path
+    e = load_config("linost-zq0as")             # dataset name (converted from Terraform) or a .json path
     o = e.make_oracle(budget=100)              # A's view: entity-permission queries
-    o.ask(Query.of("user:ext-raj.singh", "*@*"))
+    o.ask(Query.of(e.untrusted, "*@*"))
     e.reachable().found                         # whitebox check on the full (hidden) config
-    e2 = e.remove(relations=[("group:contractors", "user:ext-raj.singh")])   # B's cut -> new Env
+    e2 = e.remove(relations=[("group:<g>", "user:<u>")])   # B's cut -> new Env
 
 An "edge" B can remove is either a relation (src -> dst, permissions flow along it) or a direct
 assignment (entity holds `action@resource`). Removals return a new Env; the original is untouched.
@@ -171,7 +171,7 @@ def load_config(name_or_path: str | Path, untrusted: str | None = None, target: 
                 use_cache: bool = True) -> Env:
     """Load a config.
 
-    A dataset name (e.g. "kasol-zq0qg") is converted from its Terraform directory by
+    A dataset name (e.g. "linost-zq0as") is converted from its Terraform directory by
     iampe.parser.to_tac. A path to a .json file is loaded as TAC JSON as-is (e.g. the team's
     external/data/arifen-15ocxf.json).
     """

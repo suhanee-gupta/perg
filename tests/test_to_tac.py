@@ -3,11 +3,7 @@ import json
 import pytest
 
 import env
-from iampe.data.index import list_configs
 from iampe.parser.policy import match_action, match_resource, parse_statements
-
-HAVE_V1 = bool(list_configs("v1"))
-
 
 def test_policy_matching_and_conditions():
     assert match_action("iam:Put*", "iam:PutUserPolicy") and match_action("IAM:putuserpolicy", "iam:PutUserPolicy")
@@ -20,24 +16,6 @@ def test_policy_matching_and_conditions():
         {"Effect": "Deny", "Action": "x:A", "Resource": "*", "Condition": {"StringEquals": {"foo:Bar": "x"}}},
     ]}
     assert [s.applies for s in parse_statements(doc, {})] == [False, True, False, True]
-
-
-def _perms(e, entity):
-    return {str(p) for p in e.assignments.get(entity, [])}
-
-
-@pytest.mark.skipif(not HAVE_V1, reason="v1 dataset (arifen) not present")
-def test_arifen_matches_team_structure_and_drops_decoys():
-    mine = env.load_config("arifen-15ocxf")
-    team = env.load_config(env.DATA_DIR / "arifen-15ocxf.json")
-    assert set(mine.entity_types) == set(team.entity_types)
-    assert set(mine.relations) == set(team.relations)
-    assert mine.untrusted == team.untrusted
-    # labelled decoys: deny in a separate policy, deny in the same policy, blocking condition
-    assert "iam:AddUserToGroup@group:inj-grp-g3" not in _perms(mine, "policy:inj-pol-p4")
-    assert "iam:UpdateAssumeRolePolicy@role:inj-trust-edit-r6" not in _perms(mine, "policy:inj-pol-p7")
-    assert "iam:PutUserPolicy@user:ext-raj.singh" not in _perms(mine, "policy:inj-pol-p8")
-    assert "iam:AttachGroupPolicy@group:contractors" in _perms(mine, "policy:inj-pol-p1")
 
 
 def test_reachability_matches_labels_on_small_configs():

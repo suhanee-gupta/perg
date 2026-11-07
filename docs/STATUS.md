@@ -45,8 +45,9 @@ Full result tables: `docs/results.md`. Data: `docs/dataset.md`. Large-graph hand
 ## Decisions taken (and why)
 
 **Data and pipeline**
-- **v2 data replaces v1** as the main dataset. v1 stays readable (`list_configs("v1")`) and its
-  arifen test still runs when the v1 folders are present.
+- **Only the v2 data (`esc.zip`, `no_esc.zip`) is used.** The older 14-config dataset (`escalation/`,
+  `no_escalation/`) was deleted from the repo on 2026-11-07 to avoid confusion; it is in git history
+  before that commit.
 - **Ground truth = my converter run on the Terraform, not the generator's `config.json`.**
   `config.json` gets 3 of the 9 no-escalation configs wrong (a Deny on policy-version actions in a
   separate policy is ignored) and over-approximates open sources. Evidence: `docs/HANDOFF.md` §9.
