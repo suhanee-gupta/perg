@@ -12,7 +12,7 @@ from iampe.agents.finder_heuristic import BFSFinder, GreedyFinder, OracleFinder,
 from iampe.agents.gnn import FinderPolicy, GNNFinder, GNNRemover, RemediatorPolicy
 from iampe.agents.remediator_baselines import AdminFirstB, FullB, MinSeenB, NoB, RandomB
 from iampe.data.index import ROOT, splits
-from iampe.env.game import Game, GameConfig
+from iampe.env.game import Game, GameConfig, standard_config
 from iampe.graph.io import load_graph  # noqa: F401  (graphs come from data/graphs/, built by build_graphs.py)
 
 RUNS = ROOT / "runs"
@@ -37,9 +37,10 @@ def load_policy(kind: str, path: str | Path):
     return pol
 
 
-def make_finder(spec: str, seed: int = 0, allow_end: bool = True):
-    """random | bfs | greedy | oracle | bfs:p10 / greedy:p10 (END after 10 idle queries) |
-    bandit:<model.npz> | bandit+end:<model.npz> | ckpt:<policy.pt>. allow_end=False forces fixed-budget play (FNR@Q)."""
+def make_finder(spec: str, seed: int = 0, allow_end: bool = False):
+    """random | bfs | greedy | oracle | bfs:p10 / greedy:p10 (END after 10 idle queries; only with
+    allow_end) | bandit:<model.npz> | bandit+end:<model.npz> | ckpt:<policy.pt>. The standard game has
+    no END (fixed budget, as in Greybox-TAC), so allow_end defaults to False."""
     if spec.startswith("ckpt:"):
         return GNNFinder(load_policy("finder", spec[5:]), greedy=True, allow_end=allow_end)
     if spec.startswith("bandit:"):                 # choose-only: the game's cost rule ends its turn
@@ -60,15 +61,12 @@ def make_remover(spec: str, seed: int = 0):
             "adminfirst": AdminFirstB}[spec]()
 
 
-def fnr(G, finder, mu: float = 0.02, Q: int | None = None, seeds=(0, 1, 2), max_sources: int = 20,
-        cost_growth: float = 1.0) -> dict:
-    """Single round, no B: share of truly open sources A fails to prove, and the queries it used.
-
-    With Q=None A stops by itself (END) or by the game's cost rule; with a Q and a finder that
-    never ends, this is FNR at a fixed budget (e.g. Q=100 for the TAC comparison)."""
+def fnr(G, finder, seeds=(0, 1, 2), **overrides) -> dict:
+    """Single round, no B, in the standard game (standard_config(K=1, **overrides), e.g. Q=10):
+    share of truly open sources A fails to prove, and the queries it used."""
     missed = total = used = 0
     for sd in seeds:
-        cfg = GameConfig(Q=Q, K=1, mu=mu, max_sources=max_sources, cost_growth=cost_growth, seed=sd)
+        cfg = standard_config(**({"K": 1, "seed": sd} | overrides))
         g = Game(G, cfg, random.Random(sd))
         if hasattr(finder, "reset"):
             finder.reset(g)

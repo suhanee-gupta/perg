@@ -1,63 +1,58 @@
-"""Phase 9: evaluation tables, written to docs/results.md (and printed).
+"""Phase 9: evaluation tables in the standard game, written to docs/results.md (and printed).
 
-    python -m experiments.evaluate [--removers random minseen full ckpt:runs/remover/remover_v1.best.pt ...]
-                                   [--finders bfs greedy bandit:models/linucb.npz]
-                                   [--heldout random bfs:p10 greedy:p10] [--splits train test]
+    python -m experiments.evaluate [--removers random minseen adminfirst full ckpt:runs/remover/remover.best.pt ...]
+                                   [--finders bfs greedy bandit:models/linucb.npz ckpt:runs/finder/finder.best.pt]
+                                   [--heldout random oracle] [--splits train test] [--large] [--seeds 3]
 
-Core test: at equal cut budget (1 edge per round, count mode), open sources left by each remover,
-reported as open sources after round 0 and summed over all K rounds ("open-source-rounds").
-Every remover faces the same finders, graphs and seeds. Generalisation rows use the deferred (large)
-graphs whose files exist in data/graphs/, reported overall and per config. They are the slow part
-(mermer takes 5-35 s per game), so --large-removers can limit which removers run on them.
+Remover B: every remover faces the same finders, graphs and seeds; reported as mean total r_B, open
+sources summed over the K rounds ("open-source-rounds"), collateral (sum of normalised w over cut
+edges) and edges cut. Held-out finders are never in a training pool: random and the oracle (which sees
+the hidden graph: the strongest finder). With --large, the deferred (large) configs are added, overall
+and per config. Finder A: FNR at fixed budgets Q (single round, no B).
 """
 from __future__ import annotations
 
 import argparse
-import dataclasses
 import json
 from datetime import date
 
 from experiments.common import RUNS, fnr, load_graph, make_finder, make_remover, play, split_orgs
 from iampe.data.index import ROOT
-from iampe.env.game import GameConfig
+from iampe.env.game import standard_config
 from iampe.graph.io import graph_path
 
-REMOVERS = ["random", "minseen", "full"]
+REMOVERS = ["random", "minseen", "adminfirst", "full"]
 FINDERS = ["bfs", "greedy", "bandit:models/linucb.npz"]
-HELDOUT = ["random", "bfs:p10", "greedy:p10"]
+HELDOUT = ["random", "oracle"]
+METRICS = ("r_B", "open", "collateral", "cuts")
 
 
 def short(spec: str) -> str:
-    if spec.startswith("wconst+"):
-        return short(spec[7:]) + " (no w)"
-    return spec.split("/")[-1].removesuffix(".best.pt").removesuffix(".pt").removesuffix(".npz") if "/" in spec else spec
+    if "/" not in spec:
+        return spec
+    return spec.split("/")[-1].removesuffix(".best.pt").removesuffix(".pt").removesuffix(".npz")
 
 
-def remover_table(orgs, removers, finders, cfg, seeds):
-    """{remover: {"r0": mean open after round 0, "rounds": mean open-source-rounds, "cost": mean cut cost}}
-    A remover spec prefixed "wconst+" is played in a game where every w(e) is 1 (the no-w ablation)."""
-    graphs = {o: load_graph(o) for o in orgs}
-    out = {}
-    for rem in removers:
-        c = dataclasses.replace(cfg, w_const=rem.startswith("wconst+"))
-        spec = rem.removeprefix("wconst+")
-        r0 = tot = cost = n = 0
-        for G in graphs.values():
-            for f in finders:
-                for sd in seeds:
-                    logs = play(G, make_finder(f, sd), make_remover(spec, sd), c, sd)
-                    r0 += logs[0]["open_after"]
-                    tot += sum(l["open_after"] for l in logs)
-                    cost += sum(len(l["cut"]) for l in logs)
-                    n += 1
-        out[rem] = {"r0": r0 / n, "rounds": tot / n, "cost": cost / n}
-    return out
+def remover_row(graphs, rem, finders, cfg, seeds) -> dict:
+    tot = dict.fromkeys(METRICS, 0.0)
+    n = 0
+    for G in graphs:
+        for f in finders:
+            for sd in seeds:
+                logs = play(G, make_finder(f, sd), make_remover(rem, sd), cfg, sd)
+                tot["r_B"] += sum(l["r_B"] for l in logs)
+                tot["open"] += sum(l["open_after"] for l in logs)
+                tot["collateral"] += sum(l["cut_cost"] for l in logs)
+                tot["cuts"] += sum(len(l["cut"]) for l in logs)
+                n += 1
+    return {k: v / n for k, v in tot.items()}
 
 
-def md_remover(title, tab, removers):
-    lines = [f"### {title}", "", "| remover | open after round 0 | open-source-rounds (sum over K) | edges cut |",
-             "|---|---|---|---|"]
-    lines += [f"| {short(r)} | {tab[r]['r0']:.2f} | {tab[r]['rounds']:.2f} | {tab[r]['cost']:.2f} |" for r in removers]
+def md_table(title, tab, removers) -> list[str]:
+    lines = [f"### {title}", "", "| remover | total r_B | open-source-rounds | collateral (sum of w) | edges cut |",
+             "|---|---|---|---|---|"]
+    lines += [f"| {short(r)} | {tab[r]['r_B']:.2f} | {tab[r]['open']:.2f} | {tab[r]['collateral']:.3f} | {tab[r]['cuts']:.2f} |"
+              for r in removers]
     return lines + [""]
 
 
@@ -67,62 +62,56 @@ def main():
     ap.add_argument("--finders", nargs="+", default=FINDERS)
     ap.add_argument("--heldout", nargs="+", default=HELDOUT)
     ap.add_argument("--splits", nargs="+", default=["train", "test"])
-    ap.add_argument("--mu", type=float, default=0.3)
+    ap.add_argument("--large", action="store_true", help="also the deferred (large) configs; slow (mermer)")
+    ap.add_argument("--large-removers", nargs="+", default=None, help="removers on the large configs (default: --removers)")
     ap.add_argument("--rounds", type=int, default=5)
-    ap.add_argument("--budget", type=float, default=1)
+    ap.add_argument("--Q", type=int, default=20)
+    ap.add_argument("--decline", type=float, default=0.1)
+    ap.add_argument("--lam", type=float, default=1.0)
     ap.add_argument("--seeds", type=int, default=3)
-    ap.add_argument("--large-removers", nargs="+", default=None, help="removers for the large configs (default: --removers)")
-    ap.add_argument("--fnr-budgets", nargs="+", type=int, default=[10, 20, 30, 40])
+    ap.add_argument("--fnr-budgets", nargs="+", type=int, default=[10, 20, 40])
     ap.add_argument("--out", default=str(ROOT / "docs" / "results.md"))
     a = ap.parse_args()
-    cfg = GameConfig(K=a.rounds, mu=a.mu, cut_budget=a.budget)
+    cfg = standard_config(K=a.rounds, Q=a.Q, decline_p=a.decline, lam=a.lam)
     seeds = tuple(range(a.seeds))
     md = ["# Results", "",
-          f"Generated by `python -m experiments.evaluate` on {date.today()}. Game: mu={a.mu}, K={a.rounds} rounds, "
-          f"cut budget {a.budget:g} edge per round, sources = untrusted entity + non-admin users and roles "
-          f"(open ones plus random closed ones up to 20), {a.seeds} seeds per (config, finder).", "",
-          "## Core test: open sources left at equal cut budget", ""]
+          f"Generated by `python -m experiments.evaluate` on {date.today()}. Standard game: A has a fixed budget "
+          f"of Q={a.Q} queries per round (no END, {a.decline:.0%} of queries declined); B has no edge budget, "
+          f"r_B = sources newly closed - sources still open - {a.lam:g} x collateral, collateral = sum of w(e) "
+          f"normalised by the account's users and roles; K={a.rounds} rounds; {a.seeds} seeds per (config, finder).", "",
+          "## Remover B", ""]
     rows = {}
-    for sp in a.splits:
-        tab = remover_table(split_orgs(sp), a.removers, a.finders, cfg, seeds)
-        rows[f"{sp}/pool"] = tab
-        md += md_remover(f"{sp} split ({', '.join(split_orgs(sp))}), finders = {', '.join(map(short, a.finders))}",
-                         tab, a.removers)
-        tab = remover_table(split_orgs(sp), a.removers, a.heldout, cfg, seeds)
-        rows[f"{sp}/heldout"] = tab
-        md += md_remover(f"{sp} split, held-out finders = {', '.join(a.heldout)}", tab, a.removers)
-    big = [o for o in split_orgs("deferred") if graph_path(o).exists()]
-    md += ["## Generalisation to the large configs", ""]
+    groups = [(sp, split_orgs(sp), a.removers) for sp in a.splits]
+    big = [o for o in split_orgs("deferred") if graph_path(o).exists()] if a.large else []
     if big:
-        large = a.large_removers or a.removers
+        groups.append(("large", big, a.large_removers or a.removers))
+    for name, orgs, removers in groups:
+        graphs = {o: load_graph(o) for o in orgs}
         for label, finders in (("training finders", a.finders), ("held-out finders", a.heldout)):
-            per = {o: remover_table([o], large, finders, cfg, seeds) for o in big}
-            tab = {r: {m: sum(per[o][r][m] for o in big) / len(big) for m in ("r0", "rounds", "cost")} for r in large}
-            rows[f"deferred/{label}"] = {"mean": tab, "per_config": per}
-            md += md_remover(f"Large configs ({', '.join(big)}), {label} = {', '.join(map(short, finders))}", tab, large)
-            md += [f"Per config, {label}: open-source-rounds (edges cut)", "",
-                   "| remover | " + " | ".join(o.split("-")[0] for o in big) + " |", "|---|" + "---|" * len(big)]
-            md += [f"| {short(r)} | " + " | ".join(f"{per[o][r]['rounds']:.2f} ({per[o][r]['cost']:.2f})" for o in big) + " |"
-                   for r in large]
-            md += [""]
-            print(f"done large configs, {label}", flush=True)
-    else:
-        md += ["Not run: the deferred graphs are not in `data/graphs/` yet (see docs/HANDOFF.md).", ""]
+            per = {o: {r: remover_row([G], r, finders, cfg, seeds) for r in removers} for o, G in graphs.items()}
+            tab = {r: {m: sum(per[o][r][m] for o in orgs) / len(orgs) for m in METRICS} for r in removers}
+            rows[f"{name}/{label}"] = {"mean": tab, "per_config": per}
+            md += md_table(f"{name} ({', '.join(orgs)}), {label} = {', '.join(map(short, finders))}", tab, removers)
+            if name == "large":
+                md += [f"Per config, {label}: total r_B (open-source-rounds)", "",
+                       "| remover | " + " | ".join(o.split("-")[0] for o in orgs) + " |", "|---|" + "---|" * len(orgs)]
+                md += [f"| {short(r)} | " + " | ".join(f"{per[o][r]['r_B']:.2f} ({per[o][r]['open']:.2f})" for o in orgs)
+                       + " |" for r in removers] + [""]
+            print(f"done {name}, {label}", flush=True)
 
-    md += ["## Finder A: FNR at a fixed number of queries (single round, no B)", "",
+    md += ["## Finder A: FNR at a fixed budget (single round, no B)", "",
            "| finder | split | " + " | ".join(f"Q={q}" for q in a.fnr_budgets) + " |",
            "|---|---|" + "---|" * len(a.fnr_budgets)]
-    for f in a.finders + ["oracle"]:
-        for sp in a.splits:
-            graphs = [load_graph(o) for o in split_orgs(sp)]
+    for f in a.finders + ["random", "oracle"]:
+        for name, orgs, _ in groups:
+            graphs = [load_graph(o) for o in orgs]
             cells = []
             for q in a.fnr_budgets:
-                rs = [fnr(G, make_finder(f, allow_end=False), mu=1e-6, Q=q, seeds=seeds) for G in graphs]
-                rs = [r for r in rs if r["open"]]
+                rs = [r for r in (fnr(G, make_finder(f), seeds=seeds, Q=q, decline_p=a.decline) for G in graphs) if r["open"]]
                 cells.append(f"{sum(r['fnr'] for r in rs) / max(1, len(rs)):.2f}")
-            md.append(f"| {short(f)} | {sp} | " + " | ".join(cells) + " |")
-    md += ["", "Oracle sees the hidden graph (lower bound). A learned (PPO) finder is not included: its "
-           "training script is pending (see docs/STATUS.md).", ""]
+            md.append(f"| {short(f)} | {name} | " + " | ".join(cells) + " |")
+    md += ["", "The oracle sees the hidden graph (a lower bound on FNR).", ""]
+    RUNS.mkdir(exist_ok=True)
     (RUNS / "evaluate.json").write_text(json.dumps(rows, indent=1))
     open(a.out, "w").write("\n".join(md))
     print("\n".join(md))

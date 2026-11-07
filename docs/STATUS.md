@@ -1,196 +1,143 @@
 # Project status (for review)
 
-State of the greybox IAM privilege-escalation remediation game as of 2026-11-06.
-Full result tables: `docs/results.md`. Data: `docs/dataset.md`. Large-graph hand-off: `docs/HANDOFF.md`.
+State of the greybox IAM privilege-escalation remediation game as of 2026-11-08.
+Results: `docs/results.md`. Data: `docs/dataset.md`. Graph building: `docs/HANDOFF.md`.
+"TAC" below means the Greybox-TAC replication (github.com/DarkMatterCompiler/Greybox-TAC).
 
 ## Summary
 
-- **Pipeline:** the converter, graph builder and checker work on the v2 data. All 18 graphs are in
-  `data/graphs/` and match their labels hop for hop. The 6 large ones were built off this laptop
-  (commit `dd6a39a`) and checked here from the stored files, not rebuilt.
-- **Game:** constant per-query cost μ (optional exponential growth), END enabled, no hand-picked
-  cap. Rewards are hand-checked on a toy graph.
-- **Finder A:** BFS, Greedy, a LinUCB contextual bandit, and a cheating oracle. **No learned (PPO)
-  finder yet**: its training script still needs rewriting (see "Open items").
-- **Remover B:**
-  - baselines: random, min-seen (budgeted ILP on the edges B has seen), admin-first (hand-written
-    rule), full (ILP on the whole graph; a ceiling that cheats);
-  - learned B: GATv2 + PPO, warm-started by imitating the full-graph ceiling's cuts restricted to
-    edges B has seen;
-  - an EXP3-trained variant and three ablations.
-- **Main result:** learned B's advantage does not generalise.
-  - On the two small test configs, at the same cut budget, learned B leaves about a third of min-seen
-    B's open sources against the training finders (2.00 vs 6.00) and matches the ceiling. In practice
-    it has learned "cut the seen edge into admin, then stop".
-  - On the six large configs it is level with min-seen (12.44 vs 12.00; held-out finders 15.04 vs
-    15.46), and both are well behind the ceiling (8.33).
+- **Pipeline (done):** the converter, graph builder and checker work. All 18 graphs are in
+  `data/graphs/` and match their labels hop for hop (the 6 large ones were built off this laptop).
+  Only the v2 data (`esc.zip`, `no_esc.zip`) is used; the old 14-config dataset was deleted.
+- **New game design (implemented, not yet trained):** A gets a fixed query budget with no END,
+  as in TAC; B gets no edge budget and pays for collateral. See "The design" below.
+- **Why it changed:** the first learned A, trained with a cost per query and an END action, learned to
+  query nothing (FNR 1.0): at mu = 0.3, BFS earned about 0.2 per query against a cost of 0.3, so stopping
+  at once scored best. Learned B, trained at 1 edge per round, matched min-seen on the large configs.
+- **No model is trained for the new design yet.** Training runs on the GPU machine (commands below),
+  never on the laptop. `models/remover_*.pt` were trained for the old game and are obsolete.
 
 ## Phase status
 
-| Phase (original plan) | Status | Where |
+| Phase | Status | Where |
 |---|---|---|
-| 0 Setup | done | `pyproject.toml` |
-| 1 Dataset | done (v2: 18 configs) | `iampe/data/index.py`, `docs/dataset.md`, `data/splits.json` |
-| 2 Parser + graph | done | `iampe/parser/`, `iampe/graph/build.py`, `data/graphs/` |
-| 3 Whitebox checker | done | `iampe/checker/` |
-| 4 Game | done | `iampe/env/game.py`, `tests/test_game.py` |
-| 5a Heuristic A | done | `iampe/agents/finder_heuristic.py` |
-| 5 Bandit A (added) | done | `iampe/agents/bandit.py`, `experiments/train_bandit.py` |
-| 5b/c Learned A | **open**: policy and batched PPO exist; the training script needs a rewrite | `iampe/agents/gnn.py`, `experiments/train_finder.py` |
-| 6 Baseline B | done | `iampe/agents/remediator_baselines.py`, `experiments/run_baseline.py` |
-| 7 Learned B | done | `experiments/train_remediator.py`, `models/remover_v1.pt` |
-| 8 Co-training | **B half only** (EXP3 over a finder pool); the A half waits for learned A | `experiments/cotrain.py` |
-| 9 Evaluation | done for everything above, including the large configs | `experiments/evaluate.py`, `docs/results.md` |
+| 0-3 Setup, data, graphs, checker | done | `iampe/data`, `iampe/parser`, `iampe/graph`, `iampe/checker`, `data/graphs/` |
+| 4 Game | done, new standard design | `iampe/env/game.py` (`standard_config`), `iampe/env/potential.py` |
+| 5 Finder A | code done, **training pending (GPU)** | `experiments/train_finder.py`, `iampe/data/synth.py`, `experiments/gen_synth.py` |
+| 6 Baseline B | done for the new design | `iampe/agents/remediator_baselines.py`, `iampe/checker/mincut.py` (`tradeoff_cut`) |
+| 7 Learned B | code done, **retraining pending (GPU)** | `experiments/train_remediator.py` |
+| 8 Co-training | code done (both halves), **pending (GPU)** | `experiments/cotrain.py` |
+| 9 Evaluation | baselines done for the new design; learned agents pending | `experiments/evaluate.py`, `experiments/eval_finder.py` |
 
-## Decisions taken (and why)
+## The design (`standard_config()` in `iampe/env/game.py`)
 
-**Data and pipeline**
-- **Only the v2 data (`esc.zip`, `no_esc.zip`) is used.** The older 14-config dataset (`escalation/`,
-  `no_escalation/`) was deleted from the repo on 2026-11-07 to avoid confusion; it is in git history
-  before that commit.
-- **Ground truth = my converter run on the Terraform, not the generator's `config.json`.**
-  `config.json` gets 3 of the 9 no-escalation configs wrong (a Deny on policy-version actions in a
-  separate policy is ignored) and over-approximates open sources. Evidence: `docs/HANDOFF.md` §9.
-- **Splits:** train = linost, mavsol, mercor, dyntri, kalum, hexsol; test = orqua, ormav;
-  bench = the 4 IAM Vulnerable configs; deferred = the 6 large configs (never used for training).
-- **Graph building is the only heavy step,** done once and stored in `data/graphs/`. Everything
-  downstream reads those files. The team engine's `relax()` is refused above 100 entities, because
-  it crashed the laptop.
+**Finder A**, per round:
+- a fixed budget of Q = 20 queries; each query reveals one node's outgoing edges and costs 1;
+- no END: the round ends when the budget is spent, or as soon as every open source is proven;
+- each query is declined with probability 0.1; a declined query costs 1, reveals nothing, and that node
+  cannot be asked again in the same game;
+- memory across rounds: A never re-queries a node it asked about in an earlier round (it sees B's cuts,
+  so a re-query reveals nothing new), and at each round start it re-reports the proofs that survive the
+  cuts. Without this, BFS spent later rounds re-asking old nodes and found no new routes at all;
+- reward per query: (sources proven) - 1, plus in training only the shaping gamma * Phi(next) - Phi(now)
+  with Phi = -(sum over open sources not yet proven of the fewest unrevealed edges on a real path to
+  admin) and Phi = 0 after the game's last decision;
+- policy: GATv2 over A's view; trained by imitating the bandit finder, then PPO.
 
-**Game**
-- **Per-query cost:** μ is constant per query; exponential growth (`cost_growth`) is available as an
-  ablation knob, but not the default.
-- **When A's turn ends:** on END, when nothing is left to query, or when the round's query cost
-  reaches the number of unproven sources (beyond that no query can pay off). There is no fixed cap.
-- **Sources:** non-admin users **and roles**. With users only, min-seen B already matched the
-  ceiling, leaving learned B nothing to show.
-- **μ = 0.3 for the B experiments.** The whole graph reachable from the sources is only about
-  40–47 nodes, so any μ below about 0.2 never binds.
-- **B's budget = 1 edge per round, K = 5 rounds,** counted in edges.
+**Remover B**, per round:
+- cuts any number of seen, cuttable edges (no edge budget);
+- w(e) is divided by the number of users and roles in the account;
+- reward: (sources newly closed) - (sources still open) - 1 * (sum of w over this round's cuts);
+- baselines: min-seen and the full-graph ceiling maximise that round reward with an ILP (`tradeoff_cut`);
+  admin-first cuts every seen edge into admin or into an admin principal; random cuts a random subset.
 
-**Agents**
-- **The bandit only chooses which node to query by default** (`bandit:`). Its own one-step END rule
-  stops after 0–2 queries, because a query's payoff arrives several queries later. That variant is
-  kept as `bandit+end:`.
-- **B's round reward is divided by |S|,** so returns are comparable across configs.
-- **B always starts from imitation.** It trains against a pool of finders: BFS, Greedy, bandit.
-- **EXP3 co-training uses a finder pool disjoint from the held-out evaluation finders** (random,
-  bfs:p10, greedy:p10).
-- **The no-w ablation hides w(e) from B's features as well as from the cost** (an earlier version
-  only hid it from the cost).
+**Kept from before:** 5 rounds; A sees B's cuts and keeps what it revealed; sources = untrusted entity +
+non-admin users and roles (open ones plus closed fillers up to 20); the referee scores on the whole graph.
 
-## Results (details in `docs/results.md`)
+## Differences from TAC, and why
 
-3 seeds, budget 1 edge per round. "Open-source-rounds" = open sources summed over the 5 rounds (lower
-is better). "Edges cut" = edges actually cut over the 5 rounds. Finders used by "training finders":
-BFS, Greedy, bandit. Held-out finders: random, bfs:p10, greedy:p10.
+| Area | TAC | Ours | Why |
+|---|---|---|---|
+| Budget | Fixed, every query costs | Same (Q = 20) | Taken from TAC: it removes "do nothing" as an option |
+| END action | None | None | Taken from TAC |
+| Customer declines | Yes (they use 0.1 and 0.3) | Yes, 0.1, fixed per node | Taken from TAC |
+| Shaping | Phi from the planted plan, training only | Phi from the checker's true shortest paths, training only | We have many sources and no single plan; the checker gives every source's real path |
+| PPO settings | AdamW 1e-4, gamma 1, lambda 0.95, clip 0.2, entropy 0.01, 2 epochs | Same for A | Taken from TAC |
+| Pretraining | Thousands of synthetic tasks, size curriculum | Synthetic graphs adapted from TAC's `gen.py`, size curriculum, then fine-tune on real configs | Taken from TAC; edge types drawn from our real graphs so the synthetic ones look like ours |
+| Query | One (entity, permission) pair | One node's outgoing edges | Our graph already holds takeover steps (the converter did the permission reasoning); B needs whole paths to cut |
+| Goal | One untrusted entity reaches admin | Every source that reaches admin, +1 per proof | B has to fix every escalation, so A has to find all of them |
+| Episode end | On detection | When every open source is proven | Same idea with many targets; keeps -1 per query meaningful |
+| Rounds | One | 5, with B cutting in between | The project is remediation: A has to find routes around B's fixes |
+| Memory across rounds | Not applicable (one episode) | No re-queries; surviving proofs re-reported | A sees B's cuts, so re-asking a node is pure waste of budget |
+| Warm start | None | Imitate the bandit finder | Until the synthetic pretraining exists we have 6 real training configs against TAC's 2,000 tasks |
+| Budget size | Trains at 40 | 20 | At 40, BFS already finds every source on our small configs, so A could not show anything |
+| Models | One pooled model (the paper: 27 per type) | One pooled model | Too little data for per-type models |
+| Their trained model | Exists | Not used | Its query unit and templates differ, and it learned only on query spaces <= 800 |
 
-Test split (orqua, ormav):
+## Baselines in the new game (details in `docs/results.md`)
 
-| remover | vs training finders: open-source-rounds | edges cut | vs held-out finders: open-source-rounds | edges cut |
+Small configs, 3 seeds. Remover B: total r_B over 5 rounds (higher is better) and open-source-rounds
+(lower is better), against the training finders (BFS, Greedy, bandit).
+
+| remover | train: r_B | train: open-source-rounds | test: r_B | test: open-source-rounds |
 |---|---|---|---|---|
-| random | 16.50 | 5.00 | 18.61 | 4.67 |
-| min-seen | 6.00 | 3.00 | 8.22 | 2.78 |
-| admin-first (hand rule) | 2.00 | 5.00 | 5.11 | 4.67 |
-| **learned B** | **2.00** | **2.50** | **5.11** | **2.39** |
-| full-graph ceiling (cheats) | 2.00 | 2.50 | 2.00 | 2.50 |
+| random | -0.10 | 5.61 | -7.98 | 14.22 |
+| min-seen | 2.80 | 2.78 | -7.57 | 13.50 |
+| admin-first | 2.06 | 3.37 | -7.57 | 13.50 |
+| full-graph ceiling (cheats) | 5.80 | 0.00 | 7.99 | 0.00 |
 
-Large configs (arimer, axnor, corpyr, delnor, linlin, mermer):
+Finder A, FNR at Q = 10 / 20 / 40 with 10% declines: BFS train 0.34 / 0.12 / 0.07, test
+0.77 / 0.56 / 0.31; oracle (sees the hidden graph) train 0.12, test 0.27 at every Q.
 
-| remover | vs training finders: open-source-rounds | edges cut | vs held-out finders: open-source-rounds | edges cut |
-|---|---|---|---|---|
-| random | 20.89 | 4.63 | 21.04 | 4.67 |
-| min-seen | 12.00 | 3.17 | 15.46 | 3.26 |
-| admin-first (hand rule) | 11.67 | 4.63 | 14.31 | 4.67 |
-| **learned B** | **12.44** | **3.17** | **15.04** | **3.26** |
-| EXP3 variant | 13.33 | 3.17 | 16.09 | 3.26 |
-| full-graph ceiling (cheats) | 8.33 | 3.33 | 8.33 | 3.33 |
+What these show:
+- **The oracle cannot reach FNR 0:** a declined node on the only path makes a source unprovable. TAC's
+  "ask everything" ceiling behaves the same way.
+- **Cuts are almost free on the small configs:** every edge there has w = 1, about 0.02 after
+  normalisation, so the ceiling closes everything in round 0. B's real limit is what A reveals.
+- **There is room for learned A** (BFS test FNR 0.56 at Q = 20) and for learned B (min-seen is far from
+  the ceiling on test: 13.50 open-source-rounds against 0, and admin-first is no better than min-seen).
 
-What this does and doesn't show:
-- **On the small test split, the whole gain comes from one config, ormav.** There, min-seen spends its budget on two parallel
-  edges into a Lambda function, while learned B and the ceiling cut the edge into admin. On orqua all
-  removers cut identically. On the train configs min-seen already matches the ceiling.
-- **Learned B's advantage over the obvious rule is cost, not coverage.** It leaves the same number of
-  open sources as admin-first, with about half the cuts.
-- **On the large configs learned B shows no gain over min-seen.** The differences are small, change
-  sign between finder sets, and no variance was measured, so treat this as a tie.
-  - corpyr, delnor and linlin are too easy to separate anything: learned B and min-seen score the
-    same, and match the ceiling apart from 0.33 on corpyr against held-out finders.
-  - learned B vs min-seen, training / held-out finders: axnor 19.00 vs 17.67 / 18.00 vs 17.67,
-    mermer 23.00 vs 22.67 / 23.67 vs 24.22, arimer 29.67 vs 28.67 / 45.22 vs 47.56. So it is behind
-    against training finders on all three, and ahead against held-out finders on two.
-  - The gap to the ceiling is mostly arimer (min-seen 28.67 vs ceiling 11.00), about 80% of the total
-    gap against training finders. That is the value of seeing the whole graph there.
-  - The EXP3 variant is worse than plain learned B (13.33 vs 12.44), mainly on delnor (5.00 vs 1.00).
-- **Budget may limit these numbers.** At 1 edge per round and 5 rounds, B can cut at most 5 edges, but
-  the min-cut over all sources is 11 on arimer and 7 on axnor and mermer. No other budget has been run
-  on the large configs.
-- **Small-config numbers depend on seed count.** Learned B vs held-out finders was 4.33 at 4 seeds and
-  is 5.11 at 3 (min-seen 7.67 vs 8.22). The ranking did not change.
-- **The ablations show no measurable effect on the small configs.** All five learned variants behave
-  identically on test. On train, the EXP3 and no-w variants are slightly worse (3.17 vs 2.33). The
-  no-opponent-pool, no-w and seen-reward variants were not run on the large configs. With 2 test configs and min-cuts of 1–4 edges, B's problem is too small to separate them.
-- **Finder A,** FNR at a fixed number of queries (sources include roles, small configs only):
-  - BFS: train 0.32 / 0.10 / 0 / 0, test 0.71 / 0.38 / 0 / 0 at Q = 10 / 20 / 30 / 40;
-  - bandit: about the same as BFS on train, worse on test;
-  - oracle: 0–0.07.
+## GPU runbook (in order)
 
-  There's plenty of room for a learned sequential finder.
-- **Min-seen numbers move slightly between runs** (train 2.33 vs 2.50) because of solver
-  tie-breaking (HiGHS).
+Not on the laptop. On the GPU machine, from the repo root:
+
+```bash
+pip install -e ".[dev]" && python -m pytest -q                      # 43 tests, seconds
+python -m experiments.gen_synth --n 2000                             # data/synth/, light
+# Finder A: pretrain on synthetic graphs (size curriculum), then fine-tune on the real train split
+python -m experiments.train_finder --synth data/synth --stages 4 --iters 50 --episodes 16 --name finder_pre
+python -m experiments.train_finder --init runs/finder/finder_pre.best.pt --iters 30 --name finder
+# Remover B on the real train split
+python -m experiments.train_remediator --iters 30 --name remover
+# Co-training, both halves
+python -m experiments.cotrain --init-finder runs/finder/finder.best.pt --init-remover runs/remover/remover.best.pt --gens 4
+# Evaluation, including the large configs (mermer is the slow one)
+python -m experiments.evaluate --large \
+    --finders bfs greedy bandit:models/linucb.npz ckpt:runs/finder/finder.best.pt ckpt:runs/cotrain/cotrain_A4.pt \
+    --removers random minseen adminfirst full ckpt:runs/remover/remover.best.pt ckpt:runs/cotrain/cotrain_B4.pt
+```
+
+Each trainer prints its baselines first, then one line per iteration, and writes a log next to the
+checkpoints (`runs/finder/`, `runs/remover/`, `runs/cotrain/`). What to look for:
+- `train_finder`: FNR must drop below the BFS baseline line; queries used near Q is normal.
+- `train_remediator`: r_B must rise above min-seen's (2.80 on train with the training finders).
+- Send back the logs and `docs/results.md`; copy the best checkpoints into `models/`.
+
+Optional: train B on large configs too, e.g. `--orgs <train split> axnor-1bmoe8 delnor-1bxe74
+arimer-1bmoea`, keeping corpyr, linlin and mermer for testing.
 
 ## Open items
 
-1. **Learned Finder A (Phase 5b/c).** `experiments/train_finder.py` is outdated: its `evaluate()`
-   calls `fnr(G, finder, Q, ...)` positionally, but `fnr`'s second parameter is now `mu`, and it uses
-   the old fixed-budget assumptions. It needs a rewrite. My attempt this session was stopped by a
-   safety filter, so it is left for you. What it should do:
-   - warm-start by imitating the bandit's choices (the bandit only uses what A can see; the oracle
-     cheats);
-   - run PPO at μ ∈ {0.3, 0.5, 0.75} with END enabled;
-   - select models by A's real objective (proofs minus query cost);
-   - add a `--device` option.
+1. All training (runbook above), on the GPU machine.
+2. If learned A fails again, check in this order: shaping on (default), BC loss falls, FNR on synthetic
+   graphs drops during pretraining (TAC needed its curriculum for anything beyond small tasks).
+3. Collateral barely matters with w = 1 everywhere on the small configs; the large configs have larger
+   w. If collateral should matter more, raise `--lam`.
+4. Push to GitHub: run `git push -u origin master` yourself.
+5. `docs/GUIDE.md` is superseded (marked at the top).
+6. More seeds / a variance estimate before any firm claim.
 
-   Everything it needs exists: `FinderPolicy`, `GNNFinder`, `ppo_update`/`bc_update` (batched), and
-   `finder_episode` in `iampe/agents/rollout.py`. `experiments/train_remediator.py` is a working
-   template for the B side.
-2. **The A half of co-training (Phase 8).** Once (1) exists, alternate in `experiments/cotrain.py`:
-   train A against an EXP3 mixture over B snapshots, then B against A snapshots.
-3. **Why learned B doesn't generalise.** It trained only on 6 small configs. Options: train on some
-   large configs (holding others out), and rerun the large configs at a higher cut budget.
-4. **The arimer decoy label is too strict.** Resolved in `iampe/checker/validate.py`: a decoy hop now
-   counts as present only if the edge comes from the decoy's own policy. This changes exactly one hop
-   across all configs (arimer's `attach_role_policy` from `role:growth-7-svc`, policy `inj-pol-p3`).
-   Which policy really grants that edge has not been looked up (`docs/HANDOFF.md` §8.2).
-5. **Push to GitHub.** My push was blocked by Claude Code's permission check (it flagged pushing to a
-   public repo). Local work is merged with `origin/master`; run `git push -u origin master` yourself. The repo includes `external/` (team code)
-   and is public.
-6. **Bigger evaluation.** 2 small test configs is too few for firm claims, and the large configs have
-   not been used for finder FNR. Consider more seeds and a variance estimate.
-7. **`docs/GUIDE.md` is superseded** (marked at the top).
+## Older results
 
-## Reproducing
-
-All commands run from the repo root, CPU-only, under about 410 MB of RAM on a laptop. Each takes under
-about 1 minute, except the final evaluate, which takes about 25 minutes (mostly mermer). Rebuilding the
-6 large graphs is not listed here: see `docs/HANDOFF.md`.
-
-```bash
-python -m pytest -q                                   # 30 tests
-python -m experiments.build_graphs                    # rebuild the 12 small graphs (needs data/raw/)
-python -m experiments.train_bandit                    # bandit finder -> runs/bandit/linucb.npz
-python -m experiments.eval_finder --split test --mus 0.2 0.35 0.5 0.75 --budgets 5 10 20 30
-python -m experiments.run_baseline --finder bfs --split train test --name baseline_bfs
-python -m experiments.train_remediator --name remover_v1              # learned B
-python -m experiments.cotrain                                          # EXP3 variant
-python -m experiments.train_remediator --finders bfs --name remover_bfsonly
-python -m experiments.train_remediator --w-const --name remover_wconst
-python -m experiments.train_remediator --b-reward seen --name remover_seen
-python -m experiments.evaluate --seeds 3 --removers random minseen adminfirst full \
-    ckpt:models/remover_v1.pt ckpt:models/remover_exp3.pt ckpt:models/remover_bfsonly.pt \
-    wconst+ckpt:models/remover_wconst.pt ckpt:models/remover_seen.pt \
-    --large-removers random minseen adminfirst full \
-    ckpt:models/remover_v1.pt ckpt:models/remover_exp3.pt              # -> docs/results.md
-```
-
-The evaluated models are committed in `models/`. The trainers write to `runs/` (gitignored).
+The first design (cost per query with END for A; 1 edge per round for B) and its results are in git
+history: `docs/results.md` and `docs/STATUS.md` at commit `28315dd`.

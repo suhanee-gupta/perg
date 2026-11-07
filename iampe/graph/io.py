@@ -20,11 +20,15 @@ def graph_path(org: str) -> Path:
 
 
 def save_graph(G: nx.MultiDiGraph, org: str, extra: dict | None = None) -> Path:
+    return save_graph_file(G, graph_path(org), extra)
+
+
+def save_graph_file(G: nx.MultiDiGraph, p: Path, extra: dict | None = None) -> Path:
     data = nx.node_link_data(G, edges="edges")
     data["graph"] = dict(G.graph) | {"format": FORMAT_VERSION} | (extra or {})
-    p = graph_path(org)
+    p = Path(p)
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(data))
+    p.write_text(json.dumps(data, default=str))
     return p
 
 
@@ -33,7 +37,12 @@ def load_graph(org: str, w_mode: str = "shared") -> nx.MultiDiGraph:
     if not p.exists():
         raise FileNotFoundError(f"no graph for {org} at {p}; build it with "
                                 f"`python -m experiments.build_graphs {org}` (see docs/HANDOFF.md)")
-    data = json.loads(p.read_text())
+    return load_graph_file(p, w_mode)
+
+
+def load_graph_file(p: Path, w_mode: str = "shared") -> nx.MultiDiGraph:
+    """Load a graph file from any path (e.g. a synthetic one under data/synth/)."""
+    data = json.loads(Path(p).read_text())
     G = nx.node_link_graph(data, directed=True, multigraph=True, edges="edges")
     for _, _, k, d in G.edges(keys=True, data=True):
         if isinstance(d.get("policies"), list):

@@ -1,7 +1,9 @@
 """Phase 6: A vs each B for K rounds; per-round open pairs, cut cost, r_A, r_B, new routes.
 
     python -m experiments.run_baseline [--finder greedy|bandit:...|ckpt:...] [--removers random minseen full]
-                                       [--split train test] [--rounds 5] [--mu 0.3] [--budget 1] [--name baseline]
+                                       [--split train test] [--rounds 5] [--Q 20] [--lam 1] [--name baseline]
+
+Standard game (standard_config): fixed query budget for A, no edge budget for B.
 
 Writes runs/<name>/metrics.jsonl and runs/<name>/curves.png.
 """
@@ -16,6 +18,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from experiments.common import RUNS, load_graph, make_finder, make_remover, play, split_orgs, write_jsonl  # noqa: E402
+from experiments.train_remediator import add_game_args, game_config  # noqa: E402
 from iampe.env.game import GameConfig  # noqa: E402
 
 
@@ -61,14 +64,11 @@ def main():
     ap.add_argument("--finder", default="greedy")
     ap.add_argument("--removers", nargs="+", default=["none", "random", "minseen", "full"])
     ap.add_argument("--split", nargs="+", default=["train"])
-    ap.add_argument("--rounds", type=int, default=5)
-    ap.add_argument("--Q", type=int, default=0, help="safety cap on queries per round (0 = none)")
-    ap.add_argument("--mu", type=float, default=0.3)
-    ap.add_argument("--budget", type=float, default=1)
+    add_game_args(ap)
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--name", default="baseline")
     a = ap.parse_args()
-    cfg = GameConfig(Q=a.Q or None, K=a.rounds, mu=a.mu, cut_budget=a.budget)
+    cfg = game_config(a)
     orgs = [o for sp in a.split for o in split_orgs(sp)]
     rows = run(a.finder, a.removers, orgs, cfg, range(a.seeds), a.name)
     s = summarize(rows, a.removers, a.rounds)

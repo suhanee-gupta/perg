@@ -17,7 +17,8 @@ from iampe.graph.build import ADMIN
 KINDS = ["User", "Group", "Role", "Service", "Admin", "Hub"]
 CATS = ["CredentialTakeover", "PermissionRequest", "CodeExecution", "PermissionInheritance",
         "PermissionDelegation", "Admin"]
-NODE_DIM_A = len(KINDS) + 6
+NODE_DIM_A = len(KINDS) + 7
+GLOB_A = 3
 NODE_DIM_B = len(KINDS) + 4
 EDGE_DIM = len(CATS) + 3
 
@@ -71,7 +72,8 @@ def finder_graph(game) -> tuple[Data, list[str]]:
     S = set(game.S)
     x = [_onehot(_kind(G, n), len(KINDS)) +
          [float(n in S), float(n in game.queried), float(n in game.proven),
-          math.log1p(outdeg.get(n, 0)) / 4, math.log1p(indeg.get(n, 0)) / 4, min(dist.get(n, 9), 9) / 9]
+          math.log1p(outdeg.get(n, 0)) / 4, math.log1p(indeg.get(n, 0)) / 4, min(dist.get(n, 9), 9) / 9,
+          float(n in game.declined)]
          for n in nodes]
     ei = [[idx[u], idx[v]] for u, v, _ in revealed]
     ea = [_edge_feat(G.edges[e], [0.0, 0.0]) for e in revealed]
@@ -80,9 +82,14 @@ def finder_graph(game) -> tuple[Data, list[str]]:
                 edge_index=torch.tensor(ei, dtype=torch.long).t().reshape(2, -1),
                 edge_attr=torch.tensor(ea, dtype=torch.float32).reshape(-1, EDGE_DIM),
                 cand=torch.tensor([idx[c] for c in cands], dtype=torch.long),
-                glob=torch.tensor([[game.query_cost / max(1, len(game.S)), len(game.proven) / max(1, len(game.S))]],
-                                  dtype=torch.float32))
+                glob=torch.tensor([[game.query_cost / max(1, len(game.S)), len(game.proven) / max(1, len(game.S)),
+                                    _budget_used(game)]], dtype=torch.float32))
     return data, cands
+
+
+def _budget_used(game) -> float:
+    """Share of the round's query budget Q already used (0 without a budget)."""
+    return game.queries / game.cfg.Q if game.cfg.Q else 0.0
 
 
 def remover_graph(game, spent: float, chosen: set) -> tuple[Data, list]:
@@ -110,6 +117,7 @@ def remover_graph(game, spent: float, chosen: set) -> tuple[Data, list]:
                 edge_index=torch.tensor([[idx[u], idx[v]] for u, v, _ in seen], dtype=torch.long).t().reshape(2, -1),
                 edge_attr=torch.tensor(ea, dtype=torch.float32).reshape(-1, EDGE_DIM),
                 cand=torch.tensor([pos[e] for e in cands], dtype=torch.long),
-                glob=torch.tensor([[spent / max(1e-9, obs.budget), len(proven) / max(1, len(game.S))]],
+                glob=torch.tensor([[spent / obs.budget if obs.budget < float("inf") else min(spent, 1.0),
+                                    len(proven) / max(1, len(game.S))]],
                                   dtype=torch.float32))
     return data, cands

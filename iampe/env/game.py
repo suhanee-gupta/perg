@@ -18,6 +18,17 @@ Rewards:
                                                            or on the seen edges (b_reward="seen")
 S = every source that truly reaches admin, plus random closed non-admin users/roles up to max_sources
 (assumption: keeps every game non-trivial; A is told S but not which are open).
+
+The current design is `standard_config()` (adapted from Greybox-TAC; see docs/STATUS.md):
+  A  a fixed budget of Q queries per round, each costing 1 (mu=1, cost_rule off), no END, a query
+     declined with probability decline_p (the decline is fixed per node for the whole game, it still
+     costs, reveals nothing, and the node cannot be asked again), and the round ends early once every
+     open source is proven (Greybox-TAC ends an episode on detection). A has memory (a_memory): it
+     never re-queries a node it has asked about in any earlier round (it sees B's cuts, so a re-query
+     cannot reveal anything new), and at the start of each round it re-reports the proofs that survive
+     the cuts, since it already holds them.
+  B  no edge budget (budget_mode="none"); w(e) normalised by the number of users and roles (w_norm);
+     r_B(k) = b_close_reward * (sources newly closed in round k) - |R(G_{k+1})| - lam * sum w(e).
 """
 from __future__ import annotations
 
@@ -46,6 +57,19 @@ class GameConfig:
     b_reward: str = "full"       # "full" | "seen"
     w_const: bool = False        # ablation: treat every w(e) as 1
     seed: int = 0
+    cost_rule: bool = True       # end A's turn once the next query cannot pay off (off = fixed budget Q)
+    decline_p: float = 0.0       # chance a query is declined (fixed per node per game; still costs)
+    end_when_all_proven: bool = False   # end A's turn once every truly open source is proven
+    b_close_reward: float = 0.0  # B: reward per source newly closed in a round
+    w_norm: bool = False         # divide w(e) by the number of users and roles in the account
+    a_memory: bool = False       # no re-queries across rounds; surviving proofs re-reported at round start
+
+
+def standard_config(**overrides) -> GameConfig:
+    """The agreed design (docs/STATUS.md). Overrides replace single fields, e.g. K=1 for A alone."""
+    base = dict(Q=20, K=5, mu=1.0, cost_rule=False, decline_p=0.1, end_when_all_proven=True, a_memory=True,
+                budget_mode="none", cut_budget=float("inf"), w_norm=True, b_close_reward=1.0, lam=1.0)
+    return GameConfig(**(base | overrides))
 
 
 @dataclass
@@ -61,6 +85,7 @@ class RoundLog:
     open_after: int
     r_A: float
     r_B: float
+    closed: int = 0              # sources newly closed this round (on the reward's basis)
 
 
 @dataclass
@@ -86,6 +111,7 @@ class Game:
     def __init__(self, G: nx.MultiDiGraph, cfg: GameConfig, rng: random.Random | None = None):
         self.G, self.cfg = G, cfg
         self.rng = rng or random.Random(cfg.seed)
+        self.n_principals = max(1, sum(d.get("kind") in ("User", "Role") for _, d in G.nodes(data=True)))
         self.reset()
 
     # ---------------------------------------------------------------- setup
@@ -106,6 +132,9 @@ class Game:
         self.seen: set[Edge] = set()
         self.proven_ever: set[str] = set()
         self.log: list[RoundLog] = []
+        self.declined: set[str] = set()
+        self._decline: dict[str, bool] = {}
+        self._drng = random.Random(self.rng.random()) if self.cfg.decline_p > 0 else None
         self._start_round()
 
     def _start_round(self) -> None:
@@ -116,12 +145,22 @@ class Game:
         self.proven: set[str] = set()
         self.proofs: list[list[Edge]] = []
         self.a_done = False
+        self._open_now: set[str] | None = None
+        if self.cfg.a_memory and self.revealed:
+            self._auto_report()                       # proofs A still holds after B's cuts
+
+    def open_now(self) -> set[str]:
+        """Sources that truly reach admin this round (hidden; the graph is fixed during A's turn)."""
+        if self._open_now is None:
+            self._open_now = self.lg.open_pairs(self.S)
+        return self._open_now
 
     def w(self, e: Edge) -> float:
         d = self.G.edges[e]
         if not d.get("cuttable", True):
             return float("inf")
-        return 1.0 if self.cfg.w_const else float(d["w"])
+        w = 1.0 if self.cfg.w_const else float(d["w"])
+        return w / self.n_principals if self.cfg.w_norm else w
 
     @property
     def done(self) -> bool:
@@ -143,15 +182,22 @@ class Game:
         return (len(self.S) - len(self.proven)) - self.query_cost
 
     def a_can_query(self) -> bool:
-        """A may query again: turn not ended, cap not hit, something to query, and the next query can still pay off."""
-        return (not self.a_done and (self.cfg.Q is None or self.queries < self.cfg.Q)
-                and self.next_cost() <= self.budget_left() and bool(self.query_candidates()))
+        """A may query again: turn not ended, budget Q not spent, something to query, and (with the cost
+        rule) the next query can still pay off, and (with end_when_all_proven) some open source is unproven."""
+        if self.a_done or (self.cfg.Q is not None and self.queries >= self.cfg.Q):
+            return False
+        if self.cfg.cost_rule and self.next_cost() > self.budget_left():
+            return False
+        if self.cfg.end_when_all_proven and self.open_now() <= self.proven:
+            return False
+        return bool(self.query_candidates())
 
     def revealed_attrs(self) -> dict[Edge, dict]:
         return {e: self.G.edges[e] for e in self.revealed}
 
     def query_candidates(self) -> list[str]:
-        return sorted(n for n in self.known_nodes() if n not in self.queried and n != ADMIN)
+        asked = self.queried_ever if self.cfg.a_memory else self.queried
+        return sorted(n for n in self.known_nodes() if n not in asked and n != ADMIN and n not in self.declined)
 
     def a_query(self, u: str) -> int:
         """Reveal u's live out-edges; return how many sources became proven (cost in self.last_cost)."""
@@ -163,6 +209,14 @@ class Game:
         self.queries += 1
         self.queried.add(u)
         self.queried_ever.add(u)
+        if self._drng is not None:
+            if u not in self._decline:
+                self._decline[u] = self._drng.random() < self.cfg.decline_p
+            if self._decline[u]:
+                self.declined.add(u)
+                if not self.a_can_query():
+                    self.a_done = True
+                return 0
         self.revealed.update(self.lg.out_edges(u))
         n = self._auto_report()
         if not self.a_can_query():
@@ -218,11 +272,21 @@ class Game:
     # ---------------------------------------------------------------- B side
     def b_observe(self) -> BObs:
         seen = {e: self.G.edges[e] for e in self.seen | {e for p in self.proofs for e in p} if self.lg.live(e)}
-        return BObs(seen, set(self.proven_ever), [list(p) for p in self.proofs], self.cfg.cut_budget,
-                    self.cfg.budget_mode)
+        budget = float("inf") if self.cfg.budget_mode == "none" else self.cfg.cut_budget
+        return BObs(seen, set(self.proven_ever), [list(p) for p in self.proofs], budget, self.cfg.budget_mode)
 
     def cut_cost(self, edges) -> float:
+        """What the edges use of the round's budget: 1 each ("count") or their w(e) ("weight", "none")."""
         return sum(1.0 if self.cfg.budget_mode == "count" else self.w(e) for e in edges)
+
+    def _open_on_basis(self) -> int:
+        """Open sources on the reward's basis: the full hidden graph, or only the seen live edges."""
+        if self.cfg.b_reward != "seen":
+            return len(self.lg.open_pairs(self.S))
+        if not self.seen:
+            return 0
+        live = [e for e in self.seen if self.lg.live(e)]
+        return len(LiveGraph(self.G.edge_subgraph(live).copy()).open_pairs(self.S)) if live else 0
 
     def b_cut(self, edges: list[Edge], unrestricted: bool = False) -> RoundLog:
         """Apply B's cuts, close the round, and return its log (with both rewards).
@@ -231,25 +295,22 @@ class Game:
         obs = self.b_observe()
         edges = [e for e in dict.fromkeys(edges) if (unrestricted or e in obs.seen) and self.lg.live(e)
                  and self.w(e) < float("inf")]
-        if self.cut_cost(edges) > self.cfg.cut_budget + 1e-9:
+        if self.cfg.budget_mode != "none" and self.cut_cost(edges) > self.cfg.cut_budget + 1e-9:
             raise ValueError("cut exceeds the round budget")
         new_routes = sum(any(e not in self.seen for e in p) for p in self.proofs)
         self.seen.update(e for p in self.proofs for e in p)
         open_before = len(self.lg.open_pairs(self.S))
+        basis_before = self._open_on_basis()
         self.lg.remove(edges)
         if self.cfg.reveal_cuts_to_A:
             self.revealed -= set(edges)
-        if self.cfg.b_reward == "seen":
-            seen_live = LiveGraph(self.G.edge_subgraph([e for e in self.seen if self.lg.live(e)]).copy()
-                                  if self.seen else nx.MultiDiGraph())
-            open_after = len(seen_live.open_pairs(self.S)) if self.seen else 0
-        else:
-            open_after = len(self.lg.open_pairs(self.S))
+        open_after = self._open_on_basis()
+        closed = max(0, basis_before - open_after)    # cuts only remove edges: a closed source stays closed
         cost = sum(self.w(e) for e in edges)
         r_A = len(self.proven) - self.query_cost
-        r_B = -open_after - self.cfg.lam * cost
+        r_B = self.cfg.b_close_reward * closed - open_after - self.cfg.lam * cost
         log = RoundLog(self.k, self.queries, self.query_cost, sorted(self.proven), new_routes, edges, cost,
-                       open_before, len(self.lg.open_pairs(self.S)), r_A, r_B)
+                       open_before, len(self.lg.open_pairs(self.S)), r_A, r_B, closed)
         self.log.append(log)
         self.k += 1
         self._start_round()

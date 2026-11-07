@@ -23,11 +23,12 @@ def gae(steps: list[dict], gamma: float = 0.99, lam: float = 0.95) -> None:
 
 
 def ppo_update(policy, opt, steps: list[dict], epochs: int = 4, clip: float = 0.2, ent_coef: float = 0.01,
-               vf_coef: float = 0.5, minibatch: int = 64, rng: random.Random | None = None) -> dict:
+               vf_coef: float = 0.5, minibatch: int = 64, rng: random.Random | None = None,
+               gamma: float = 0.99, lam: float = 0.95) -> dict:
     if not steps:
         return {}
     rng = rng or random.Random(0)
-    gae(steps)
+    gae(steps, gamma, lam)
     advs = torch.tensor([s["adv"] for s in steps])
     mean, std = advs.mean(), advs.std() + 1e-8
     stats = {"loss": 0.0, "n": 0}

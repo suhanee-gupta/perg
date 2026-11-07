@@ -1,4 +1,4 @@
-"""Phase 4 check: random A + random B play full K-round games on every train config.
+"""Phase 4 check: random A + random B play full K-round games (standard game) on every train config.
 
     python -m experiments.play_random [--rounds K] [--queries Q]
 """
@@ -7,15 +7,15 @@ from __future__ import annotations
 import argparse
 
 from experiments.common import load_graph, make_finder, make_remover, play, split_orgs
-from iampe.env.game import GameConfig
+from iampe.env.game import standard_config
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--rounds", type=int, default=4)
+    ap.add_argument("--rounds", type=int, default=5)
     ap.add_argument("--queries", type=int, default=20)
     a = ap.parse_args()
-    cfg = GameConfig(Q=a.queries, K=a.rounds)
+    cfg = standard_config(Q=a.queries, K=a.rounds)
     for org in split_orgs("train"):
         G = load_graph(org)
         logs = play(G, make_finder("random"), make_remover("random"), cfg, seed=0)

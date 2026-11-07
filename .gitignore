@@ -6,3 +6,4 @@ runs/
 *.zip
 __MACOSX/
 data/raw/
+data/synth/

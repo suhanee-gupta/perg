@@ -8,14 +8,19 @@ from iampe.agents.gnn import GNNFinder, GNNRemover
 from iampe.agents.remediator_baselines import FullB, MinSeenB
 from iampe.env.features import finder_graph, remover_graph
 from iampe.env.game import Game
+from iampe.env.potential import potential
 
 
-def _a_phase(game, A, rec: list | None):
-    """Run A's phase. If rec is given (A is learning), credit each query with proven - its cost."""
+def _a_phase(game, A, rec: list | None, shaping: bool = False):
+    """Run A's phase. If rec is given (A is learning), credit each query with proven - its cost, and
+    (with shaping) store the potential of the state the decision was made in."""
     while game.a_can_query():
         n0 = len(rec) if rec is not None else 0
+        phi = potential(game) if shaping and rec is not None else 0.0
         u = A.act(game)
         stepped = rec is not None and len(rec) > n0
+        if stepped:
+            rec[-1]["phi"] = phi
         if u is None:
             game.a_end()
         else:
@@ -25,14 +30,25 @@ def _a_phase(game, A, rec: list | None):
     game.a_done = True
 
 
-def finder_episode(G, cfg, policy, B, rng: random.Random) -> tuple[list[dict], list]:
-    """A learns; B is a fixed opponent. Returns (steps, round logs)."""
+def finder_episode(G, cfg, policy, B, rng: random.Random, shaping: bool = True,
+                   gamma: float = 1.0) -> tuple[list[dict], list]:
+    """A learns; B is a fixed opponent. Returns (steps, round logs).
+
+    Step reward: proofs - query cost (+ gamma * Phi(next decision) - Phi(this decision) with shaping;
+    Phi = 0 after the last decision of the game, as in Greybox-TAC, so the best policy is unchanged).
+    B's cuts between rounds are part of the transition, so they are inside the shaping term."""
     game = Game(G, cfg, rng)
     rec: list[dict] = []
     A = GNNFinder(policy, record=rec)
+    if hasattr(B, "reset"):
+        B.reset(game)
     while not game.done:
-        _a_phase(game, A, rec)
+        _a_phase(game, A, rec, shaping)
         game.b_cut(B.cut(game), unrestricted=getattr(B, "cheats", False))
+    if shaping:
+        for i, s in enumerate(rec):
+            nxt = rec[i + 1]["phi"] if i + 1 < len(rec) else 0.0
+            s["r"] += gamma * nxt - s["phi"]
     if rec:
         rec[-1]["done"] = True
     return rec, game.log
@@ -57,15 +73,18 @@ def remover_episode(G, cfg, policy, A, rng: random.Random) -> tuple[list[dict], 
     return rec, game.log
 
 
-def finder_bc_pairs(G, cfg, rng: random.Random) -> list[tuple]:
-    """(observation, oracle action index) pairs from single-round oracle play."""
+def finder_bc_pairs(G, cfg, rng: random.Random, teacher=None) -> list[tuple]:
+    """(observation, teacher action index) pairs from single-round play; the teacher defaults to the oracle."""
     game = Game(G, cfg, rng)
-    oracle, pairs = OracleFinder(), []
+    teacher = teacher or OracleFinder()
+    if hasattr(teacher, "reset"):
+        teacher.reset(game)
+    pairs = []
     while game.a_can_query():
         data, cands = finder_graph(game)
         if not cands:
             break
-        u = oracle.act(game)
+        u = teacher.act(game)
         pairs.append((data, cands.index(u) if u in cands else len(cands)))
         if u is None or u not in cands:
             break

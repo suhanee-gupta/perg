@@ -11,7 +11,7 @@ from torch import nn
 from torch_geometric.data import Batch
 from torch_geometric.nn import GATv2Conv, global_max_pool, global_mean_pool
 
-from iampe.env.features import EDGE_DIM, NODE_DIM_A, NODE_DIM_B, finder_graph, remover_graph
+from iampe.env.features import EDGE_DIM, GLOB_A, NODE_DIM_A, NODE_DIM_B, finder_graph, remover_graph
 
 
 class _Encoder(nn.Module):
@@ -51,8 +51,8 @@ class FinderPolicy(_GraphPolicy):
         super().__init__()
         self.enc = _Encoder(NODE_DIM_A, hidden)
         self.node_head = nn.Sequential(nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, 1))
-        self.end_head = nn.Sequential(nn.Linear(2 * hidden + 2, hidden), nn.ReLU(), nn.Linear(hidden, 1))
-        self.value = nn.Sequential(nn.Linear(2 * hidden + 2, hidden), nn.ReLU(), nn.Linear(hidden, 1))
+        self.end_head = nn.Sequential(nn.Linear(2 * hidden + GLOB_A, hidden), nn.ReLU(), nn.Linear(hidden, 1))
+        self.value = nn.Sequential(nn.Linear(2 * hidden + GLOB_A, hidden), nn.ReLU(), nn.Linear(hidden, 1))
 
     def forward_batch(self, datas):
         b, h, g, ncand = self._prep(datas)
@@ -94,10 +94,10 @@ def _sample(policy, data, greedy: bool, allow_last: bool = True):
 
 
 class GNNFinder:
-    """`allow_end=False` masks END (used for fixed-budget evaluation, e.g. FNR@100)."""
+    """`allow_end=False` (the default, as in Greybox-TAC) masks END: the game's budget ends the turn."""
 
     def __init__(self, policy: FinderPolicy, greedy: bool = False, record: list | None = None,
-                 allow_end: bool = True):
+                 allow_end: bool = False):
         self.policy, self.greedy, self.record, self.allow_end = policy, greedy, record, allow_end
 
     def act(self, game):

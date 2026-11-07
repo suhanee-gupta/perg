@@ -66,32 +66,45 @@ def min_cut(G: nx.MultiDiGraph, S, weight: str | None = "w", removed=frozenset()
     return value, cut
 
 
-def budgeted_cut(G: nx.MultiDiGraph, S, budget: float, weight: str | None = "w", removed=frozenset(),
-                 allowed: set[Edge] | None = None, time_limit: float = 30.0) -> list[Edge]:
-    """ILP: choose edges with total weight <= budget minimising the number of sources still open.
-
-    d_v = 1 if v can still reach admin; d_admin = 1; every edge u->v gives d_u >= d_v - x_e
-    (x_e = 1 if cut; uncuttable edges and edges outside `allowed` have x_e = 0). Minimise sum d_s.
-    """
+def _cut_ilp(G: nx.MultiDiGraph, S, cost, budget: float | None, penalty: float, removed, allowed,
+             time_limit: float) -> list[Edge]:
+    """Shared ILP. d_v = 1 if v can still reach admin; d_admin = 1; every live edge u->v gives
+    d_u >= d_v - x_e (x_e = 1 if cut; uncuttable edges and edges outside `allowed` have x_e = 0).
+    Minimise sum d_s + penalty * sum cost(e) x_e, optionally with sum cost(e) x_e <= budget."""
     edges = relevant_edges(G, S, removed)
     if not edges:
         return []
     nodes = {n for e in edges for n in e[:2]}
     srcs = [s for s in S if s in nodes]
-    cuttable = [e for e in edges if (allowed is None or e in allowed) and _w(G, e, weight) < float("inf")]
-    prob = pulp.LpProblem("budgeted_cut", pulp.LpMinimize)
+    cuttable = [e for e in edges if (allowed is None or e in allowed) and cost(e) < float("inf")]
+    prob = pulp.LpProblem("cut", pulp.LpMinimize)
     idx = {n: i for i, n in enumerate(sorted(nodes))}
     src_set = set(srcs)
     d = {n: prob.add_variable(f"d{idx[n]}", 0, 1, "Binary" if n in src_set else "Continuous") for n in nodes}
     x = {e: prob.add_variable(f"x{i}", 0, 1, "Binary") for i, e in enumerate(cuttable)}
-    prob += pulp.lpSum(d[s] for s in srcs)
+    prob += pulp.lpSum(d[s] for s in srcs) + penalty * pulp.lpSum(cost(e) * x[e] for e in cuttable)
     prob += d[ADMIN] == 1
     for e in edges:
         u, v = e[0], e[1]
         prob += (d[u] >= d[v] - x[e]) if e in x else (d[u] >= d[v])
-    prob += pulp.lpSum(_w(G, e, weight) * x[e] for e in cuttable) <= budget
+    if budget is not None:
+        prob += pulp.lpSum(cost(e) * x[e] for e in cuttable) <= budget
     prob.solve(pulp.HiGHS(msg=False, timeLimit=time_limit))
     return [e for e in cuttable if (x[e].value() or 0) > 0.5]
+
+
+def budgeted_cut(G: nx.MultiDiGraph, S, budget: float, weight: str | None = "w", removed=frozenset(),
+                 allowed: set[Edge] | None = None, time_limit: float = 30.0) -> list[Edge]:
+    """Edges with total weight <= budget minimising the number of sources still open."""
+    return _cut_ilp(G, S, lambda e: _w(G, e, weight), budget, 0.0, removed, allowed, time_limit)
+
+
+def tradeoff_cut(G: nx.MultiDiGraph, S, cost, penalty: float, removed=frozenset(),
+                 allowed: set[Edge] | None = None, time_limit: float = 30.0) -> list[Edge]:
+    """No budget: edges minimising (sources still open) + penalty * (sum of cost(e) over cut edges).
+    `cost(e)` gives an edge's collateral (inf = uncuttable). Remover B's baselines use it with
+    penalty = lam / (1 + b_close_reward), which maximises one round of r_B."""
+    return _cut_ilp(G, S, cost, None, penalty, removed, allowed, time_limit)
 
 
 def cut_cost(G: nx.MultiDiGraph, edges, weight: str | None = "w") -> float:
