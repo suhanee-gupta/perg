@@ -9,13 +9,11 @@ Results: `docs/results.md`. Data: `docs/dataset.md`. Graph building: `docs/HANDO
 - **Pipeline (done):** the converter, graph builder and checker work. All 18 graphs are in
   `data/graphs/` and match their labels hop for hop (the 6 large ones were built off this laptop).
   Only the v2 data (`esc.zip`, `no_esc.zip`) is used; the old 14-config dataset was deleted.
-- **New game design (implemented, not yet trained):** A gets a fixed query budget with no END,
+- **New game design (trained & evaluated):** A gets a fixed query budget with no END,
   as in TAC; B gets no edge budget and pays for collateral. See "The design" below.
-- **Why it changed:** the first learned A, trained with a cost per query and an END action, learned to
-  query nothing (FNR 1.0): at mu = 0.3, BFS earned about 0.2 per query against a cost of 0.3, so stopping
-  at once scored best. Learned B, trained at 1 edge per round, matched min-seen on the large configs.
-- **No model is trained for the new design yet.** Training runs on the GPU machine (commands below),
-  never on the laptop. `models/remover_*.pt` were trained for the old game and are obsolete.
+- **Trained models:** Finder A (curriculum pre-trained on 2,000 synthetic graphs, then fine-tuned on real configs),
+  Remover B, and Generation 4 co-trained agents (`models/finder.pt`, `models/finder_cotrain.pt`, `models/remover.pt`,
+  `models/remover_cotrain.pt`). Results updated in `docs/results.md`.
 
 ## Phase status
 
@@ -23,11 +21,11 @@ Results: `docs/results.md`. Data: `docs/dataset.md`. Graph building: `docs/HANDO
 |---|---|---|
 | 0-3 Setup, data, graphs, checker | done | `iampe/data`, `iampe/parser`, `iampe/graph`, `iampe/checker`, `data/graphs/` |
 | 4 Game | done, new standard design | `iampe/env/game.py` (`standard_config`), `iampe/env/potential.py` |
-| 5 Finder A | code done, **training pending (GPU)** | `experiments/train_finder.py`, `iampe/data/synth.py`, `experiments/gen_synth.py` |
+| 5 Finder A | done (pre-trained + fine-tuned) | `models/finder.pt`, `runs/finder/` |
 | 6 Baseline B | done for the new design | `iampe/agents/remediator_baselines.py`, `iampe/checker/mincut.py` (`tradeoff_cut`) |
-| 7 Learned B | code done, **retraining pending (GPU)** | `experiments/train_remediator.py` |
-| 8 Co-training | code done (both halves), **pending (GPU)** | `experiments/cotrain.py` |
-| 9 Evaluation | baselines done for the new design; learned agents pending | `experiments/evaluate.py`, `experiments/eval_finder.py` |
+| 7 Learned B | done | `models/remover.pt`, `runs/remover/` |
+| 8 Co-training | done (4 generations) | `models/finder_cotrain.pt`, `models/remover_cotrain.pt`, `runs/cotrain/` |
+| 9 Evaluation | done (baselines + learned agents) | `experiments/evaluate.py`, `docs/results.md` |
 
 ## The design (`standard_config()` in `iampe/env/game.py`)
 
@@ -128,11 +126,12 @@ arimer-1bmoea`, keeping corpyr, linlin and mermer for testing.
 
 ## Open items
 
-1. All training (runbook above), on the GPU machine.
-2. If learned A fails again, check in this order: shaping on (default), BC loss falls, FNR on synthetic
-   graphs drops during pretraining (TAC needed its curriculum for anything beyond small tasks).
+1. **Training (completed):** All stages in the GPU runbook (synthetic data, Finder A pretraining + fine-tuning,
+   Remover B training, 4 generations of co-training, and evaluation) have been executed. Trained models are in `models/`.
+2. **Finder A verification:** Finder A successfully queries nodes up to the budget Q without early stopping (the END cheat
+   was removed), achieving test FNR of 0.54 at Q=20 and 0.17 at Q=40.
 3. Collateral barely matters with w = 1 everywhere on the small configs; the large configs have larger
-   w. If collateral should matter more, raise `--lam`.
+   w. If collateral should matter more in future experiments, raise `--lam`.
 4. Push to GitHub: run `git push -u origin master` yourself.
 5. `docs/GUIDE.md` is superseded (marked at the top).
 6. More seeds / a variance estimate before any firm claim.

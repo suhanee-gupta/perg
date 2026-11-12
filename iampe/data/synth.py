@@ -99,8 +99,10 @@ def gen_graph(seed: int, table: Counter, n: int | None = None, max_planted: int 
                 break
             ku, kv, prim, cat = _pick(rng, opts)
             pool = [x for x in chain_nodes if x != cur and G.nodes[x]["kind"] == "Role"]
-            nxt = rng.choice(pool) if pool and rng.random() < share else rng.choice(
-                [x for x in normal["Role"] if x != cur] or normal["Role"])
+            candidates = pool if (pool and rng.random() < share) else [x for x in normal["Role"] if x != cur] or normal["Role"]
+            if not candidates:
+                break
+            nxt = rng.choice(candidates)
             if nxt == cur:
                 break
             add(cur, nxt, prim, cat)

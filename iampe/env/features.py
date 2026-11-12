@@ -62,7 +62,7 @@ def finder_graph(game) -> tuple[Data, list[str]]:
     """Returns (data, candidate node ids); data.cand indexes candidate nodes, END is implicit last."""
     G = game.G
     revealed = [e for e in game.revealed if game.lg.live(e)]
-    nodes = sorted(game.known_nodes() | {ADMIN})
+    nodes = sorted(game.known_nodes() | {e[0] for e in revealed} | {e[1] for e in revealed} | {ADMIN})
     idx = {n: i for i, n in enumerate(nodes)}
     outdeg, indeg = {}, {}
     for u, v, _ in revealed:

@@ -168,7 +168,7 @@ class Game:
 
     # ---------------------------------------------------------------- A side
     def known_nodes(self) -> set[str]:
-        return set(self.S) | {e[1] for e in self.revealed}
+        return set(self.S) | self.queried_ever | {e[0] for e in self.revealed} | {e[1] for e in self.revealed}
 
     def a_observe(self) -> AObs:
         rev = {e: self.G.edges[e] for e in self.revealed}

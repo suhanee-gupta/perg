@@ -80,8 +80,12 @@ def _cut_ilp(G: nx.MultiDiGraph, S, cost, budget: float | None, penalty: float, 
     prob = pulp.LpProblem("cut", pulp.LpMinimize)
     idx = {n: i for i, n in enumerate(sorted(nodes))}
     src_set = set(srcs)
-    d = {n: prob.add_variable(f"d{idx[n]}", 0, 1, "Binary" if n in src_set else "Continuous") for n in nodes}
-    x = {e: prob.add_variable(f"x{i}", 0, 1, "Binary") for i, e in enumerate(cuttable)}
+    def _var(name, low, up, cat):
+        if hasattr(prob, "add_variable"):
+            return prob.add_variable(name, low, up, cat)
+        return pulp.LpVariable(name, lowBound=low, upBound=up, cat=cat)
+    d = {n: _var(f"d{idx[n]}", 0, 1, "Binary" if n in src_set else "Continuous") for n in nodes}
+    x = {e: _var(f"x{i}", 0, 1, "Binary") for i, e in enumerate(cuttable)}
     prob += pulp.lpSum(d[s] for s in srcs) + penalty * pulp.lpSum(cost(e) * x[e] for e in cuttable)
     prob += d[ADMIN] == 1
     for e in edges:
@@ -89,7 +93,10 @@ def _cut_ilp(G: nx.MultiDiGraph, S, cost, budget: float | None, penalty: float, 
         prob += (d[u] >= d[v] - x[e]) if e in x else (d[u] >= d[v])
     if budget is not None:
         prob += pulp.lpSum(cost(e) * x[e] for e in cuttable) <= budget
-    prob.solve(pulp.HiGHS(msg=False, timeLimit=time_limit))
+    solver = pulp.HiGHS(msg=False, timeLimit=time_limit)
+    if not solver.available():
+        solver = pulp.PULP_CBC_CMD(msg=False, timeLimit=time_limit)
+    prob.solve(solver)
     return [e for e in cuttable if (x[e].value() or 0) > 0.5]
 
 
