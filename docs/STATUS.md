@@ -1,6 +1,6 @@
 # Project status
 
-State as of 2026-11-17. Data: `docs/dataset.md`. Graph building: `docs/HANDOFF.md`. Results:
+State as of 2026-11-17 (with `more.zip`). Data: `docs/dataset.md`. Graph building: `docs/HANDOFF.md`. Results:
 `docs/results.md` (still the 2026-11-12 node-mode run until the GPU pipeline below is rerun).
 
 ## The goal
@@ -26,9 +26,14 @@ load with the current code.
 
 ## The data
 
-- **Real configs: 18** (`esc.zip`, `no_esc.zip`): 6 train (29–356 nodes), 2 test, 4 toy bench, 6 large
-  (1k–28k nodes, evaluation only). About 21 open escalation sources in train, 11 in test. They were made by
-  a generator (`iamgen`, named in each `config.json`); more of them would be the best extra data.
+- **Real configs: 72** (`esc.zip` + `no_esc.zip`: 18, `more.zip`: 54), all from the generator `iamgen`.
+  Splits (reasoning in `docs/dataset.md`): **train 40** configs (29–2,263 nodes, 175 open escalation
+  sources), **val 10** (44 open sources; model selection), **test 10** (46; final tables only), bench 4
+  (IAM Vulnerable), **large 8** (5k–30k+ nodes, evaluation only). Before `more.zip`: 21 open sources in
+  train and 11 in test.
+- All graphs pass their label checks. One fix was needed: a group's own Deny policy was not applied to
+  the group's Allow policies (`iampe/parser/to_tac.py`); it made one decoy in `quabel-1o4s3l` look real
+  and changes no earlier graph. The three largest configs are built on the GPU machine (step 1).
 - **Synthetic graphs** (`experiments/gen_synth.py`, seeded, minutes on a CPU): 2000 train, 300 validation,
   300 test, never overlapping. Known gaps against the real graphs: no hubs, no groups, every w = 1.
 
@@ -99,7 +104,7 @@ The test split has only 11 distinct open sources: compare finders on the synthet
 ## The pipeline (`scripts/run_gpu.sh`; GPU machine only)
 
 Every A variant starts from the same A (step 3) and every B variant from the same B (step 4); each then
-trains 40 uninterrupted iterations × 32 five-round games on the same graphs (6 real + 500 synthetic), with
+trains 40 uninterrupted iterations × 32 five-round games on the same graphs (the 40 real train configs), with
 one optimizer (co-training too: 4 generations × 10 iterations, continuing from the last weights). Only the
 opponent differs. To keep it that way:
 - **Variants are compared by their last weights.** Each run still saves a "best" checkpoint, but every
@@ -112,9 +117,9 @@ opponent differs. To keep it that way:
 | Step | What | Why |
 |---|---|---|
 | 0 | `pytest --run-training` | Tests that take gradient steps run only here |
-| 1 | Synthetic graphs, seeds 0 / 1 / 2 → train / validation / test | Disjoint sets; the real test split is too small |
-| 2 | A: imitate the oracle (+3 DAgger rounds), then PPO, size curriculum, on synthetic graphs | Warm start from the strongest finder; checkpoints chosen on 100 validation graphs every 5 iterations |
-| 3 | A: fine-tune on the 6 real configs → `finder` | The common start of every A variant |
+| 1 | Build the three largest graphs; synthetic graphs, seeds 0 / 2 → pre-training / extra test set | Large configs for evaluation; synthetic volume for pre-training |
+| 2 | A: imitate the oracle (+3 DAgger rounds), then PPO, size curriculum, on synthetic graphs | Warm start from the strongest finder; checkpoints chosen on the real val split every 5 iterations (as in every later step) |
+| 3 | A: fine-tune on the 40 real train configs, small then large → `finder` | The common start of every A variant |
 | 4 | B: imitation warm start only → `remover_init` | The common start of every B variant |
 | 5 | A with **no B**, 5-round games → `finder_noB` | Equal-time control: same graphs and iterations, no fixer |
 | 6 | A against **fixed** removers → `finder_vsB` | Is a fixed fixer in the loop already a help? Selected on 5-round FNR against them |
@@ -128,19 +133,21 @@ opponent differs. To keep it that way:
 cores (`--workers`), one torch thread each. Results do not depend on the number of workers or on Python's
 hash seed (checked for the baselines and a neural finder; set iteration that affected decisions was made
 explicit on 2026-11-17). One caveat: the ILP cut has a 30 s time limit, so on the largest configs a heavily
-loaded machine could stop it at a different incumbent. CIs resample whole configs, so with the 2 real test
-configs they are wide; the synthetic test set is the one that can separate variants.
+loaded machine could stop it at a different incumbent. CIs resample whole configs; with 10 real test
+configs they are still fairly wide, and the synthetic test set is a second check.
 
-**First look at re-finds** (baselines only, test split, 2 seeds): bfs, greedy and the oracle never re-find a
-source after B cut its proof. If trained finders don't either, these graphs may have too few alternative
-routes for the loop to show anything, which would point to richer configs (`iamgen`) rather than more
-training.
+**Re-finds exist in the new data** (baselines only, 3 seeds, 5 rounds against `minseen`; sources re-found per
+game, summed over rounds). Oracle: 3.03 on test, 0.69 on train; greedy: 0.07 / 0.28; bfs: 0.00 / 0.04. With the
+first 18 configs every finder re-found 0. So the graphs now have routes around B's fixes, and a finder that
+explores well finds them: the room the loop needs. bfs and greedy rarely do, which is what a learned A
+should improve.
 
 ## Open items
 
 1. Smoke run, then the full run, on the GPU machine; bring back `runs/logs.tgz`.
 2. Team: confirm `visible_p = 0.5` for the loop experiments; get the TAC-GB sub-team's settings.
-3. More generated configs from `iamgen`; make the synthetic generator closer to them (hubs, groups, w).
+3. Make the synthetic generator closer to the real configs (hubs, groups, w), or drop synthetic
+   pre-training if step 2 does not help over imitation on the 40 real train configs.
 4. Permission-level questions (exact TAC query unit) on the same `a_query` interface.
 
 ## Older designs
