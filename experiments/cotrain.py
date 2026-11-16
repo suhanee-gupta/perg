@@ -1,16 +1,20 @@
 """Phase 8: co-training A and B in the standard game, PSRO-style pools with EXP3 opponent choice.
 
     python -m experiments.cotrain --init-finder runs/finder/finder.best.pt --init-remover runs/remover/remover.best.pt
-                                  [--gens 4] [--iters 10] [--episodes 8] [--gamma 0.2] [--name cotrain]
+                                  [--eval-synth data/synth_val] [--gens 4] [--iters 10] [--episodes 32]
+                                  [--gamma 0.2] [game options as in train_remediator] [--name cotrain]
 
 Each generation:
   1. A trains against the B pool (baselines min-seen and admin-first, plus every B snapshot so far);
      EXP3 picks the opponent and favours the remover A currently does worst against
      (EXP3 reward = share of open sources A failed to prove, averaged over rounds).
-  2. B trains against the A pool (BFS, Greedy, the bandit, plus every A snapshot so far); EXP3 favours
+  2. B trains against the A pool (BFS, Greedy, plus every A snapshot so far); EXP3 favours
      the finder B currently does worst against (share of sources left open, averaged over rounds).
   3. The new A and B are added to the pools as snapshots runs/cotrain/<name>_A<g>.pt / _B<g>.pt.
-The pools never contain the held-out finders used in evaluate.py (random, oracle).
+The pools never contain the held-out finders used in evaluate.py (random, oracle). A's snapshots are
+selected on --eval-synth / --eval-orgs (held-out) when given, else on the training configs.
+EXP3 only samples opponents; the head-to-head matrix in evaluate.py (--matrix) is where the resulting
+pools are compared.
 """
 from __future__ import annotations
 
@@ -22,9 +26,10 @@ import shutil
 
 import torch
 
-from experiments.common import RUNS, device, load_graph, split_orgs
+from experiments.common import RUNS, add_game_args, device, game_config, load_graph, split_orgs
+from experiments.train_finder import synth_graphs
 from experiments.train_finder import train as train_a
-from experiments.train_remediator import FINDERS, add_game_args, game_config
+from experiments.train_remediator import FINDERS
 from experiments.train_remediator import train as train_b
 from iampe.agents.gnn import FinderPolicy, RemediatorPolicy
 
@@ -82,10 +87,15 @@ def main():
     ap.add_argument("--init-remover", required=True)
     ap.add_argument("--gens", type=int, default=4)
     ap.add_argument("--iters", type=int, default=10)
-    ap.add_argument("--episodes", type=int, default=8)
+    ap.add_argument("--episodes", type=int, default=32)
     ap.add_argument("--gamma", type=float, default=0.2, help="EXP3 exploration")
     ap.add_argument("--orgs", nargs="+", default=None)
+    ap.add_argument("--eval-synth", default=None, help="held-out synthetic graphs to select A's snapshots on")
+    ap.add_argument("--eval-orgs", nargs="+", default=None, help="held-out real configs to select A's snapshots on")
     add_game_args(ap)
+    ap.add_argument("--baseline", default=None, help="B's training reward minus this remover's r_B (as train_remediator)")
+    ap.add_argument("--eval-limit", type=int, default=30,
+                    help="use the first N --eval-synth graphs (selection plays every pool opponent for K rounds)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--device", default="auto")
     ap.add_argument("--name", default="cotrain")
@@ -93,6 +103,8 @@ def main():
     torch.manual_seed(a.seed)
     graphs = sorted([load_graph(o) for o in a.orgs or split_orgs("train")], key=lambda G: G.number_of_nodes())
     cfg = game_config(a)
+    a_eval = (synth_graphs(a.eval_synth, a.eval_limit) if a.eval_synth else []) + [load_graph(o) for o in a.eval_orgs or []]
+    a_eval = a_eval or graphs
     out = RUNS / "cotrain"
     out.mkdir(parents=True, exist_ok=True)
     logf = open(out / f"{a.name}.log", "w")
@@ -110,15 +122,15 @@ def main():
     a_pool = EXP3(FINDERS + [f"ckpt:{a.init_finder}"], a.gamma, a.seed + 1, reward=b_failure)
     for g in range(1, a.gens + 1):
         log(f"== generation {g}: A vs {b_pool.arms}")
-        train_a(pa, graphs, cfg, b_pool.arms, a.iters, a.episodes, 1e-4, a.seed + g, f"{a.name}_A", graphs,
-                log, pick=b_pool.pick, observe=b_pool.observe)
+        train_a(pa, graphs, cfg, b_pool.arms, a.iters, a.episodes, 1e-4, a.seed + g, f"{a.name}_A", a_eval,
+                log, pick=b_pool.pick, observe=b_pool.observe, eval_every=5)
         snap_a = out / f"{a.name}_A{g}.pt"
         shutil.copy(RUNS / "finder" / f"{a.name}_A.best.pt", snap_a)
         pa.load_state_dict(torch.load(snap_a, map_location="cpu"))
         a_pool.add(f"ckpt:{snap_a}")
         log(f"== generation {g}: B vs {a_pool.arms}")
         train_b(pb, graphs, cfg, a_pool.arms, a.iters, a.episodes, 3e-4, a.seed + g, f"{a.name}_B", log,
-                pick=a_pool.pick, observe=a_pool.observe)
+                pick=a_pool.pick, observe=a_pool.observe, baseline=a.baseline)
         snap_b = out / f"{a.name}_B{g}.pt"
         shutil.copy(RUNS / "remover" / f"{a.name}_B.best.pt", snap_b)
         pb.load_state_dict(torch.load(snap_b, map_location="cpu"))

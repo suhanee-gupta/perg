@@ -18,7 +18,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from experiments.common import RUNS, load_graph, make_finder, make_remover, play, split_orgs, write_jsonl  # noqa: E402
-from experiments.train_remediator import add_game_args, game_config  # noqa: E402
+from experiments.common import add_game_args, game_config  # noqa: E402
 from iampe.env.game import GameConfig  # noqa: E402
 
 

@@ -2,7 +2,8 @@
 
     python -m experiments.train_bandit [--episodes 300] [--Q 20] [--alpha 0.5] [--beta 0.2]
 
-Plays the standard game (fixed budget Q, declines; standard_config). The bandit only chooses which
+Plays the standard game in node mode (fixed budget Q, declines; standard_config(query_mode="node")): the
+bandit scores nodes, so it has no edge-mode (yes/no question) version. The bandit only chooses which
 node to query: the budget ends its turn. Saves runs/bandit/linucb.npz. The committed
 models/linucb.npz was trained under the earlier cost-per-query game; the two features that changed
 meaning (spent cost and proofs as a share of S) are equal for every candidate, so they do not change
@@ -33,14 +34,14 @@ def main():
     model = LinUCB(alpha=a.alpha)
     finder = BanditFinder(model, beta=a.beta, learn=True, allow_end=False)   # explore fully while training
     for ep in range(1, a.episodes + 1):
-        g = Game(graphs[rng.choice(orgs)], standard_config(K=1, Q=a.Q), random.Random(rng.random()))
+        g = Game(graphs[rng.choice(orgs)], standard_config(K=1, Q=a.Q, query_mode="node"), random.Random(rng.random()))
         finder.reset(g)
         while g.a_can_query():
             g.a_query(finder.act(g))
         finder.finish(g)
         if ep % 50 == 0:
             evalf = BanditFinder(model, beta=a.beta, allow_end=False)
-            rows = [fnr(G, evalf, seeds=(100, 101), Q=a.Q) for G in graphs.values()]
+            rows = [fnr(G, evalf, seeds=(100, 101), Q=a.Q, query_mode="node") for G in graphs.values()]
             rows = [r for r in rows if r["open"]]
             print(f"episode {ep}: train FNR {sum(r['fnr'] for r in rows) / len(rows):.3f} "
                   f"queries {sum(r['queries'] for r in rows) / len(rows):.1f}", flush=True)

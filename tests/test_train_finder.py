@@ -1,6 +1,8 @@
-"""Phase 5c check: finder evaluation and the trainer run end to end on the toy graph."""
+"""Phase 5c check: finder evaluation and the trainers run end to end: node mode on the toy graph, edge mode
+(yes/no questions, DAgger, the factorised PPO update, B with the min-seen baseline) on a small real config."""
 import random
 
+import pytest
 import torch
 
 import experiments.train_finder as tf
@@ -13,40 +15,65 @@ from tests.test_game import Script, toy
 
 
 def test_fnr_at_budget():
-    m = tf.evaluate(Script(["s1", "r", "s2"]), [toy()], Q=10, decline_p=0.0, seeds=(0,))
+    m = tf.evaluate(Script(["s1", "r", "s2"]), [toy()], Q=10, decline_p=0.0, query_mode="node", visible_p=0.0,
+                    seeds=(0,))
     assert m["fnr"] == 0 and m["queries"] == 3
-    m = tf.evaluate(Script(["s3"]), [toy()], Q=10, decline_p=0.0, seeds=(0,))
+    m = tf.evaluate(Script(["s3"]), [toy()], Q=10, decline_p=0.0, query_mode="node", visible_p=0.0,
+                    seeds=(0,))
     assert m["fnr"] == 1
 
 
 def test_bc_pairs_follow_the_teacher():
-    cfg = standard_config(K=1, max_sources=3, decline_p=0.0)
+    cfg = standard_config(K=1, max_sources=3, decline_p=0.0, query_mode="node", visible_p=0.0)
     pairs = finder_bc_pairs(toy(), cfg, random.Random(0), BFSFinder())
     assert pairs and all(0 <= y < d.cand.numel() + 1 for d, y in pairs)
 
 
+@pytest.mark.training
 def test_train_writes_loadable_checkpoints(tmp_path, monkeypatch):
     monkeypatch.setattr(tf, "RUNS", tmp_path)
     torch.manual_seed(0)
-    cfg = standard_config(K=2, Q=5, decline_p=0.1)
+    cfg = standard_config(K=2, Q=5, decline_p=0.1, query_mode="node", visible_p=0.0)
     tf.train(FinderPolicy(), [toy()], cfg, ["minseen"], iters=1, episodes=2, lr=1e-3, seed=0, out_name="t",
              eval_graphs=[toy()], log=lambda s: None, bc=4, teacher="bfs", stages=2)
     for f in ("t.pt", "t.best.pt"):
         assert (tmp_path / "finder" / f).exists()
     assert isinstance(load_policy("finder", tmp_path / "finder" / "t.pt"), FinderPolicy)
-    m = tf.evaluate(make_finder(f"ckpt:{tmp_path / 'finder' / 't.best.pt'}"), [toy()], Q=5, decline_p=0.0, seeds=(0,))
+    m = tf.evaluate(make_finder(f"ckpt:{tmp_path / 'finder' / 't.best.pt'}"), [toy()], Q=5, decline_p=0.0,
+                    query_mode="node", visible_p=0.0, seeds=(0,))
     assert 0 <= m["fnr"] <= 1 and m["queries"] <= 5
 
 
+@pytest.mark.training
 def test_remover_and_cotrain_pieces(tmp_path, monkeypatch):
     import experiments.train_remediator as tr
     from experiments.cotrain import EXP3, a_failure
     from iampe.agents.gnn import RemediatorPolicy
     monkeypatch.setattr(tr, "RUNS", tmp_path)
-    cfg = standard_config(K=2, Q=5, max_sources=4)
+    cfg = standard_config(K=2, Q=5, max_sources=4, query_mode="node", visible_p=0.0)
     tr.train(RemediatorPolicy(), [toy()], cfg, ["bfs"], iters=1, episodes=2, lr=1e-3, seed=0, out_name="b",
              log=lambda s: None, bc=4)
     assert (tmp_path / "remover" / "b.best.pt").exists()
     e = EXP3(["x", "y"], seed=0, reward=a_failure)
     e.add("z")
     assert len(e.probs()) == 3 and abs(sum(e.probs()) - 1) < 1e-9
+
+
+@pytest.mark.training
+def test_edge_mode_trainers_run_end_to_end(tmp_path, monkeypatch):
+    import experiments.train_remediator as tr
+    from experiments.common import load_graph
+    monkeypatch.setattr(tf, "RUNS", tmp_path)
+    monkeypatch.setattr(tr, "RUNS", tmp_path)
+    torch.manual_seed(0)
+    G = load_graph("linost-zq0as")
+    cfg = standard_config(K=2, Q=6, query_mode="edge", visible_p=0.3, b_sees="revealed")
+    tf.train(FinderPolicy(), [G], cfg, ["minseen"], iters=1, episodes=2, lr=1e-3, seed=0, out_name="e",
+             eval_graphs=[G], log=lambda s: None, bc=8, teacher="oracle", dagger=1)
+    ck = tmp_path / "finder" / "e.best.pt"
+    m = tf.evaluate(make_finder(f"ckpt:{ck}"), [G], Q=6, query_mode="edge", visible_p=0.3, seeds=(0,))
+    assert 0 <= m["fnr"] <= 1 and m["queries"] <= 6
+    from iampe.agents.gnn import RemediatorPolicy
+    tr.train(RemediatorPolicy(), [G], cfg, ["bfs", f"ckpt:{ck}"], iters=1, episodes=2, lr=1e-3, seed=0,
+             out_name="eb", log=lambda s: None, bc=4, baseline="minseen")
+    assert (tmp_path / "remover" / "eb.best.pt").exists()

@@ -20,7 +20,8 @@ E_S2 = ("s2", ADMIN, "p")
 
 
 def game(**kw):
-    return Game(toy(), standard_config(**({"K": 1, "max_sources": 4, "decline_p": 0.0} | kw)), random.Random(0))
+    base = {"K": 1, "max_sources": 4, "decline_p": 0.0, "query_mode": "node", "visible_p": 0.0, "b_sees": "proofs"}
+    return Game(toy(), standard_config(**(base | kw)), random.Random(0))
 
 
 def test_fixed_budget_has_no_cost_rule_and_ends_when_all_open_are_proven():
@@ -82,7 +83,7 @@ def test_shaping_telescopes_to_minus_the_first_potential():
     from iampe.agents.remediator_baselines import NoB
     import torch
     torch.manual_seed(0)
-    cfg = standard_config(K=1, Q=10, max_sources=4, decline_p=0.0)
+    cfg = standard_config(K=1, Q=10, max_sources=4, decline_p=0.0, query_mode="node", visible_p=0.0)
     rec_s, _ = finder_episode(toy(), cfg, FinderPolicy(), NoB(), random.Random(0), shaping=True)
     torch.manual_seed(0)
     rec_p, _ = finder_episode(toy(), cfg, FinderPolicy(), NoB(), random.Random(0), shaping=False)

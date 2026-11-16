@@ -1,15 +1,27 @@
 """Phase 7: train Remover B (GATv2 edge scorer + PPO on r_B) in the standard game, warm-started by
 imitating FullB's cuts restricted to the edges B has seen.
 
-    python -m experiments.train_remediator [--iters 20] [--episodes 8] [--finders bfs greedy bandit:...]
-                                           [--orgs ...] [--eval-orgs ...] [--lam 1] [--bc 400]
-                                           [--b-reward full|seen] [--w-const] [--device auto] [--name remover]
+    python -m experiments.train_remediator [--iters 30] [--episodes 32] [--finders bfs greedy ckpt:runs/finder/finder.best.pt]
+                                           [--orgs ...] [--synth DIR] [--eval-orgs ...] [--eval-synth DIR]
+                                           [--b-sees revealed] [--baseline minseen] [--lam 1] [--cut-budget N]
+                                           [--bc 400] [--device auto] [--name remover]
 
-Standard game (standard_config): no edge budget, w(e) normalised by the number of users and roles,
-r_B(k) = (sources newly closed) - (sources still open) - lam * sum w(e) of the round's cuts.
-B trains against a pool of fixed finders (one sampled per episode). Model selection: mean total r_B
-(higher is better) on --eval-orgs (default: the training configs) against the same pool.
-Saves runs/remover/<name>.pt and <name>.best.pt.
+Standard game (standard_config): r_B(k) = (sources newly closed) - (sources still open) - lam * sum w(e)
+of the round's cuts, w(e) normalised by the number of users and roles. B trains against a pool of
+fixed finders (one sampled per episode). Warm start: imitate the full-graph ceiling's cut restricted
+to the edges B can see (iampe/agents/rollout.py: remover_bc_pairs).
+
+What B can learn depends on the game, not on the number of iterations:
+  * --b-sees proofs (original): B sees only edges on proven paths. The ILP baseline min-seen is optimal
+    on that view, so a learned B can at best copy it (the 2026-11-12 results: learned B = min-seen).
+  * --b-sees revealed: B also sees edges A explored without a proof, so it can cut routes before they
+    are proven; min-seen ignores them, so a learned B has room to beat it.
+  * collateral matters only if cuts cost something: raise --lam, train on configs with varying w
+    (the large ones), or give B a cut budget (--cut-budget).
+--baseline minseen trains on r_B minus min-seen's r_B in the same state (lower variance, see
+remover_episode). Model selection: mean total r_B on --eval-orgs / --eval-synth (default: the
+training graphs, as B's training set is the 6 real configs and the selection is only between
+iterations of one run). Saves runs/remover/<name>.pt and <name>.best.pt.
 """
 from __future__ import annotations
 
@@ -20,13 +32,15 @@ import time
 
 import torch
 
-from experiments.common import RUNS, device, load_graph, make_finder, play, split_orgs
+from experiments.common import (RUNS, add_game_args, device, game_config, load_graph, make_finder, make_remover,
+                                play, split_orgs)
+from experiments.train_finder import synth_graphs
 from iampe.agents.gnn import GNNRemover, RemediatorPolicy
 from iampe.agents.ppo import bc_update, ppo_update
 from iampe.agents.rollout import remover_bc_pairs, remover_episode
-from iampe.env.game import GameConfig, standard_config
+from iampe.env.game import GameConfig
 
-FINDERS = ["bfs", "greedy", "bandit:models/linucb.npz"]
+FINDERS = ["bfs", "greedy"]          # + trained finders via --finders ckpt:...; random and the oracle stay held out
 
 
 def open_rounds(logs) -> float:
@@ -46,10 +60,11 @@ def fmt(m: dict) -> str:
 
 
 def train(policy, graphs, cfg: GameConfig, finders, iters: int, episodes: int, lr: float, seed: int,
-          out_name: str, log=print, bc: int = 0, pick=None, observe=None, eval_graphs=None) -> RemediatorPolicy:
+          out_name: str, log=print, bc: int = 0, pick=None, observe=None, eval_graphs=None,
+          baseline: str | None = None) -> RemediatorPolicy:
     """`finders`: specs or agents to train against. `pick(rng)` (optional) chooses one per episode and
     `observe(finder, logs)` receives its outcome (co-training passes an EXP3 sampler); default is
-    uniform sampling."""
+    uniform sampling. `baseline`: a remover spec whose r_B is subtracted from B's training reward."""
     rng = random.Random(seed)
     opt = torch.optim.Adam(policy.parameters(), lr=lr)
     out = RUNS / "remover"
@@ -57,6 +72,7 @@ def train(policy, graphs, cfg: GameConfig, finders, iters: int, episodes: int, l
     eval_graphs = eval_graphs or graphs
     as_agent = (lambda f: make_finder(f, rng.randrange(1 << 30)) if isinstance(f, str) else f)
     pick = pick or (lambda r: rng.choice(finders))
+    ref = make_remover(baseline) if baseline else None
     if bc:
         pairs = []
         while len(pairs) < bc:
@@ -70,7 +86,8 @@ def train(policy, graphs, cfg: GameConfig, finders, iters: int, episodes: int, l
         t0, steps, ret = time.time(), [], 0.0
         for _ in range(episodes):
             f = pick(rng)
-            rec, logs = remover_episode(rng.choice(graphs), cfg, policy, as_agent(f), random.Random(rng.random()))
+            rec, logs = remover_episode(rng.choice(graphs), cfg, policy, as_agent(f), random.Random(rng.random()),
+                                        baseline=ref)
             if observe:
                 observe(f, logs)
             steps += rec
@@ -86,28 +103,17 @@ def train(policy, graphs, cfg: GameConfig, finders, iters: int, episodes: int, l
     return policy
 
 
-def game_config(a) -> GameConfig:
-    return standard_config(K=a.rounds, Q=a.Q, decline_p=a.decline, lam=a.lam, b_reward=a.b_reward,
-                           w_const=a.w_const)
-
-
-def add_game_args(ap) -> None:
-    ap.add_argument("--rounds", type=int, default=5)
-    ap.add_argument("--Q", type=int, default=20)
-    ap.add_argument("--decline", type=float, default=0.1)
-    ap.add_argument("--lam", type=float, default=1.0)
-    ap.add_argument("--b-reward", default="full", choices=["full", "seen"])
-    ap.add_argument("--w-const", action="store_true")
-
-
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--iters", type=int, default=20)
-    ap.add_argument("--episodes", type=int, default=8)
+    ap.add_argument("--iters", type=int, default=30)
+    ap.add_argument("--episodes", type=int, default=32)
     ap.add_argument("--finders", nargs="+", default=FINDERS)
     ap.add_argument("--orgs", nargs="+", default=None, help="training configs (default: the train split)")
-    ap.add_argument("--eval-orgs", nargs="+", default=None, help="model selection configs (default: --orgs)")
+    ap.add_argument("--synth", default=None, help="also train on these synthetic graphs")
+    ap.add_argument("--eval-orgs", nargs="+", default=None, help="model selection configs (default: training graphs)")
+    ap.add_argument("--eval-synth", default=None, help="synthetic model selection graphs")
     add_game_args(ap)
+    ap.add_argument("--baseline", default=None, help="remover whose r_B is subtracted in training (e.g. minseen)")
     ap.add_argument("--bc", type=int, default=400)
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--seed", type=int, default=0)
@@ -116,8 +122,8 @@ def main():
     ap.add_argument("--name", default="remover")
     a = ap.parse_args()
     torch.manual_seed(a.seed)
-    graphs = [load_graph(o) for o in a.orgs or split_orgs("train")]
-    eval_graphs = [load_graph(o) for o in a.eval_orgs] if a.eval_orgs else None
+    graphs = [load_graph(o) for o in a.orgs or split_orgs("train")] + (synth_graphs(a.synth) if a.synth else [])
+    eval_graphs = ([load_graph(o) for o in a.eval_orgs or []] + (synth_graphs(a.eval_synth) if a.eval_synth else [])) or None
     cfg = game_config(a)
     (RUNS / "remover").mkdir(parents=True, exist_ok=True)
     logf = open(RUNS / "remover" / f"{a.name}.log", "w")
@@ -126,12 +132,14 @@ def main():
         print(s, flush=True)
         logf.write(s + "\n")
         logf.flush()
-    log(json.dumps(vars(a)))
+    log(json.dumps(vars(a)) + f" | {len(graphs)} training graphs")
+    for spec in ("minseen", "adminfirst", "full"):
+        log(f"baseline {spec}: {fmt(evaluate(make_remover(spec), eval_graphs or graphs, cfg, a.finders))}")
     policy = RemediatorPolicy().to(device(a.device))
     if a.init:
         policy.load_state_dict(torch.load(a.init, map_location="cpu"))
     train(policy, graphs, cfg, a.finders, a.iters, a.episodes, a.lr, a.seed, a.name, log,
-          0 if a.init else a.bc, eval_graphs=eval_graphs)
+          0 if a.init else a.bc, eval_graphs=eval_graphs, baseline=a.baseline)
 
 
 if __name__ == "__main__":

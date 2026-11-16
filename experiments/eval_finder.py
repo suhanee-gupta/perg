@@ -1,7 +1,10 @@
 """Finder A evaluation (single round, no B) in the standard game: FNR at a fixed budget Q.
 
     python -m experiments.eval_finder [--split test] [--finders bfs greedy ckpt:runs/finder/finder.best.pt]
-                                      [--budgets 10 20 40] [--decline 0.1] [--seeds 3]
+                                      [--budgets 10 20 40] [--decline 0.1] [--query-mode edge] [--visible 0.5]
+                                      [--seeds 3]
+
+A quick per-config view; experiments/evaluate.py has the pooled table with CIs and the floor.
 
 FNR = share of truly open sources the finder fails to prove within Q queries (mean over configs
 that have open sources); also the queries actually used (the round ends early once every open
@@ -13,6 +16,7 @@ import argparse
 import json
 
 from experiments.common import RUNS, fnr, load_graph, make_finder, split_orgs
+from iampe.env.game import standard_config
 
 DEFAULT = ["random", "bfs", "greedy", "bandit:models/linucb.npz", "oracle"]
 
@@ -23,16 +27,21 @@ def main():
     ap.add_argument("--split", nargs="+", default=["test"])
     ap.add_argument("--budgets", nargs="+", type=int, default=[10, 20, 40])
     ap.add_argument("--decline", type=float, default=0.1)
+    ap.add_argument("--query-mode", default=standard_config().query_mode, choices=["node", "edge"])
+    ap.add_argument("--visible", type=float, default=None, help="default: 0.5 in edge mode, 0 in node mode")
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
     seeds = tuple(range(a.seeds))
     graphs = {o: load_graph(o) for sp in a.split for o in split_orgs(sp)}
     rows = []
+    if a.query_mode == "edge":
+        a.finders = [f for f in a.finders if not f.startswith("bandit")]   # the bandit scores nodes only
     for spec in a.finders:
         for Q in a.budgets:
             for org, G in graphs.items():
-                rows.append(fnr(G, make_finder(spec), seeds=seeds, Q=Q, decline_p=a.decline)
+                rows.append(fnr(G, make_finder(spec), seeds=seeds, Q=Q, decline_p=a.decline,
+                                query_mode=a.query_mode, visible_p=a.visible)
                             | {"org": org, "finder": spec, "Q": Q})
     w = max(len(f) for f in a.finders)
     print(f"split={'+'.join(a.split)} ({', '.join(graphs)}), decline {a.decline}\n\nFNR / queries used at budget Q")

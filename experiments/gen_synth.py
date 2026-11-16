@@ -1,6 +1,11 @@
 """Generate synthetic graphs for pretraining Finder A (iampe/data/synth.py; adapted from Greybox-TAC).
 
-    python -m experiments.gen_synth --n 2000 --out data/synth [--seed 0]
+    python -m experiments.gen_synth --n 2000 --out data/synth                     # training (seed 0)
+    python -m experiments.gen_synth --n 300 --seed 1 --out data/synth_val          # model selection
+    python -m experiments.gen_synth --n 300 --seed 2 --out data/synth_test         # held-out test set
+
+Graph i of seed s is generated from seed s * 1,000,000 + i, so the three sets never share a graph.
+Validation selects checkpoints; the test set is only read by experiments/evaluate.py (--synth-test).
 
 Edge-type frequencies come from the real train split only (never the test or large configs). Each
 graph is written as <out>/synth-<seed>.json; <out>/index.json lists node counts for the size curriculum.

@@ -105,6 +105,8 @@ class BanditFinder:
         self._pending = None
 
     def act(self, game):
+        if game.qs is not None:
+            raise NotImplementedError("the LinUCB finder chooses nodes: it plays query_mode='node' only")
         if self._pending is not None and game.queries == 0:
             self._pending = None                      # a new round started: drop the stale query
         self._credit(game)
