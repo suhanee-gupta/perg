@@ -12,7 +12,7 @@ from collections import Counter, defaultdict
 
 import env
 from iampe.checker.validate import PRIM_TEMPLATES
-from iampe.data.index import ROOT, list_configs, load_labels, splits
+from iampe.data.index import GRAPH_DIR, ROOT, list_configs, load_labels, splits
 
 
 def main():
@@ -20,13 +20,17 @@ def main():
     split = splits()
     where = {o: k for k, os in split.items() for o in os}
     tmpl = {t.id: t for t in env.templates()}
+    idx_path = GRAPH_DIR / "index.json"
+    built = json.loads(idx_path.read_text()) if idx_path.exists() else {}
     rows, prim_cfg, prim_n = [], defaultdict(set), Counter()
     for r in refs:
         L = load_labels(r)
         c = json.loads((r.path / "config.json").read_text())
         ty = Counter(x["type"] for x in c["entities"])
+        g = built.get(r.org, {})
         rows.append((r.org, where[r.org], L.get("scenario") or L["archetype"], r.has_pe, L["ground_truth"].get("min_len"),
-                     ty["User"], ty["Group"], ty["Role"], ty["Policy"], ty["Service"]))
+                     ty["User"], ty["Group"], ty["Role"], ty["Policy"], ty["Service"],
+                     g.get("nodes", "not built"), g.get("open", "–")))
         for k in ("planted", "dead_ends", "decoys"):
             for p in L.get("injection_plan", {}).get(k, []):
                 for h in p["hops"]:
@@ -40,10 +44,27 @@ def main():
           "(ground truth `has_pe`, `min_len`, witness; injected planted paths, dead ends, decoys; `dfs.paths` "
           "for the small configs) + the generator's `config.json` (not used as ground truth, see docs/HANDOFF.md). "
           "Converted by `iampe/parser/to_tac.py`. Sizes below are entity counts from `config.json`.", "",
-          "## Configs", "",
-          "| config | split | archetype / scenario | has_pe | min_len | users | groups | roles | policies | compute |",
-          "|---|---|---|---|---|---|---|---|---|---|"]
-    md += ["| " + " | ".join(str(c) for c in row) + " |" for row in sorted(rows, key=lambda x: (x[1], x[5]))]
+          "## Splits", "",
+          "All 72 configs come from one generator (`iamgen`; 18 in `esc.zip` + `no_esc.zip`, 54 in `more.zip`). "
+          "Its seed puts each config in a size tier: 6e7 (~50 graph nodes), 7e7 (100-350), 8e7 (500-2,300), "
+          "1e8 (5k-30k+).", "",
+          "- **train / val / test** (tiers 6e7-8e7): the 8 configs of the first release keep their old split; "
+          "the rest are spread about 60/20/20 within each (tier, has_pe) group, in seed order. So every split "
+          "has every size and both labels. `val` is for model selection, `test` only for the final tables.",
+          "- **bench**: the four IAM Vulnerable scenarios (tiny, hand-made).",
+          "- **large** (tier 1e8): evaluation only. The three over 15 MB of Terraform are built on the GPU "
+          "machine (`build_graphs --large --allow-large --missing`).", "",
+          "| split | configs | has_pe | open sources (graph) |", "|---|---|---|---|"]
+    for k, os_ in split.items():
+        md.append(f"| {k} | {len(os_)} | {sum(where[r.org] == k and r.has_pe for r in refs)} | "
+                  f"{sum(built.get(o, {}).get('open', 0) for o in os_)} |")
+    md += ["", "Open sources = users and roles that reach admin in the graph (the untrusted entity is one of them).", "",
+           "## Configs", "",
+           "| config | split | archetype / scenario | has_pe | min_len | users | groups | roles | policies | compute "
+           "| graph nodes | open sources |",
+           "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    order = {k: i for i, k in enumerate(split)}
+    md += ["| " + " | ".join(str(c) for c in row) + " |" for row in sorted(rows, key=lambda x: (order[x[1]], x[5], x[0]))]
     md += ["", "## Escalation-pattern coverage", "",
            "Label primitive → team templates (provenance from `templates.json`). Hops counted over planted, "
            "dead-end and decoy paths.", "",
@@ -62,7 +83,7 @@ def main():
            "- Not modelled by the converter: resource-based policies, permission boundaries, SCPs, "
            "inline policies (none in the dataset), `NotResource` (none in the dataset).",
            "- The four `iv*` configs are IAM Vulnerable scenarios (no injection plan; witness + dfs only).",
-           "- Graphs for the `deferred` configs are built off-laptop (docs/HANDOFF.md).", ""]
+           "- Graphs for the three largest configs are built on the GPU machine (docs/HANDOFF.md).", ""]
     (ROOT / "docs" / "dataset.md").write_text("\n".join(md))
     (ROOT / "data" / "splits.json").write_text(json.dumps(split, indent=1) + "\n")
     print("\n".join(md))

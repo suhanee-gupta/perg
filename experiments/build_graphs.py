@@ -1,12 +1,12 @@
 """The heavy step: Terraform -> converted config -> permission graph -> data/graphs/<org>.json.
 
-    python -m experiments.build_graphs                     # train + test + bench (laptop-safe)
-    python -m experiments.build_graphs arimer-1bmoea --allow-large
-    python -m experiments.build_graphs --deferred --allow-large   # the six large configs (bigger machine)
+    python -m experiments.build_graphs                     # train + val + test + bench (laptop-safe)
+    python -m experiments.build_graphs quabel-1o4s3l --allow-large
+    python -m experiments.build_graphs --large --allow-large --missing   # large configs not built yet (bigger machine)
 
 Each graph is checked against its labels before it is written; data/graphs/index.json records the
 result. Configs whose Terraform is larger than --max-mb are skipped unless --allow-large: parsing
-them needs minutes and up to ~1.5 GB of RAM (mermer), which is what made the laptop struggle.
+them needs minutes and up to ~2 GB of RAM (the 30 MB ones), which is what made the laptop struggle.
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from iampe.checker.reach import LiveGraph
 from iampe.checker.validate import check
 from iampe.data.index import GRAPH_DIR, get_config, load_labels, splits
 from iampe.graph.build import build_graph, sources
-from iampe.graph.io import save_graph
+from iampe.graph.io import graph_path, save_graph
 
 
 def tf_mb(path) -> float:
@@ -44,19 +44,22 @@ def build_one(org: str) -> dict:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("orgs", nargs="*")
-    ap.add_argument("--deferred", action="store_true", help="build the large deferred configs")
+    ap.add_argument("--large", action="store_true", help="build the large (evaluation-only) configs")
+    ap.add_argument("--missing", action="store_true", help="skip configs whose graph file already exists")
     ap.add_argument("--allow-large", action="store_true")
     ap.add_argument("--max-mb", type=float, default=3.0, help="skip Terraform larger than this (MB)")
     a = ap.parse_args()
     s = splits()
-    orgs = a.orgs or (s["deferred"] if a.deferred else s["train"] + s["test"] + s["bench"])
+    orgs = a.orgs or (s["large"] if a.large else s["train"] + s["val"] + s["test"] + s["bench"])
+    if a.missing:
+        orgs = [o for o in orgs if not graph_path(o).exists()]
     idx_path = GRAPH_DIR / "index.json"
     index = json.loads(idx_path.read_text()) if idx_path.exists() else {}
     bad = 0
     for org in orgs:
         mb = tf_mb(get_config(org).path)
         if mb > a.max_mb and not a.allow_large:
-            print(f"SKIP {org:16} Terraform is {mb:.1f} MB > {a.max_mb} MB (deferred; pass --allow-large)", flush=True)
+            print(f"SKIP {org:16} Terraform is {mb:.1f} MB > {a.max_mb} MB (pass --allow-large)", flush=True)
             continue
         r = build_one(org)
         index[org] = r

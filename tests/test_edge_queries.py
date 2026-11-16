@@ -7,6 +7,7 @@ import pytest
 import torch
 
 from experiments.common import fnr, load_graph, make_finder, split_orgs
+from iampe.graph.io import graph_path
 from iampe.agents.finder_heuristic import OracleFinder
 from iampe.agents.gnn import FinderPolicy, GNNFinder
 from iampe.agents.remediator_baselines import MinSeenB
@@ -48,8 +49,10 @@ def game(G=None, **kw):
 
 
 def test_schema_covers_every_edge_of_the_real_graphs():
-    for sp in ("train", "test", "bench"):
+    for sp in ("train", "val", "test", "bench", "large"):
         for org in split_orgs(sp):
+            if not graph_path(org).exists():                  # the largest are built on the GPU machine
+                continue
             G = load_graph(org)
             qs = QuerySpace(G)
             for e in G.edges(keys=True):

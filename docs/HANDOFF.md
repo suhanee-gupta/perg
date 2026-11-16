@@ -1,5 +1,11 @@
 # Hand-off: building the permission graphs (the "processing" step)
 
+> **Status (2026-11-17):** done for the first 18 configs, and for 51 of the 54 in `more.zip` (built on the
+> laptop; the split names changed: `deferred` is now `large`, see docs/dataset.md). The three largest
+> (`ostmav-1o4s3m`, `axlin-1o4s3n`, `rynlin-1ofhwm`, 16-32 MB of Terraform) are built by step 1 of
+> `scripts/run_gpu.sh` with `python -m experiments.build_graphs --large --allow-large --missing`.
+> The rest of this page is the original hand-off and still describes how the step works.
+
 **What we need from you:** build the permission graphs for the six large configs in the v2 dataset,
 check them against their labels, and send back the graph files. On a machine with 4 GB of free RAM
 this is one command and about 5 minutes. Everything else in the project (the game, the learning
@@ -17,7 +23,7 @@ Python on the CPU; it does not need a GPU.
 1. Get the repo and the two data zips (`esc.zip`, `no_esc.zip`). The zips are not in git.
 2. Install four Python packages (section 4).
 3. Unzip the data into `data/raw/` (section 3).
-4. Run `python -m experiments.build_graphs --deferred --allow-large` (section 5).
+4. Run `python -m experiments.build_graphs --large --allow-large` (section 5).
 5. Check the printed results against the table in section 6. Fix or report any `BAD` line (section 8).
 6. Send back `data/graphs/<org>.json` for the six configs and the updated `data/graphs/index.json`,
    either as a commit or as files (section 10).
@@ -111,7 +117,7 @@ truth) and `config.json` (the generator's own export; not used, see section 9).
 ## 5. What to run
 
 ```bash
-python -m experiments.build_graphs --deferred --allow-large
+python -m experiments.build_graphs --large --allow-large
 ```
 
 This builds the six deferred configs one after another:
@@ -140,7 +146,7 @@ machine. On Linux with systemd:
 
 ```bash
 systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0 \
-  python -m experiments.build_graphs --deferred --allow-large
+  python -m experiments.build_graphs --large --allow-large
 ```
 
 ---
