@@ -15,7 +15,7 @@ The engine matches resources exactly or by `*`, so the converter does the IAM se
   * resource ARNs and ARN globs are resolved to entity ids; a glob on an action that creates a new
     resource (a template op on `*`, e.g. lambda:CreateFunction) is widened to `*`;
   * conditions are evaluated in the attacker context (see policy.py); explicit Deny removes the
-    matching grants from the principals it applies to;
+    matching grants from the users, roles and groups it is attached to (directly or via a group);
   * sts:AssumeRole via identity policy only on roles whose trust names the account root; a trust
     that names a principal grants it directly; iam:PassRole only on roles that trust a service
     (and that service when iam:PassedToService is set); Create/UpdateLoginProfile only on users
@@ -359,7 +359,8 @@ class _Converter:
         direct = {u: {("sts:AssumeRole", r) for r in rs} for u, rs in self.direct_assume.items()}
         relations = list(self.relations)
         for u, x in self.ents.items():
-            if x["type"] not in ("User", "Role"):
+            # groups too: a group's own Deny filters its own policies (and so what its members inherit)
+            if x["type"] not in ("User", "Role", "Group"):
                 continue
             ds = self._denies(u)
             if not ds:

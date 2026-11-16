@@ -25,6 +25,8 @@ def save_graph(G: nx.MultiDiGraph, org: str, extra: dict | None = None) -> Path:
 
 def save_graph_file(G: nx.MultiDiGraph, p: Path, extra: dict | None = None) -> Path:
     data = nx.node_link_data(G, edges="edges")
+    # the builder's edge order can vary between runs; a fixed order keeps rebuilt files identical
+    data["edges"].sort(key=lambda e: (str(e["source"]), str(e["target"]), str(e["key"])))
     data["graph"] = dict(G.graph) | {"format": FORMAT_VERSION} | (extra or {})
     p = Path(p)
     p.parent.mkdir(parents=True, exist_ok=True)
