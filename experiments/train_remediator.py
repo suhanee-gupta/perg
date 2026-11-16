@@ -33,7 +33,7 @@ import time
 import torch
 
 from experiments.common import (RUNS, add_game_args, device, game_config, load_graph, make_finder, make_remover,
-                                play, split_orgs)
+                                orgs_of, play)
 from experiments.train_finder import synth_graphs
 from iampe.agents.gnn import GNNRemover, RemediatorPolicy
 from iampe.agents.ppo import bc_update, ppo_update
@@ -111,7 +111,7 @@ def main():
     ap.add_argument("--orgs", nargs="+", default=None, help="training configs (default: the train split)")
     ap.add_argument("--synth", default=None, help="also train on these synthetic graphs")
     ap.add_argument("--max-graphs", type=int, default=0, help="use the first N --synth graphs (0 = all)")
-    ap.add_argument("--eval-orgs", nargs="+", default=None, help="model selection configs (default: the real training configs)")
+    ap.add_argument("--eval-orgs", nargs="+", default=None, help="model selection configs or split names, e.g. val (default: the training configs)")
     ap.add_argument("--eval-synth", default=None, help="synthetic model selection graphs")
     ap.add_argument("--eval-limit", type=int, default=30, help="use the first N --eval-synth graphs")
     add_game_args(ap)
@@ -124,9 +124,9 @@ def main():
     ap.add_argument("--name", default="remover")
     a = ap.parse_args()
     torch.manual_seed(a.seed)
-    real = [load_graph(o) for o in a.orgs or split_orgs("train")]
+    real = [load_graph(o) for o in orgs_of(a.orgs or ["train"])]
     graphs = real + (synth_graphs(a.synth, a.max_graphs) if a.synth else [])
-    eval_graphs = ([load_graph(o) for o in a.eval_orgs or []]
+    eval_graphs = ([load_graph(o) for o in orgs_of(a.eval_orgs)]
                    + (synth_graphs(a.eval_synth, a.eval_limit) if a.eval_synth else [])) or real
     cfg = game_config(a)
     (RUNS / "remover").mkdir(parents=True, exist_ok=True)

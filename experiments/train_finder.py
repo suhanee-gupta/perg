@@ -1,9 +1,9 @@
 """Phase 5c: train Finder A (GATv2 + PPO) in the standard game (iampe/env/game.py standard_config).
 
-    # 1. pretrain on synthetic graphs with a size curriculum; select on held-out synthetic graphs
-    python -m experiments.train_finder --synth data/synth --eval-synth data/synth_val --stages 4 --name finder_pre
-    # 2. fine-tune on the real training configs
-    python -m experiments.train_finder --init runs/finder/finder_pre.best.pt --eval-synth data/synth_val --name finder
+    # 1. pretrain on synthetic graphs with a size curriculum; select on the real val split
+    python -m experiments.train_finder --synth data/synth --eval-orgs val --stages 4 --name finder_pre
+    # 2. fine-tune on the real training configs (the train split, 40 configs)
+    python -m experiments.train_finder --init runs/finder/finder_pre.best.pt --eval-orgs val --stages 2 --name finder
     # 3. fine-tune in the game it is evaluated in: 5 rounds against removers
     python -m experiments.train_finder --init runs/finder/finder.best.pt --rounds 5 --opponent minseen adminfirst --name finder_vsB
 
@@ -13,14 +13,15 @@ Steps, in order:
      query on a cheapest remaining path. Round 0 imitates the oracle's own games; each DAgger round then
      plays with the policy (teacher with probability 0.5**round) and labels every visited state with the
      oracle's choice, so the policy also learns what to do after its own mistakes (Ross et al. 2011).
-     Greybox-TAC has no warm start; we add it because our real data is small (6 training configs).
+     Greybox-TAC has no warm start; we add it because PPO from scratch rarely proves anything with
+     yes/no queries (the baselines miss most sources), so early episodes carry almost no signal.
   2. PPO, as Greybox-TAC: fixed budget Q per round, no END, -1 per query (mu = 1), declines,
      potential shaping gamma * Phi(s') - Phi(s) with Phi(end) = 0 (training only; iampe/env/potential.py),
      AdamW lr 1e-4, gamma 1, GAE lambda 0.95, clip 0.2, entropy 0.01, 2 epochs. Ours: +1 per source
      proven and the round ends once every open source is proven (many sources, not one).
 Model selection: pooled FNR at Q (missed open sources / open sources, then fewer queries), on held-out
-graphs: --eval-synth (a synthetic validation set; the first --eval-limit graphs, 100 by default, as
-scoring 300 graphs x 3 seeds every iteration would cost more than the training) and/or --eval-orgs,
+graphs: --eval-orgs (real configs or a split name; the pipeline uses the val split) and/or --eval-synth
+(synthetic graphs; the first --eval-limit, 100 by default),
 every --eval-every iterations. Single round with no B, or, with --rounds > 1 and removers as opponents,
 FNR over all rounds against them (step 3 is selected on the game it trains in). Selecting
 on the graphs being trained on (the old default) rewards overfitting, so one of them is required unless
@@ -37,7 +38,7 @@ from pathlib import Path
 import torch
 
 from experiments.common import (RUNS, add_game_args, device, fnr, game_kwargs, load_graph, make_finder,
-                                make_remover, play, split_orgs)
+                                make_remover, orgs_of, play, split_orgs)
 from iampe.agents.gnn import FinderPolicy, GNNFinder
 from iampe.agents.ppo import bc_update, ppo_update
 from iampe.agents.rollout import finder_bc_pairs, finder_episode
@@ -168,7 +169,7 @@ def synth_graphs(d: str, limit: int = 0) -> list:
 def load_pool(a) -> list:
     """Training graphs sorted by size: synthetic ones from --synth (plus the real ones with --also-real),
     else the real --orgs / train split."""
-    real = [load_graph(o) for o in a.orgs or split_orgs("train")]
+    real = [load_graph(o) for o in orgs_of(a.orgs or ["train"])]
     graphs = (synth_graphs(a.synth, a.max_graphs) + (real if a.also_real else [])) if a.synth else real
     return sorted(graphs, key=lambda G: G.number_of_nodes())
 
@@ -180,7 +181,7 @@ def main():
     ap.add_argument("--also-real", action="store_true", help="with --synth: add the real training configs")
     ap.add_argument("--orgs", nargs="+", default=None, help="real training configs (default: the train split)")
     ap.add_argument("--eval-synth", default=None, help="held-out synthetic graphs for model selection")
-    ap.add_argument("--eval-orgs", nargs="+", default=None, help="real configs for model selection")
+    ap.add_argument("--eval-orgs", nargs="+", default=None, help="real configs or split names (e.g. val) for model selection")
     ap.add_argument("--select-on-train", action="store_true", help="allow selecting on the training graphs")
     ap.add_argument("--eval-limit", type=int, default=100, help="use the first N --eval-synth graphs (0 = all)")
     ap.add_argument("--eval-every", type=int, default=5, help="score for model selection every N iterations")
@@ -204,7 +205,7 @@ def main():
     torch.manual_seed(a.seed)
     graphs = load_pool(a)
     eval_graphs = ((synth_graphs(a.eval_synth, a.eval_limit) if a.eval_synth else [])
-                   + [load_graph(o) for o in a.eval_orgs or []])
+                   + [load_graph(o) for o in orgs_of(a.eval_orgs)])
     if not eval_graphs:
         if not a.select_on_train:
             ap.error("give held-out selection graphs (--eval-synth / --eval-orgs) or --select-on-train")

@@ -26,6 +26,12 @@ def split_orgs(name: str) -> list[str]:
     return splits()[name]
 
 
+def orgs_of(names) -> list[str]:
+    """Config names for --orgs / --eval-orgs; a split name (train, val, test, bench, large) stands for its configs."""
+    s = splits()
+    return [o for n in names or [] for o in (s[n] if n in s else [n])]
+
+
 def device(name: str = "auto") -> torch.device:
     """`auto` picks CUDA when available, else CPU."""
     if name == "auto":

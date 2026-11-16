@@ -2,14 +2,14 @@
 
     python -m experiments.evaluate [--finders bfs greedy ckpt:runs/finder/finder.best.pt ...]
                                    [--removers random minseen adminfirst full ckpt:runs/remover/remover.best.pt ...]
-                                   [--heldout random oracle] [--splits train test] [--large]
+                                   [--heldout random oracle] [--splits test] [--large]
                                    [--synth-test data/synth_test] [--seeds 10] [--matrix] [game options]
 
 What is reported, and why:
   * Finder A: FNR at fixed budgets Q (single round, no B) = missed open sources / open sources, pooled
-    over configs and seeds, with the raw counts and a 95% bootstrap CI over (config, seed) games. The
-    test split has only 2 configs (11 open sources), so without the counts and the CI a difference of
-    one source looks like a result. "unprovable floor" is the exact share of open sources no finder
+    over configs and seeds, with the raw counts and a 95% bootstrap CI that resamples whole configs. The
+    test split has 10 configs (46 open sources), so without the counts and the CI a difference of a
+    few sources looks like a result. "unprovable floor" is the exact share of open sources no finder
     can prove in these games (every path needs a declined query): the best any finder can reach.
     The oracle reads the hidden graph; it is a strong reference, not a guaranteed bound for small Q.
   * Remover B: mean total r_B over the K rounds, open sources summed over rounds ("open-source-rounds"),
@@ -192,8 +192,9 @@ def main():
                     help="finders some compared B trained against (its pools); B tables are split by this")
     ap.add_argument("--heldout", nargs="*", default=HELDOUT,
                     help="finders no compared B trained against (none: give the flag alone)")
-    ap.add_argument("--splits", nargs="*", default=["train", "test"], help="real splits (none: give the flag alone)")
-    ap.add_argument("--large", action="store_true", help="also the deferred (large) configs; slow (mermer)")
+    ap.add_argument("--splits", nargs="*", default=["test"], choices=["train", "val", "test", "bench"],
+                    help="real splits (none: give the flag alone); val is used for model selection, so test is the verdict")
+    ap.add_argument("--large", action="store_true", help="also the large configs (5k+ nodes; those with a built graph)")
     ap.add_argument("--large-removers", nargs="+", default=None, help="removers on the large configs (default: --removers)")
     ap.add_argument("--synth-test", default=None, help="held-out synthetic graphs as an extra test group")
     ap.add_argument("--synth-limit", type=int, default=0, help="use only the first N synthetic test graphs")
@@ -227,7 +228,7 @@ def main():
             _GRAPHS[o] = load_graph(o)
         groups.append((sp, split_orgs(sp), a.removers))
     if a.large:
-        big = [o for o in split_orgs("deferred") if graph_path(o).exists()]
+        big = [o for o in split_orgs("large") if graph_path(o).exists()]
         for o in big:
             _GRAPHS[o] = load_graph(o)
         groups.append(("large", big, a.large_removers or a.removers))

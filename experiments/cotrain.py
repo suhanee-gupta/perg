@@ -1,7 +1,7 @@
 """Phase 8: co-training A and B in the standard game, PSRO-style pools with EXP3 opponent choice.
 
     python -m experiments.cotrain --init-finder runs/finder/finder.best.pt --init-remover runs/remover/remover.best.pt
-                                  [--eval-synth data/synth_val] [--gens 4] [--iters 10] [--episodes 32]
+                                  [--eval-orgs val] [--gens 4] [--iters 10] [--episodes 32]
                                   [--gamma 0.2] [game options as in train_remediator] [--name cotrain]
 
 Graphs: the real training configs, plus --synth graphs if given (more fix -> re-find cycles per run).
@@ -30,7 +30,7 @@ import shutil
 
 import torch
 
-from experiments.common import RUNS, add_game_args, device, game_config, load_graph, split_orgs
+from experiments.common import RUNS, add_game_args, device, game_config, load_graph, orgs_of
 from experiments.train_finder import synth_graphs
 from experiments.train_finder import train as train_a
 from experiments.train_remediator import FINDERS
@@ -97,7 +97,7 @@ def main():
     ap.add_argument("--synth", default=None, help="also co-train on these synthetic graphs")
     ap.add_argument("--max-graphs", type=int, default=0, help="use the first N --synth graphs (0 = all)")
     ap.add_argument("--eval-synth", default=None, help="held-out synthetic graphs to select A's snapshots on")
-    ap.add_argument("--eval-orgs", nargs="+", default=None, help="held-out real configs to select A's snapshots on")
+    ap.add_argument("--eval-orgs", nargs="+", default=None, help="held-out real configs or split names (e.g. val) to select A's snapshots on")
     add_game_args(ap)
     ap.add_argument("--baseline", default=None, help="B's training reward minus this remover's r_B (as train_remediator)")
     ap.add_argument("--eval-limit", type=int, default=30,
@@ -107,11 +107,11 @@ def main():
     ap.add_argument("--name", default="cotrain")
     a = ap.parse_args()
     torch.manual_seed(a.seed)
-    real = [load_graph(o) for o in a.orgs or split_orgs("train")]
+    real = [load_graph(o) for o in orgs_of(a.orgs or ["train"])]
     graphs = real + (synth_graphs(a.synth, a.max_graphs) if a.synth else [])
     graphs.sort(key=lambda G: G.number_of_nodes())
     cfg = game_config(a)
-    a_eval = (synth_graphs(a.eval_synth, a.eval_limit) if a.eval_synth else []) + [load_graph(o) for o in a.eval_orgs or []]
+    a_eval = (synth_graphs(a.eval_synth, a.eval_limit) if a.eval_synth else []) + [load_graph(o) for o in orgs_of(a.eval_orgs)]
     a_eval = a_eval or real                 # never the whole synthetic pool: scoring would cost more than training
     out = RUNS / "cotrain"
     out.mkdir(parents=True, exist_ok=True)
