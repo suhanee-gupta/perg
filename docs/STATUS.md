@@ -1,142 +1,161 @@
-# Project status (for review)
+# Project status
 
-State of the greybox IAM privilege-escalation remediation game as of 2026-11-08.
-Results: `docs/results.md`. Data: `docs/dataset.md`. Graph building: `docs/HANDOFF.md`.
-"TAC" below means the Greybox-TAC replication (github.com/DarkMatterCompiler/Greybox-TAC).
+State of the greybox IAM privilege-escalation remediation game as of 2026-11-17.
+"TAC" means the Greybox-TAC replication (github.com/DarkMatterCompiler/Greybox-TAC).
+Data: `docs/dataset.md`. Graph building: `docs/HANDOFF.md`. Results: `docs/results.md` (still the
+2026-11-12 node-mode run until the GPU pipeline below is rerun).
 
 ## Summary
 
-- **Pipeline (done):** the converter, graph builder and checker work. All 18 graphs are in
-  `data/graphs/` and match their labels hop for hop (the 6 large ones were built off this laptop).
-  Only the v2 data (`esc.zip`, `no_esc.zip`) is used; the old 14-config dataset was deleted.
-- **New game design (trained & evaluated):** A gets a fixed query budget with no END,
-  as in TAC; B gets no edge budget and pays for collateral. See "The design" below.
-- **Trained models:** Finder A (curriculum pre-trained on 2,000 synthetic graphs, then fine-tuned on real configs),
-  Remover B, and Generation 4 co-trained agents (`models/finder.pt`, `models/finder_cotrain.pt`, `models/remover.pt`,
-  `models/remover_cotrain.pt`). Results updated in `docs/results.md`.
+- **Data.** 18 real configs from `esc.zip` / `no_esc.zip`: 6 train (29–356 nodes), 2 test, 4 toy bench,
+  6 large (1k–28k nodes, evaluation only). About 21 open escalation sources in train and 11 in test.
+  Synthetic graphs are not in any zip: `experiments/gen_synth.py` makes them (seeded, minutes on a CPU).
+  Three disjoint sets are used: 2000 for training, 300 for model selection and 300 for testing.
+- **Design change (2026-11-17).** A asks TAC-style yes/no questions about single edges (`query_mode="edge"`)
+  instead of revealing a node's outgoing edges. B may see and cut every edge A revealed, not only proof edges.
+- **What the 2026-11-12 run showed.** Learned and co-trained B equalled the `minseen` ILP to two decimals
+  everywhere. On proof edges `minseen` is already the best cut, so there was nothing left to learn. A's
+  test gains (0.54 vs 0.56) were within the noise of an 11-source test set. The "oracle lower bound" was
+  not one. All three are addressed below. Those checkpoints no longer load: the observation features changed.
+- **Next:** rerun `scripts/run_gpu.sh` on the GPU machine and bring back `runs/logs.tgz`. Open question for
+  the team: how much of the config is visible (see "Visibility").
 
-## Phase status
+## The game (`standard_config()` in `iampe/env/game.py`)
 
-| Phase | Status | Where |
-|---|---|---|
-| 0-3 Setup, data, graphs, checker | done | `iampe/data`, `iampe/parser`, `iampe/graph`, `iampe/checker`, `data/graphs/` |
-| 4 Game | done, new standard design | `iampe/env/game.py` (`standard_config`), `iampe/env/potential.py` |
-| 5 Finder A | done (pre-trained + fine-tuned) | `models/finder.pt`, `runs/finder/` |
-| 6 Baseline B | done for the new design | `iampe/agents/remediator_baselines.py`, `iampe/checker/mincut.py` (`tradeoff_cut`) |
-| 7 Learned B | done | `models/remover.pt`, `runs/remover/` |
-| 8 Co-training | done (4 generations) | `models/finder_cotrain.pt`, `models/remover_cotrain.pt`, `runs/cotrain/` |
-| 9 Evaluation | done (baselines + learned agents) | `experiments/evaluate.py`, `docs/results.md` |
-
-## The design (`standard_config()` in `iampe/env/game.py`)
+Standard values: Q=40, 10% declines, edge mode, `visible_p=0.5`, `b_sees="revealed"`, λ=1, 5 rounds.
+Each round A queries until its budget is spent, then B cuts edges. Cuts are permanent,
+and A sees them.
 
 **Finder A**, per round:
-- a fixed budget of Q = 20 queries; each query reveals one node's outgoing edges and costs 1;
-- no END: the round ends when the budget is spent, or as soon as every open source is proven;
-- each query is declined with probability 0.1; a declined query costs 1, reveals nothing, and that node
-  cannot be asked again in the same game;
-- memory across rounds: A never re-queries a node it asked about in an earlier round (it sees B's cuts,
-  so a re-query reveals nothing new), and at each round start it re-reports the proofs that survive the
-  cuts. Without this, BFS spent later rounds re-asking old nodes and found no new routes at all;
-- reward per query: (sources proven) - 1, plus in training only the shaping gamma * Phi(next) - Phi(now)
-  with Phi = -(sum over open sources not yet proven of the fewest unrevealed edges on a real path to
-  admin) and Phi = 0 after the game's last decision;
-- policy: GATv2 over A's view; trained by imitating the bandit finder, then PPO.
+- **Query (edge mode, the standard):** one question `(u, v, template)`: "can u take over v with this
+  template?" The answer is TRUE (the edge is revealed), FALSE, or UNKNOWN (declined).
+  - *Public* (what A may use to form questions, as in TAC's query space): every entity id and kind,
+    the admin sink, the template list, and which (actor kind, template, target kind) combinations the
+    templates allow. `iampe/env/query_space.py` builds this schema from the template definitions only.
+    It covers 100% of the edges in all 18 real graphs (tested).
+  - *Frontier:* u must be a source or a node A has already proven reachable from a source (forward
+    search, as before).
+  - *Hubs:* confirming `u → any:<template>` (u holds the permission on `*`) also reveals that hub's
+    uncuttable out-edges. The builder derives those from public entity types.
+  - Node mode (`query_mode="node"`, the old design) is kept for comparison.
+- **Budget:** fixed Q per round, every query costs 1, no END (as in TAC).
+- **Declines:** each query is declined with probability 0.1. A decline is a fixed property of that
+  query in that game, independent of the order queries are made in. Before 2026-11-17 it depended on
+  the order, so two finders saw different declines in the same game. A declined query costs 1, reveals
+  nothing and cannot be repeated.
+- **Memory:** a question asked in any earlier round is never asked again. Answers only change when B
+  cuts the edge, which A sees. Proofs that survive the cuts are re-reported at the start of each round.
+- **Early end:** the round ends as soon as every open source is proven (TAC ends on detection).
+- **Reward per query:** (sources proven) − 1. In training only, add the shaping term
+  γΦ(s′) − Φ(s), where Φ = −(questions still needed on the cheapest live path, summed over unproven
+  open sources). Declined queries are impassable in Φ. A source that declines have cut off counts as
+  10, so a blocking decline lowers Φ rather than looking like progress (`iampe/env/potential.py`).
+- **Node mode** (`query_mode="node"`) brings the old game back as a whole: nothing visible and B sees
+  proof edges only, unless those are set explicitly, so node-mode numbers stay comparable with old runs.
+- **Visibility (`visible_p`):** the share of hidden edges A knows from the start, as in TAC's partial
+  permission-flow graph. See "Visibility" below for why this matters.
 
 **Remover B**, per round:
-- cuts any number of seen, cuttable edges (no edge budget);
-- w(e) is divided by the number of users and roles in the account;
-- reward: (sources newly closed) - (sources still open) - 1 * (sum of w over this round's cuts);
-- baselines: min-seen and the full-graph ceiling maximise that round reward with an ILP (`tradeoff_cut`);
-  admin-first cuts every seen edge into admin or into an admin principal; random cuts a random subset.
+- **Sees** the edges on reported proofs (`b_sees="proofs"`, old) or every edge A revealed
+  (`b_sees="revealed"`, the pipeline's setting). Only the second gives a learned B something to beat
+  the ILP with: routes A explored but has not proven yet. First check (test split, 3 seeds,
+  baselines only, wide CIs): with `revealed`, `adminfirst` (r_B −0.68) and even random cuts (−1.70)
+  beat `minseen` (−3.68), because `minseen` only separates already-proven sources.
+- **Cuts** any number of seen cuttable edges. Optionally a per-round edge budget (`--cut-budget`).
+- **Reward:** r_B = (sources newly closed) − (sources still open) − λ · Σ w(e). Here w(e) is the number
+  of users and roles that lose the permission, divided by the account's users and roles.
+  `Game.preview_cut` gives the same reward for any cut without applying it.
 
-**Kept from before:** 5 rounds; A sees B's cuts and keeps what it revealed; sources = untrusted entity +
-non-admin users and roles (open ones plus closed fillers up to 20); the referee scores on the whole graph.
+## Evidence for the design choices (baselines only, nothing trained)
+
+Pooled FNR = missed open sources / open sources, 10 seeds, 10% declines, single round. The oracle reads
+the hidden graph. At large Q it reaches the exact floor: the share of sources behind declined queries.
+
+| mode | visible | finder | train Q=20 | train Q=40 | test Q=20 | test Q=40 |
+|---|---|---|---|---|---|---|
+| node | – | bfs | 0.44 | 0.21 | 0.47 | 0.24 |
+| node | – | oracle | 0.21 | 0.21 | 0.24 | 0.24 |
+| edge | 0 | random | 1.00 | 1.00 | 1.00 | 1.00 |
+| edge | 0 | bfs | 0.98 | 0.98 | 0.94 | 0.94 |
+| edge | 0 | greedy (prior × value) | 1.00 | 0.87 | 1.00 | 0.88 |
+| edge | 0 | oracle | 0.23 | 0.23 | 0.11 | 0.11 |
+| edge | 0.25 | greedy | 0.93 | 0.79 | 0.92 | 0.82 |
+| edge | 0.5 | random | 0.81 | 0.81 | 0.82 | 0.82 |
+| edge | 0.5 | bfs | 0.80 | 0.80 | 0.72 | 0.72 |
+| edge | 0.5 | greedy | 0.81 | 0.65 | 0.82 | 0.80 |
+| edge | 0.5 | oracle | 0.14 | 0.14 | 0.11 | 0.11 |
+
+What this shows:
+- **Fixing the oracle and the declines made the node-mode reference consistent.** Before the fix, the
+  oracle was beaten (test Q=40: co-trained A 0.17 vs "oracle" 0.27). Now no finder beats it, and every
+  finder converges on the same floor at Q=1000 (train 0.21, test 0.24).
+- **Yes/no questions are much harder than revealing out-edges, and that's the honest comparison with
+  TAC.** One actor has 600–7,000 possible questions on the small configs (TAC: total query spaces ≤ 800).
+  With nothing visible, targets of the same kind look identical, so the non-whitebox baselines barely
+  find anything. The oracle sits at the floor (0.11–0.23). The gap is where a learned A should help, but
+  only if there is some structure to learn from.
+- **Visibility.** TAC's greybox setting exposes part of the configuration. `visible_p` is our version
+  of that. With half the edges visible, about 19% of open sources are proven before any question
+  (random ≈ 0.81), and the best public baseline gets to 0.65 on train at Q=40. **Its value is a team
+  decision:** it sets how hard the game is. The standard config and the pipeline use 0.5.
+- **Q = 40.** That's TAC's training budget, and it's the first budget where a non-whitebox baseline
+  gets anywhere (greedy 0.81 → 0.65 on train). In node mode we used 20, because at 40 BFS already found
+  everything. In edge mode that argument no longer holds.
+- **The test split is too small to decide anything.** On test the oracle misses 17 of 160 open
+  source-games, but there are only 11 distinct open sources. Use `--synth-test` for comparisons
+  between finders.
 
 ## Differences from TAC, and why
 
 | Area | TAC | Ours | Why |
 |---|---|---|---|
-| Budget | Fixed, every query costs | Same (Q = 20) | Taken from TAC: it removes "do nothing" as an option |
-| END action | None | None | Taken from TAC |
-| Customer declines | Yes (they use 0.1 and 0.3) | Yes, 0.1, fixed per node | Taken from TAC |
-| Shaping | Phi from the planted plan, training only | Phi from the checker's true shortest paths, training only | We have many sources and no single plan; the checker gives every source's real path |
-| PPO settings | AdamW 1e-4, gamma 1, lambda 0.95, clip 0.2, entropy 0.01, 2 epochs | Same for A | Taken from TAC |
-| Pretraining | Thousands of synthetic tasks, size curriculum | Synthetic graphs adapted from TAC's `gen.py`, size curriculum, then fine-tune on real configs | Taken from TAC; edge types drawn from our real graphs so the synthetic ones look like ours |
-| Query | One (entity, permission) pair | One node's outgoing edges | Our graph already holds takeover steps (the converter did the permission reasoning); B needs whole paths to cut |
-| Goal | One untrusted entity reaches admin | Every source that reaches admin, +1 per proof | B has to fix every escalation, so A has to find all of them |
-| Episode end | On detection | When every open source is proven | Same idea with many targets; keeps -1 per query meaningful |
-| Rounds | One | 5, with B cutting in between | The project is remediation: A has to find routes around B's fixes |
-| Memory across rounds | Not applicable (one episode) | No re-queries; surviving proofs re-reported | A sees B's cuts, so re-asking a node is pure waste of budget |
-| Warm start | None | Imitate the bandit finder | Until the synthetic pretraining exists we have 6 real training configs against TAC's 2,000 tasks |
-| Budget size | Trains at 40 | 20 | At 40, BFS already finds every source on our small configs, so A could not show anything |
-| Models | One pooled model (the paper: 27 per type) | One pooled model | Too little data for per-type models |
-| Their trained model | Exists | Not used | Its query unit and templates differ, and it learned only on query spaces <= 800 |
+| Query unit | One (entity, permission) pair, yes/no | One takeover edge (u, template, v), yes/no | Same answer semantics. Our graph already combines a template's permissions into one edge; permission-level queries are the next step (open items below) |
+| Query space | E_vis × P_vis from public info | Frontier actors × schema from the templates | Same public-only rule; forward search keeps it tractable |
+| Partial view | Part of the config visible | `visible_p` share of edges | Without it the yes/no game has no signal (table above) |
+| Budget, END | Fixed, no END | Same | Taken from TAC |
+| Declines | Per query | Per query, fixed per game, order-independent | Fair comparison between finders |
+| Shaping | Φ from the planted plan, training only | Φ from true cheapest remaining paths, training only | Many sources, no single plan |
+| Warm start | None | Imitate the oracle, then DAgger | 6 real training configs vs TAC's 2,000 tasks; the old teacher (LinUCB) was the worst finder on test |
+| PPO | AdamW 1e-4, γ 1, λ 0.95, clip 0.2, entropy 0.01, 2 epochs | Same for A; 64 episodes per iteration in pretraining and fine-tuning, 32 in the 5-round stages | Taken from TAC; bigger batches because a single round is short |
+| Pretraining | Synthetic tasks, size curriculum | Same, edge types drawn from our real train graphs | Taken from TAC |
+| Goal | One untrusted entity reaches admin | Every source that reaches admin | B has to fix every escalation |
+| Rounds | One | 5, B cuts in between | The project is remediation |
 
-## Baselines in the new game (details in `docs/results.md`)
+## Agents
 
-Small configs, 3 seeds. Remover B: total r_B over 5 rounds (higher is better) and open-source-rounds
-(lower is better), against the training finders (BFS, Greedy, bandit).
+| Agent | What it does | Where |
+|---|---|---|
+| random / bfs / greedy / oracle (A) | Baselines for both modes. Greedy in edge mode = public prior P(edge) from the train split × (1 if the target already reaches admin, else 0.1). Oracle = next query on the cheapest remaining path (exact 0-1 BFS) | `iampe/agents/finder_heuristic.py` |
+| LinUCB bandit (A) | Node mode only (it scores nodes) | `iampe/agents/bandit.py` |
+| Learned A | GATv2. Edge mode factorises π(u, v, t) = π(u) · π(v, t \| u); the second factor scores [h_u, h_v, template embedding] | `iampe/agents/gnn.py` |
+| minseen / adminfirst / random / full (B) | ILP trade-off cut on seen edges / cut seen edges into admin / random / ILP on the whole graph (cheats: the ceiling) | `iampe/agents/remediator_baselines.py` |
+| Learned B | GATv2 edge scorer: imitates `full` restricted to seen edges, then PPO, optionally on r_B minus `minseen`'s r_B in the same state | `iampe/agents/gnn.py`, `iampe/agents/rollout.py` |
 
-| remover | train: r_B | train: open-source-rounds | test: r_B | test: open-source-rounds |
-|---|---|---|---|---|
-| random | -0.10 | 5.61 | -7.98 | 14.22 |
-| min-seen | 2.80 | 2.78 | -7.57 | 13.50 |
-| admin-first | 2.06 | 3.37 | -7.57 | 13.50 |
-| full-graph ceiling (cheats) | 5.80 | 0.00 | 7.99 | 0.00 |
+## The pipeline (`scripts/run_gpu.sh`; GPU machine only)
 
-Finder A, FNR at Q = 10 / 20 / 40 with 10% declines: BFS train 0.34 / 0.12 / 0.07, test
-0.77 / 0.56 / 0.31; oracle (sees the hidden graph) train 0.12, test 0.27 at every Q.
+| Step | Command (game flags in `$GAME`) | Why |
+|---|---|---|
+| 0 | `pytest --run-training` | Tests that take gradient steps are skipped elsewhere (no training on the laptop) |
+| 1 | `gen_synth` with seeds 0 / 1 / 2 → `data/synth`, `synth_val`, `synth_test` | Disjoint training, selection and test sets; the real test split (11 sources) is too small to tell finders apart |
+| 2 | `train_finder --synth data/synth --eval-synth data/synth_val --stages 4 --iters 50 --episodes 64 --bc 2000 --dagger 3` | Imitate the oracle, DAgger, then PPO with a size curriculum. Checkpoints are scored every 5 iterations on 100 held-out graphs (scoring all 300 every iteration would cost more than the training) |
+| 3 | `train_finder --init finder_pre.best.pt --iters 30` (real train split) | Adapt to real configs |
+| 4 | `train_finder --init finder.best.pt --rounds 5 --opponent minseen adminfirst` | Train A in the game it is evaluated in, and select on FNR over all 5 rounds against those removers (the log says if no iteration beat the start) |
+| 5 | `train_remediator --finders bfs greedy ckpt:finder_vsB --baseline minseen` | B against the trained A; random and the oracle stay held out |
+| 6 | `cotrain --gens 4 --baseline minseen` | PSRO-style pools with EXP3 opponent sampling; B uses the same reward as step 5 |
+| 7 | `evaluate --seeds 10 --large --synth-test data/synth_test --matrix` | FNR with CIs and the floor, B tables with CIs and per-round numbers, finder × remover matrix |
+| 8 | Copy the best checkpoints to `models/`; pack `runs/logs.tgz` | `runs/` is gitignored; the logs are what tell us whether longer training would help |
 
-What these show:
-- **The oracle cannot reach FNR 0:** a declined node on the only path makes a source unprovable. TAC's
-  "ask everything" ceiling behaves the same way.
-- **Cuts are almost free on the small configs:** every edge there has w = 1, about 0.02 after
-  normalisation, so the ceiling closes everything in round 0. B's real limit is what A reveals.
-- **There is room for learned A** (BFS test FNR 0.56 at Q = 20) and for learned B (min-seen is far from
-  the ceiling on test: 13.50 open-source-rounds against 0, and admin-first is no better than min-seen).
-
-## GPU runbook (in order)
-
-Not on the laptop. On the GPU machine, from the repo root:
-
-```bash
-pip install -e ".[dev]" && python -m pytest -q                      # 43 tests, seconds
-python -m experiments.gen_synth --n 2000                             # data/synth/, light
-# Finder A: pretrain on synthetic graphs (size curriculum), then fine-tune on the real train split
-python -m experiments.train_finder --synth data/synth --stages 4 --iters 50 --episodes 16 --name finder_pre
-python -m experiments.train_finder --init runs/finder/finder_pre.best.pt --iters 30 --name finder
-# Remover B on the real train split
-python -m experiments.train_remediator --iters 30 --name remover
-# Co-training, both halves
-python -m experiments.cotrain --init-finder runs/finder/finder.best.pt --init-remover runs/remover/remover.best.pt --gens 4
-# Evaluation, including the large configs (mermer is the slow one)
-python -m experiments.evaluate --large \
-    --finders bfs greedy bandit:models/linucb.npz ckpt:runs/finder/finder.best.pt ckpt:runs/cotrain/cotrain_A4.pt \
-    --removers random minseen adminfirst full ckpt:runs/remover/remover.best.pt ckpt:runs/cotrain/cotrain_B4.pt
-```
-
-Each trainer prints its baselines first, then one line per iteration, and writes a log next to the
-checkpoints (`runs/finder/`, `runs/remover/`, `runs/cotrain/`). What to look for:
-- `train_finder`: FNR must drop below the BFS baseline line; queries used near Q is normal.
-- `train_remediator`: r_B must rise above min-seen's (2.80 on train with the training finders).
-- Send back the logs and `docs/results.md`; copy the best checkpoints into `models/`.
-
-Optional: train B on large configs too, e.g. `--orgs <train split> axnor-1bmoe8 delnor-1bxe74
-arimer-1bmoea`, keeping corpyr, linlin and mermer for testing.
+`bash scripts/run_gpu.sh smoke` runs every stage tiny, in a few minutes, to check the setup first.
 
 ## Open items
 
-1. **Training (completed):** All stages in the GPU runbook (synthetic data, Finder A pretraining + fine-tuning,
-   Remover B training, 4 generations of co-training, and evaluation) have been executed. Trained models are in `models/`.
-2. **Finder A verification:** Finder A successfully queries nodes up to the budget Q without early stopping (the END cheat
-   was removed), achieving test FNR of 0.54 at Q=20 and 0.17 at Q=40.
-3. Collateral barely matters with w = 1 everywhere on the small configs; the large configs have larger
-   w. If collateral should matter more in future experiments, raise `--lam`.
-4. Push to GitHub: run `git push -u origin master` yourself.
-5. `docs/GUIDE.md` is superseded (marked at the top).
-6. More seeds / a variance estimate before any firm claim.
+1. Run the pipeline on the GPU machine and bring back `runs/logs.tgz`.
+2. Decide the visible share and Q for the yes/no game (table above).
+3. Permission-level queries (exact TAC), built on the same `a_query` interface.
+4. Exploitability (best responses to the final agents), once B can differ from `minseen`.
+5. More B experiments: `--lam`, `--cut-budget`, training on the large configs with varying w.
 
 ## Older results
 
-The first design (cost per query with END for A; 1 edge per round for B) and its results are in git
-history: `docs/results.md` and `docs/STATUS.md` at commit `28315dd`.
+The first design (cost per query with END; 1 edge per round for B) is in git history at commit `28315dd`.
+The node-mode fixed-budget design and its 2026-11-12 run are at commit `22ec59d`.

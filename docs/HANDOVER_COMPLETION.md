@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-12  
 **Repository:** `perg` (Greybox IAM Privilege-Escalation Remediation Game)  
-**Status:** **100% Completed & Verified**
+**Status:** Completed for the 2026-11-12 design (superseded; see the correction in section 5.3)
 
 ---
 
@@ -111,8 +111,16 @@ An independent verification test (`verify_agents.py`) pitted the co-trained agen
 * **Invariant enforcement:** All cuts were strictly legal (no uncuttable edges touched), budget constraints were respected, and closed-source counts matched ground truth reachability.
 
 ### 5.3. Benchmark Performance Highlights
-* **Finder A (Test Generalization):** At budget $Q=20$, co-trained Finder A achieved a test False Negative Rate of **0.54** (outperforming BFS at 0.56, Greedy at 0.69, and LinUCB at 0.79). At budget $Q=40$, test FNR dropped to **0.17** (compared to 0.31 for BFS and Greedy).
-* **Remover B (Test Generalization):** Successfully learned to match the optimal seen-graph integer programming ceiling (`minseen`), keeping collateral minimal while closing maximum reachable paths.
+* **Finder A (Test Generalization):** At budget $Q=20$, co-trained Finder A achieved a test False Negative Rate of **0.54** (BFS 0.56, Greedy 0.69, LinUCB 0.79). At budget $Q=40$, test FNR was **0.17** (0.31 for BFS and Greedy).
+* **Remover B (Test Generalization):** Learned B reproduced the `minseen` ILP baseline exactly, keeping collateral minimal while closing maximum reachable paths.
+
+> **Correction (2026-11-17).** The test split has 2 configs and 11 open sources (3 seeds), so one
+> source moves FNR by about 0.09: 0.54 vs 0.56 is within noise, not an improvement over BFS. `minseen`
+> is the best cut on B's seen edges, not the ceiling; the ceiling is `full` (test r_B 7.99 vs -4.35).
+> The "oracle lower bound" was not a bound: the oracle ended its turn when a declined node blocked
+> its path, and declines depended on query order. All three are fixed and the design has changed since
+> (edge-level yes/no queries); see `docs/STATUS.md`. The models listed here do not load with the
+> current code and are kept only as a record.
 
 ---
 
