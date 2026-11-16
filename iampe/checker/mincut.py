@@ -49,7 +49,7 @@ def _w(G, e, weight):
 def min_cut(G: nx.MultiDiGraph, S, weight: str | None = "w", removed=frozenset(),
             allowed: set[Edge] | None = None) -> tuple[float, list[Edge]]:
     """Exact minimum-weight edge cut separating every s in S from admin. Returns (cost, edges)."""
-    edges = relevant_edges(G, S, removed, allowed)
+    edges = sorted(relevant_edges(G, S, removed, allowed))     # deterministic order (see _cut_ilp)
     if not edges:
         return 0.0, []
     D = nx.DiGraph()
@@ -71,7 +71,9 @@ def _cut_ilp(G: nx.MultiDiGraph, S, cost, budget: float | None, penalty: float, 
     """Shared ILP. d_v = 1 if v can still reach admin; d_admin = 1; every live edge u->v gives
     d_u >= d_v - x_e (x_e = 1 if cut; uncuttable edges and edges outside `allowed` have x_e = 0).
     Minimise sum d_s + penalty * sum cost(e) x_e, optionally with sum cost(e) x_e <= budget."""
-    edges = relevant_edges(G, S, removed)
+    # sorted: graph views (edge_subgraph) iterate in Python's per-process set order, and the variable order
+    # decides which of several equally good cuts the solver returns
+    edges = sorted(relevant_edges(G, S, removed))
     if not edges:
         return []
     nodes = {n for e in edges for n in e[:2]}
@@ -84,7 +86,7 @@ def _cut_ilp(G: nx.MultiDiGraph, S, cost, budget: float | None, penalty: float, 
         if hasattr(prob, "add_variable"):
             return prob.add_variable(name, low, up, cat)
         return pulp.LpVariable(name, lowBound=low, upBound=up, cat=cat)
-    d = {n: _var(f"d{idx[n]}", 0, 1, "Binary" if n in src_set else "Continuous") for n in nodes}
+    d = {n: _var(f"d{idx[n]}", 0, 1, "Binary" if n in src_set else "Continuous") for n in sorted(nodes)}
     x = {e: _var(f"x{i}", 0, 1, "Binary") for i, e in enumerate(cuttable)}
     prob += pulp.lpSum(d[s] for s in srcs) + penalty * pulp.lpSum(cost(e) * x[e] for e in cuttable)
     prob += d[ADMIN] == 1

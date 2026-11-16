@@ -33,7 +33,9 @@ def device(name: str = "auto") -> torch.device:
     return torch.device(name)
 
 
+@lru_cache(maxsize=32)
 def load_policy(kind: str, path: str | Path):
+    """Load a checkpoint once per process (cached: evaluation builds an agent per game)."""
     pol = FinderPolicy() if kind == "finder" else RemediatorPolicy()
     try:
         pol.load_state_dict(torch.load(path, map_location="cpu"))

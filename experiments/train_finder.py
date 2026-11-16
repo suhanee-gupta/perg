@@ -103,14 +103,15 @@ def imitate(policy, opt, graphs, cfg: GameConfig, n_pairs: int, dagger: int, tea
 def train(policy, graphs, cfg: GameConfig, opponents, iters: int, episodes: int, lr: float, seed: int,
           out_name: str, eval_graphs, log=print, bc: int = 0, teacher: str = TEACHER, stages: int = 1,
           gamma: float = 1.0, epochs: int = 2, shaping: bool = True, pick=None, observe=None,
-          dagger: int = 0, eval_every: int = 1) -> FinderPolicy:
+          dagger: int = 0, eval_every: int = 1, opt=None) -> FinderPolicy:
     """`graphs` are sampled from a pool that grows with the stage (curriculum: they must be sorted by
     size; stage i uses the smallest (i+1)/stages of them). `opponents`: remover specs or agents, one
     per episode (`pick(rng)` / `observe(opponent, logs)` let co-training plug in EXP3). The policy is
     scored for model selection every `eval_every` iterations and at the end of each stage: single-round
-    FNR when cfg.K == 1, else FNR over the K rounds against the opponent specs (the game it trains in)."""
+    FNR when cfg.K == 1, else FNR over the K rounds against the opponent specs (the game it trains in).
+    `opt`: an optimizer to keep using (co-training passes one that lives across generations)."""
     rng = random.Random(seed)
-    opt = torch.optim.AdamW(policy.parameters(), lr=lr)
+    opt = opt or torch.optim.AdamW(policy.parameters(), lr=lr)
     out = RUNS / "finder"
     out.mkdir(parents=True, exist_ok=True)
     as_agent = (lambda b: make_remover(b, rng.randrange(1 << 30)) if isinstance(b, str) else b)
@@ -165,15 +166,18 @@ def synth_graphs(d: str, limit: int = 0) -> list:
 
 
 def load_pool(a) -> list:
-    """Training graphs sorted by size: synthetic ones from --synth, else the real --orgs / train split."""
-    graphs = synth_graphs(a.synth, a.max_graphs) if a.synth else [load_graph(o) for o in a.orgs or split_orgs("train")]
+    """Training graphs sorted by size: synthetic ones from --synth (plus the real ones with --also-real),
+    else the real --orgs / train split."""
+    real = [load_graph(o) for o in a.orgs or split_orgs("train")]
+    graphs = (synth_graphs(a.synth, a.max_graphs) + (real if a.also_real else [])) if a.synth else real
     return sorted(graphs, key=lambda G: G.number_of_nodes())
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--synth", default=None, help="directory of synthetic training graphs (experiments/gen_synth.py)")
-    ap.add_argument("--max-graphs", type=int, default=0)
+    ap.add_argument("--max-graphs", type=int, default=0, help="use the first N --synth graphs (0 = all)")
+    ap.add_argument("--also-real", action="store_true", help="with --synth: add the real training configs")
     ap.add_argument("--orgs", nargs="+", default=None, help="real training configs (default: the train split)")
     ap.add_argument("--eval-synth", default=None, help="held-out synthetic graphs for model selection")
     ap.add_argument("--eval-orgs", nargs="+", default=None, help="real configs for model selection")

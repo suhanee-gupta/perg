@@ -84,7 +84,7 @@ def finder_graph(game) -> tuple[Data, list[str]]:
     In edge mode data.node_ids keeps the node order for `finder_options`."""
     G = game.G
     edge_mode = game.qs is not None
-    revealed = [e for e in game.revealed if game.lg.live(e)]
+    revealed = [e for e in sorted(game.revealed) if game.lg.live(e)]
     ends = {e[0] for e in revealed} | {e[1] for e in revealed}
     nodes = sorted(game.known_nodes() | ends | {ADMIN} | (set(all_hubs()) if edge_mode else set()))
     idx = {n: i for i, n in enumerate(nodes)}

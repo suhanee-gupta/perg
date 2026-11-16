@@ -219,3 +219,47 @@ def test_a_blocking_decline_never_raises_the_potential():
     before = potential(g)
     g.a_query(E3)                                             # s2's only route is now declined
     assert potential(g) < before
+
+
+def test_games_do_not_depend_on_pythons_hash_seed(tmp_path):
+    """Set iteration order differs per process (PYTHONHASHSEED); no decision may depend on it. Covers
+    the baselines and an (untrained, randomly initialised) neural finder."""
+    import os
+    import subprocess
+    import sys
+    torch.manual_seed(0)
+    ck = tmp_path / "rand.pt"
+    torch.save(FinderPolicy().state_dict(), ck)
+    code = ("import sys, torch\n"
+            "from experiments.common import load_graph, make_finder, make_remover, play\n"
+            "from iampe.env.game import standard_config\n"
+            "torch.set_num_threads(1)\n"
+            "G = load_graph('ormav-15z25c')\n"
+            "for mode in ('edge', 'node'):\n"
+            "    for f in ('oracle', 'bfs', 'greedy', 'ckpt:' + sys.argv[1]):\n"
+            "        for r in ('minseen', 'adminfirst', 'random'):\n"
+            "            logs = play(G, make_finder(f, 0), make_remover(r, 0), standard_config(query_mode=mode, Q=10), 0)\n"
+            "            print([(l['open_after'], l['cut'], l['proven']) for l in logs])\n")
+    outs = [subprocess.run([sys.executable, "-c", code, str(ck)], capture_output=True, text=True, check=True,
+                           env=os.environ | {"PYTHONHASHSEED": h, "PYTHONPATH": "."}).stdout for h in ("1", "2")]
+    assert outs[0] and outs[0] == outs[1]
+
+
+def test_refound_counts_only_sources_proved_again_after_a_cut():
+    from experiments.evaluate import _later_finds
+    logs = [{"proven": ["a", "b"], "reported_at_start": []},
+            {"proven": ["a", "c"], "reported_at_start": ["a"]},     # a survived the cut; c is new
+            {"proven": ["b"], "reported_at_start": []}]             # b lost its proof, proved again
+    assert _later_finds(logs) == ([0, 0, 1], [2, 1, 0])
+
+
+def test_round_log_records_proofs_reported_at_round_start():
+    g = game(K=2)
+    for q in (E1, E2, E3):
+        g.a_query(q)
+    g.a_done = True
+    g.b_cut([E3])
+    assert g.reported_at_start == ["s1"]                       # s1's proof survived; s2's was cut
+    g.a_done = True
+    log = g.b_cut([])
+    assert log.reported_at_start == ["s1"] and log.reproven == 1

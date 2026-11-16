@@ -19,9 +19,9 @@ What B can learn depends on the game, not on the number of iterations:
   * collateral matters only if cuts cost something: raise --lam, train on configs with varying w
     (the large ones), or give B a cut budget (--cut-budget).
 --baseline minseen trains on r_B minus min-seen's r_B in the same state (lower variance, see
-remover_episode). Model selection: mean total r_B on --eval-orgs / --eval-synth (default: the
-training graphs, as B's training set is the 6 real configs and the selection is only between
-iterations of one run). Saves runs/remover/<name>.pt and <name>.best.pt.
+remover_episode). Model selection: mean total r_B on --eval-orgs / --eval-synth (the first
+--eval-limit graphs), default: the real training configs (never the whole synthetic pool, which would
+cost more than the training). Saves runs/remover/<name>.pt and <name>.best.pt.
 """
 from __future__ import annotations
 
@@ -61,12 +61,12 @@ def fmt(m: dict) -> str:
 
 def train(policy, graphs, cfg: GameConfig, finders, iters: int, episodes: int, lr: float, seed: int,
           out_name: str, log=print, bc: int = 0, pick=None, observe=None, eval_graphs=None,
-          baseline: str | None = None) -> RemediatorPolicy:
+          baseline: str | None = None, opt=None) -> RemediatorPolicy:
     """`finders`: specs or agents to train against. `pick(rng)` (optional) chooses one per episode and
     `observe(finder, logs)` receives its outcome (co-training passes an EXP3 sampler); default is
     uniform sampling. `baseline`: a remover spec whose r_B is subtracted from B's training reward."""
     rng = random.Random(seed)
-    opt = torch.optim.Adam(policy.parameters(), lr=lr)
+    opt = opt or torch.optim.Adam(policy.parameters(), lr=lr)
     out = RUNS / "remover"
     out.mkdir(parents=True, exist_ok=True)
     eval_graphs = eval_graphs or graphs
@@ -110,8 +110,10 @@ def main():
     ap.add_argument("--finders", nargs="+", default=FINDERS)
     ap.add_argument("--orgs", nargs="+", default=None, help="training configs (default: the train split)")
     ap.add_argument("--synth", default=None, help="also train on these synthetic graphs")
-    ap.add_argument("--eval-orgs", nargs="+", default=None, help="model selection configs (default: training graphs)")
+    ap.add_argument("--max-graphs", type=int, default=0, help="use the first N --synth graphs (0 = all)")
+    ap.add_argument("--eval-orgs", nargs="+", default=None, help="model selection configs (default: the real training configs)")
     ap.add_argument("--eval-synth", default=None, help="synthetic model selection graphs")
+    ap.add_argument("--eval-limit", type=int, default=30, help="use the first N --eval-synth graphs")
     add_game_args(ap)
     ap.add_argument("--baseline", default=None, help="remover whose r_B is subtracted in training (e.g. minseen)")
     ap.add_argument("--bc", type=int, default=400)
@@ -122,8 +124,10 @@ def main():
     ap.add_argument("--name", default="remover")
     a = ap.parse_args()
     torch.manual_seed(a.seed)
-    graphs = [load_graph(o) for o in a.orgs or split_orgs("train")] + (synth_graphs(a.synth) if a.synth else [])
-    eval_graphs = ([load_graph(o) for o in a.eval_orgs or []] + (synth_graphs(a.eval_synth) if a.eval_synth else [])) or None
+    real = [load_graph(o) for o in a.orgs or split_orgs("train")]
+    graphs = real + (synth_graphs(a.synth, a.max_graphs) if a.synth else [])
+    eval_graphs = ([load_graph(o) for o in a.eval_orgs or []]
+                   + (synth_graphs(a.eval_synth, a.eval_limit) if a.eval_synth else [])) or real
     cfg = game_config(a)
     (RUNS / "remover").mkdir(parents=True, exist_ok=True)
     logf = open(RUNS / "remover" / f"{a.name}.log", "w")
@@ -134,7 +138,7 @@ def main():
         logf.flush()
     log(json.dumps(vars(a)) + f" | {len(graphs)} training graphs")
     for spec in ("minseen", "adminfirst", "full"):
-        log(f"baseline {spec}: {fmt(evaluate(make_remover(spec), eval_graphs or graphs, cfg, a.finders))}")
+        log(f"baseline {spec}: {fmt(evaluate(make_remover(spec), eval_graphs, cfg, a.finders))}")
     policy = RemediatorPolicy().to(device(a.device))
     if a.init:
         policy.load_state_dict(torch.load(a.init, map_location="cpu"))

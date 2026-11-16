@@ -41,8 +41,9 @@ Query modes (query_mode):
           (iampe/env/query_space.py). Confirming an edge into a hub also reveals the hub's public,
           uncuttable out-edges. With a_memory, a question asked in any earlier round is never asked
           again (answers only change by B's cuts, which A sees).
-visible_p: share of the hidden edges A knows from the start (TAC's partial PFG: some of the config is
-visible). They count as already asked.
+visible_p: share of the hidden edges A knows from the start; they count as already asked. This is our
+own knob, not TAC's: TAC-GB (arXiv 2304.14540, Sec. 7) shows a random subset of entities and confirms no
+permission at the start, which corresponds to visible_p = 0 with every entity public.
 b_sees: what B observes: "proofs" (edges on reported proofs, the original design) or "revealed"
 (every live edge A has revealed, so B can cut routes A explored but has not proven yet).
 """
@@ -50,7 +51,7 @@ from __future__ import annotations
 
 import random
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import networkx as nx
 
@@ -81,7 +82,7 @@ class GameConfig:
     w_norm: bool = False         # divide w(e) by the number of users and roles in the account
     a_memory: bool = False       # no re-queries across rounds; surviving proofs re-reported at round start
     query_mode: str = "node"     # "node" (reveal u's out-edges) | "edge" (yes/no on one edge, TAC-style)
-    visible_p: float = 0.0       # share of hidden edges public from the start (TAC's partial view)
+    visible_p: float = 0.0       # share of hidden edges known from the start (our knob; TAC-GB: 0)
     b_sees: str = "proofs"       # B observes "proofs" (proof edges) | "revealed" (all of A's live edges)
 
     def __post_init__(self):
@@ -122,6 +123,9 @@ class RoundLog:
     r_A: float
     r_B: float
     closed: int = 0              # sources newly closed this round (on the reward's basis)
+    reproven: int = 0            # proofs reported at round start without a query: in round 0 from visible
+                                 # edges, later the proofs that survived B's cuts
+    reported_at_start: list = field(default_factory=list)   # which sources those were
 
 
 @dataclass
@@ -205,6 +209,7 @@ class Game:
         self._open_now: set[str] | None = None
         if self.revealed and (self.cfg.a_memory or self.k == 0):
             self._auto_report()                       # proofs A still holds after B's cuts (or visible ones)
+        self.reported_at_start = sorted(self.proven)
 
     def open_now(self) -> set[str]:
         """Sources that truly reach admin this round (hidden; the graph is fixed during A's turn)."""
@@ -355,8 +360,8 @@ class Game:
     def _proof(self, s: str) -> list[Edge] | None:
         prev, q = {s: None}, deque([s])
         adj: dict[str, list[Edge]] = {}
-        for e in self.revealed:
-            if self.lg.live(e):
+        for e in sorted(self.revealed):               # sorted: which shortest proof is found must not
+            if self.lg.live(e):                       # depend on Python's per-process set order
                 adj.setdefault(e[0], []).append(e)
         while q:
             u = q.popleft()
@@ -404,7 +409,7 @@ class Game:
         return view
 
     def b_observe(self) -> BObs:
-        seen = {e: self.G.edges[e] for e in self.seen | self._b_new_view() if self.lg.live(e)}
+        seen = {e: self.G.edges[e] for e in sorted(self.seen | self._b_new_view()) if self.lg.live(e)}
         budget = float("inf") if self.cfg.budget_mode == "none" else self.cfg.cut_budget
         return BObs(seen, set(self.proven_ever), [list(p) for p in self.proofs], budget, self.cfg.budget_mode)
 
@@ -453,7 +458,8 @@ class Game:
             self.revealed -= set(edges)
         r_A = len(self.proven) - self.query_cost
         log = RoundLog(self.k, self.queries, self.query_cost, sorted(self.proven), new_routes, edges, cost,
-                       open_before, len(self.lg.open_pairs(self.S)), r_A, r_B, closed)
+                       open_before, len(self.lg.open_pairs(self.S)), r_A, r_B, closed,
+                       len(self.reported_at_start), list(self.reported_at_start))
         self.log.append(log)
         self.k += 1
         self._start_round()
