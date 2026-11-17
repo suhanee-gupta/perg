@@ -31,7 +31,10 @@ GAME="--query-mode edge --visible 0.5 --Q 40 --decline 0.1 --b-sees revealed --l
 # trains on the 40 real train configs (the default of every script); synthetic graphs are only used to
 # pre-train A (step 2) and as an extra test set.
 SELECT="--eval-orgs val"
-echo "== $(date -Is) commit $(git rev-parse --short HEAD) game: $GAME"
+# Parallel game processes in evaluation (one CPU core each). The machine is shared, so not every core:
+#   WORKERS=32 bash scripts/run_gpu.sh
+WORKERS="${WORKERS:-16}"
+echo "== $(date -Is) commit $(git rev-parse --short HEAD) game: $GAME workers: $WORKERS"
 
 if [ "${1:-}" = "smoke" ]; then
   python -m pytest -q --run-training
@@ -51,7 +54,7 @@ if [ "${1:-}" = "smoke" ]; then
       $O $V $GAME --baseline minseen --iters 1 --episodes 4 --name smoke_b
   python -m experiments.cotrain --init-finder runs/finder/smoke_a.best.pt --init-remover runs/remover/smoke_b_init.best.pt \
       $O $V $GAME --baseline minseen --gens 1 --iters 1 --episodes 2 --name smoke_co
-  python -m experiments.evaluate --finders bfs ckpt:runs/cotrain/smoke_co_A1.pt --heldout oracle ckpt:runs/finder/smoke_a_noB.pt \
+  python -m experiments.evaluate --workers $WORKERS --finders bfs ckpt:runs/cotrain/smoke_co_A1.pt --heldout oracle ckpt:runs/finder/smoke_a_noB.pt \
       --removers minseen ckpt:runs/remover/smoke_b.pt ckpt:runs/cotrain/smoke_co_B1.pt \
       $GAME --seeds 2 --fnr-budgets 40 --splits bench --synth-test data/synth_check_test --matrix --out runs/smoke_results.md
   echo "SMOKE OK"
@@ -104,15 +107,15 @@ A_HELD="ckpt:runs/finder/finder_noB.pt ckpt:runs/finder/finder_vsB.pt"
 B_ALL="ckpt:runs/remover/remover_init.best.pt ckpt:runs/remover/remover.pt ckpt:runs/cotrain/cotrain_B4.pt"
 
 echo "[9/11] every variant on the real (10 configs) and synthetic test graphs (docs/results.md), then the large configs"
-python -m experiments.evaluate $GAME --seeds 10 --fnr-budgets 20 40 100 --splits test --synth-test data/synth_test --synth-limit 200 \
+python -m experiments.evaluate --workers $WORKERS $GAME --seeds 10 --fnr-budgets 20 40 100 --splits test --synth-test data/synth_test --synth-limit 200 \
     --title "Results: every A and B variant" --finders bfs greedy $A_POOL --heldout random oracle $A_HELD \
     --removers random minseen adminfirst full $B_ALL --matrix
-python -m experiments.evaluate $GAME --seeds 3 --fnr-budgets 40 --splits --large \
+python -m experiments.evaluate --workers $WORKERS $GAME --seeds 3 --fnr-budgets 40 --splits --large \
     --title "Large configs (1k-28k nodes)" --finders bfs $A_POOL --heldout oracle $A_HELD \
     --removers minseen full $B_ALL --out docs/results_large.md
 
 echo "[10/11] every A generation against every B generation (docs/results_generations.md)"
-python -m experiments.evaluate $GAME --seeds 5 --splits test --synth-test data/synth_test --synth-limit 100 \
+python -m experiments.evaluate --workers $WORKERS $GAME --seeds 5 --splits test --synth-test data/synth_test --synth-limit 100 \
     --title "Co-training: A generations (rows) against B generations (columns)" --no-finder-table --no-removers --matrix \
     --finders ckpt:runs/finder/finder.best.pt $(for g in 1 2 3 4; do echo ckpt:runs/cotrain/cotrain_A$g.pt; done) --heldout \
     --removers ckpt:runs/remover/remover_init.best.pt $(for g in 1 2 3 4; do echo ckpt:runs/cotrain/cotrain_B$g.pt; done) \
@@ -120,7 +123,7 @@ python -m experiments.evaluate $GAME --seeds 5 --splits test --synth-test data/s
 
 echo "[11/11] baselines at other visible shares (docs/results_visibility_*.md), then pack"
 for V in 0 0.1 0.25 0.5; do
-  python -m experiments.evaluate --query-mode edge --visible $V --seeds 5 --fnr-budgets 20 40 100 --splits test \
+  python -m experiments.evaluate --workers $WORKERS --query-mode edge --visible $V --seeds 5 --fnr-budgets 20 40 100 --splits test \
       --synth-test data/synth_test --synth-limit 100 --no-removers --finders bfs greedy --heldout random oracle \
       --title "Baselines with visible share $V" --out docs/results_visibility_$V.md
 done
