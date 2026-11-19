@@ -2,6 +2,9 @@
 # The whole pipeline on the GPU machine (never on the laptop). docs/STATUS.md explains every step.
 #   bash scripts/run_gpu.sh smoke   # a few minutes: tests (incl. training tests) + tiny runs of every stage
 #   bash scripts/run_gpu.sh         # full run (launch under tmux or nohup)
+#   FROM=5 bash scripts/run_gpu.sh  # resume: skip steps 0-4 (their checkpoints must exist in runs/)
+# Steps 5-8 only need the checkpoints of steps 3 and 4, so they run at the same time (each prints to
+# runs/<name>.out besides its own log); the run waits for all four before evaluating.
 # Needs esc.zip, no_esc.zip and more.zip in the repo root (not in git); they are unzipped into data/raw/ if
 # missing. Everything printed is also in runs/pipeline.log; at the end runs/logs.tgz holds every log, the
 # results and the graphs built here, which is what to copy back (checkpoints stay in runs/; the last
@@ -34,6 +37,8 @@ SELECT="--eval-orgs val"
 # Parallel game processes in evaluation (one CPU core each). The machine is shared, so not every core:
 #   WORKERS=32 bash scripts/run_gpu.sh
 WORKERS="${WORKERS:-16}"
+FROM="${FROM:-0}"
+at() { [ "$FROM" -le "$1" ]; }          # run step $1 unless resuming past it
 echo "== $(date -Is) commit $(git rev-parse --short HEAD) game: $GAME workers: $WORKERS"
 
 if [ "${1:-}" = "smoke" ]; then
@@ -61,42 +66,57 @@ if [ "${1:-}" = "smoke" ]; then
   exit 0
 fi
 
+if at 0; then
 echo "[0/11] tests, including the ones that train"
 python -m pytest -q --run-training
+fi
 
+if at 1; then
 echo "[1/11] graphs of the three largest configs (evaluation only); synthetic graphs: pre-training (seed 0), test (seed 2)"
 python -m experiments.build_graphs --large --allow-large --missing
 python -m experiments.gen_synth --n 2000 --seed 0 --out data/synth
 python -m experiments.gen_synth --n 300 --seed 2 --out data/synth_test
+fi
 
+if at 2; then
 echo "[2/11] finder A: imitate the oracle (+3 DAgger rounds), then PPO on synthetic graphs, size curriculum"
 python -m experiments.train_finder --synth data/synth $SELECT $GAME \
     --stages 4 --iters 50 --episodes 64 --bc 2000 --dagger 3 --eval-every 5 --name finder_pre
+fi
 
+if at 3; then
 echo "[3/11] finder A: fine-tune on the 40 real training configs, small to large (the common start of every A variant)"
 python -m experiments.train_finder --init runs/finder/finder_pre.best.pt $SELECT $GAME \
     --stages 2 --iters 20 --episodes 64 --eval-every 5 --name finder
+fi
 
+if at 4; then
 echo "[4/11] remover B: warm start only, by imitating the ceiling's cut (the common start of every B variant)"
 python -m experiments.train_remediator --finders bfs greedy ckpt:runs/finder/finder.best.pt $SELECT $GAME \
     --iters 0 --bc 2000 --name remover_init
+fi
 
-echo "[5/11] finder A, control: 5-round games with NO remover"
-python -m experiments.train_finder --init runs/finder/finder.best.pt $SELECT \
+PIDS=(); NAMES=()
+bg() { local name=$1; shift; "$@" > runs/$name.out 2>&1 & PIDS+=($!); NAMES+=($name); echo "  started $name (pid $!)"; }
+echo "[5-8/11] the A and B variants, in parallel from the same starts"
+# 5: A control, 5-round games with NO remover
+at 5 && bg finder_noB python -m experiments.train_finder --init runs/finder/finder.best.pt $SELECT \
     $GAME --rounds 5 --opponent none --iters 40 --episodes 32 --eval-every 5 --name finder_noB
-
-echo "[6/11] finder A against fixed removers"
-python -m experiments.train_finder --init runs/finder/finder.best.pt $SELECT \
+# 6: A against fixed removers
+at 6 && bg finder_vsB python -m experiments.train_finder --init runs/finder/finder.best.pt $SELECT \
     $GAME --rounds 5 --opponent minseen adminfirst --iters 40 --episodes 32 --eval-every 5 --name finder_vsB
-
-echo "[7/11] remover B against fixed finders (BFS, greedy, the fine-tuned A)"
-python -m experiments.train_remediator --init runs/remover/remover_init.best.pt --finders bfs greedy ckpt:runs/finder/finder.best.pt \
-    $SELECT $GAME --baseline minseen --iters 40 --episodes 32 --name remover
-
-echo "[8/11] co-training from the same starts: 4 generations x 10 iterations per player (40, as steps 5-7)"
-python -m experiments.cotrain --init-finder runs/finder/finder.best.pt --init-remover runs/remover/remover_init.best.pt \
-    $SELECT $GAME --baseline minseen \
+# 7: B against fixed finders (BFS, greedy, the fine-tuned A)
+at 7 && bg remover python -m experiments.train_remediator --init runs/remover/remover_init.best.pt \
+    --finders bfs greedy ckpt:runs/finder/finder.best.pt $SELECT $GAME --baseline minseen --iters 40 --episodes 32 --name remover
+# 8: co-training from the same starts, 4 generations x 10 iterations per player (40, as steps 5-7)
+at 8 && bg cotrain python -m experiments.cotrain --init-finder runs/finder/finder.best.pt \
+    --init-remover runs/remover/remover_init.best.pt $SELECT $GAME --baseline minseen \
     --gens 4 --iters 10 --episodes 32 --name cotrain
+FAIL=0
+for i in "${!PIDS[@]}"; do
+  if wait "${PIDS[$i]}"; then echo "  done ${NAMES[$i]}"; else echo "  FAILED ${NAMES[$i]}: see runs/${NAMES[$i]}.out"; FAIL=1; fi
+done
+[ "$FAIL" = 0 ] || exit 1
 
 # Last weights of every variant. For B's tables, "pool" finders are ones some compared B trained against
 # (bfs, greedy, the common start, co-trained A); held-out finders no B trained against (random, the
