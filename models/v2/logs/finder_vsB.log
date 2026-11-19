@@ -1,0 +1,27 @@
+{"synth": null, "max_graphs": 0, "also_real": false, "orgs": null, "eval_synth": null, "eval_orgs": ["velzen-169rye", "ostlum-169ryj", "solfen-169ryo"], "select_on_train": false, "eval_limit": 100, "eval_every": 5, "stages": 1, "iters": 20, "episodes": 32, "rounds": 5, "Q": 40, "decline": 0.1, "query_mode": "edge", "visible": 0.5, "lam": 1.0, "b_reward": "full", "b_sees": "revealed", "cut_budget": 0, "w_const": false, "opponent": ["minseen", "adminfirst"], "bc": 2000, "dagger": 3, "teacher": "oracle", "no_shaping": false, "lr": 0.0001, "gamma": 1.0, "epochs": 2, "seed": 0, "device": "auto", "init": "runs/finder/finder.best.pt", "name": "finder_vsB"} | 40 training graphs, 3 selection graphs
+baseline random: FNR 0.533 (24/45) queries 35.6
+baseline bfs: FNR 0.511 (23/45) queries 35.6
+baseline greedy: FNR 0.400 (18/45) queries 33.9
+baseline oracle: FNR 0.156 (7/45) queries 2.0
+model selection: FNR over 5 rounds against minseen, adminfirst
+iter 0: FNR 0.709 (146/206) queries 29.0
+stage 1/1 (pool 40) iter 1: return -132.25 loss 139.173 steps 4324 500.3s
+stage 1/1 (pool 40) iter 2: return -171.75 loss 86.460 steps 5594 400.1s
+stage 1/1 (pool 40) iter 3: return -153.50 loss 117.692 steps 4994 468.9s
+stage 1/1 (pool 40) iter 4: return -127.94 loss 124.190 steps 4181 362.3s
+stage 1/1 (pool 40) iter 5: return -176.47 loss 132.342 steps 5771 FNR 0.699 (144/206) queries 31.2 (best FNR 0.699 (144/206) queries 31.2 at iter 5) 564.2s
+stage 1/1 (pool 40) iter 6: return -148.47 loss 139.607 steps 4886 211.7s
+stage 1/1 (pool 40) iter 7: return -141.69 loss 216.731 steps 4643 374.9s
+stage 1/1 (pool 40) iter 8: return -167.22 loss 139.004 steps 5437 318.1s
+stage 1/1 (pool 40) iter 9: return -165.84 loss 119.460 steps 5400 345.5s
+stage 1/1 (pool 40) iter 10: return -140.44 loss 117.905 steps 4592 FNR 0.687 (136/198) queries 27.4 (best FNR 0.687 (136/198) queries 27.4 at iter 10) 622.4s
+stage 1/1 (pool 40) iter 11: return -174.47 loss 155.480 steps 5680 543.3s
+stage 1/1 (pool 40) iter 12: return -169.31 loss 176.678 steps 5520 616.5s
+stage 1/1 (pool 40) iter 13: return -164.31 loss 175.308 steps 5335 298.8s
+stage 1/1 (pool 40) iter 14: return -141.12 loss 148.788 steps 4615 412.4s
+stage 1/1 (pool 40) iter 15: return -173.31 loss 112.635 steps 5640 FNR 0.718 (148/206) queries 27.5 (best FNR 0.687 (136/198) queries 27.4 at iter 10) 652.7s
+stage 1/1 (pool 40) iter 16: return -157.94 loss 163.299 steps 5160 293.8s
+stage 1/1 (pool 40) iter 17: return -156.25 loss 116.567 steps 5086 309.2s
+stage 1/1 (pool 40) iter 18: return -154.75 loss 125.283 steps 5040 430.2s
+stage 1/1 (pool 40) iter 19: return -178.41 loss 114.198 steps 5800 459.5s
+stage 1/1 (pool 40) iter 20: return -161.50 loss 109.478 steps 5240 FNR 0.697 (138/198) queries 27.2 (best FNR 0.687 (136/198) queries 27.4 at iter 10) 596.4s

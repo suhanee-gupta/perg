@@ -1,0 +1,71 @@
+{"init_finder": "runs/finder/finder.best.pt", "init_remover": "runs/remover/remover_init.best.pt", "gens": 4, "iters": 5, "episodes": 32, "gamma": 0.2, "orgs": null, "synth": null, "max_graphs": 0, "eval_synth": null, "eval_orgs": ["velzen-169rye", "ostlum-169ryj", "solfen-169ryo"], "rounds": 5, "Q": 40, "decline": 0.1, "query_mode": "edge", "visible": 0.5, "lam": 1.0, "b_reward": "full", "b_sees": "revealed", "cut_budget": 0, "w_const": false, "baseline": "minseen", "eval_limit": 30, "seed": 0, "device": "auto", "name": "cotrain"}
+== generation 1: A vs ['minseen', 'adminfirst', 'ckpt:runs/remover/remover_init.best.pt']
+model selection: FNR over 5 rounds against minseen, adminfirst, ckpt:runs/remover/remover_init.best.pt
+iter 0: FNR 0.707 (217/307) queries 29.0
+stage 1/1 (pool 40) iter 1: return -114.31 loss 131.677 steps 3758 274.0s
+stage 1/1 (pool 40) iter 2: return -180.03 loss 91.830 steps 5898 383.6s
+stage 1/1 (pool 40) iter 3: return -152.00 loss 107.885 steps 5005 474.4s
+stage 1/1 (pool 40) iter 4: return -131.03 loss 157.741 steps 4300 271.9s
+stage 1/1 (pool 40) iter 5: return -141.56 loss 159.900 steps 4652 FNR 0.737 (235/319) queries 31.4 (best FNR 0.707 (217/307) queries 29.0 at iter 0) 542.7s
+note: no iteration beat the starting policy; <name>.best.pt is the starting policy
+== generation 1: B vs ['bfs', 'greedy', 'ckpt:runs/finder/finder.best.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A1.pt']
+iter 0: r_B -7.48 open-source-rounds 10.58 collateral 0.026
+iter 1: return -6.80 loss -0.033 steps 236 r_B -7.48 open-source-rounds 10.58 collateral 0.026 (best r_B -7.48) 145.9s
+iter 2: return -4.36 loss -0.021 steps 318 r_B -7.48 open-source-rounds 10.58 collateral 0.026 (best r_B -7.48) 203.5s
+iter 3: return -4.15 loss -0.004 steps 236 r_B -7.48 open-source-rounds 10.58 collateral 0.026 (best r_B -7.48) 120.2s
+iter 4: return -8.42 loss -0.012 steps 242 r_B -7.48 open-source-rounds 10.58 collateral 0.026 (best r_B -7.48) 163.2s
+iter 5: return -8.64 loss -0.012 steps 327 r_B -7.48 open-source-rounds 10.58 collateral 0.026 (best r_B -7.48) 300.4s
+opponent probabilities for A: minseen=0.17, adminfirst=0.22, ckpt:runs/remover/remover_init.best.pt=0.31, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt=0.31
+opponent probabilities for B: bfs=0.58, greedy=0.18, ckpt:runs/finder/finder.best.pt=0.17, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A1.pt=0.07
+== generation 2: A vs ['minseen', 'adminfirst', 'ckpt:runs/remover/remover_init.best.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt']
+model selection: FNR over 5 rounds against minseen, adminfirst, ckpt:runs/remover/remover_init.best.pt, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt
+iter 0: FNR 0.736 (312/424) queries 31.4
+stage 1/1 (pool 40) iter 1: return -167.09 loss 156.372 steps 5426 485.7s
+stage 1/1 (pool 40) iter 2: return -123.72 loss 189.876 steps 4023 487.7s
+stage 1/1 (pool 40) iter 3: return -160.53 loss 206.303 steps 5231 389.0s
+stage 1/1 (pool 40) iter 4: return -173.16 loss 150.105 steps 5619 479.8s
+stage 1/1 (pool 40) iter 5: return -175.81 loss 179.743 steps 5720 FNR 0.726 (308/424) queries 31.2 (best FNR 0.726 (308/424) queries 31.2 at iter 5) 644.1s
+== generation 2: B vs ['bfs', 'greedy', 'ckpt:runs/finder/finder.best.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A1.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A2.pt']
+iter 0: r_B -7.59 open-source-rounds 10.63 collateral 0.025
+iter 1: return -5.08 loss -0.007 steps 238 r_B -7.59 open-source-rounds 10.63 collateral 0.025 (best r_B -7.59) 266.8s
+iter 2: return -6.95 loss -0.026 steps 395 r_B -7.59 open-source-rounds 10.63 collateral 0.025 (best r_B -7.59) 342.4s
+iter 3: return -12.67 loss -0.019 steps 289 r_B -7.59 open-source-rounds 10.63 collateral 0.025 (best r_B -7.59) 352.4s
+iter 4: return -10.80 loss -0.000 steps 280 r_B -7.59 open-source-rounds 10.63 collateral 0.025 (best r_B -7.59) 313.9s
+iter 5: return -7.18 loss -0.033 steps 422 r_B -7.59 open-source-rounds 10.63 collateral 0.025 (best r_B -7.59) 295.3s
+opponent probabilities for A: minseen=0.14, adminfirst=0.30, ckpt:runs/remover/remover_init.best.pt=0.15, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt=0.10, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B2.pt=0.30
+opponent probabilities for B: bfs=0.53, greedy=0.05, ckpt:runs/finder/finder.best.pt=0.10, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A1.pt=0.04, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A2.pt=0.27
+== generation 3: A vs ['minseen', 'adminfirst', 'ckpt:runs/remover/remover_init.best.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B2.pt']
+model selection: FNR over 5 rounds against minseen, adminfirst, ckpt:runs/remover/remover_init.best.pt, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B2.pt
+iter 0: FNR 0.726 (384/529) queries 31.2
+stage 1/1 (pool 40) iter 1: return -154.47 loss 199.633 steps 5040 620.5s
+stage 1/1 (pool 40) iter 2: return -157.94 loss 194.739 steps 5135 339.8s
+stage 1/1 (pool 40) iter 3: return -165.34 loss 122.647 steps 5400 374.7s
+stage 1/1 (pool 40) iter 4: return -161.34 loss 191.403 steps 5240 276.0s
+stage 1/1 (pool 40) iter 5: return -180.47 loss 137.842 steps 5880 FNR 0.735 (389/529) queries 31.1 (best FNR 0.726 (384/529) queries 31.2 at iter 0) 617.2s
+note: no iteration beat the starting policy; <name>.best.pt is the starting policy
+== generation 3: B vs ['bfs', 'greedy', 'ckpt:runs/finder/finder.best.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A1.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A2.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A3.pt']
+iter 0: r_B -7.66 open-source-rounds 10.67 collateral 0.025
+iter 1: return -4.52 loss -0.036 steps 470 r_B -7.66 open-source-rounds 10.67 collateral 0.025 (best r_B -7.66) 287.3s
+iter 2: return -11.36 loss 0.002 steps 332 r_B -7.64 open-source-rounds 10.64 collateral 0.027 (best r_B -7.64) 275.7s
+iter 3: return -12.40 loss -0.038 steps 653 r_B -7.64 open-source-rounds 10.64 collateral 0.027 (best r_B -7.64) 249.2s
+iter 4: return -5.66 loss -0.051 steps 1119 r_B -7.64 open-source-rounds 10.64 collateral 0.027 (best r_B -7.64) 351.6s
+iter 5: return -6.15 loss -0.034 steps 742 r_B -7.64 open-source-rounds 10.64 collateral 0.027 (best r_B -7.64) 255.4s
+opponent probabilities for A: minseen=0.11, adminfirst=0.07, ckpt:runs/remover/remover_init.best.pt=0.05, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt=0.12, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B2.pt=0.32, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B3.pt=0.32
+opponent probabilities for B: bfs=0.49, greedy=0.04, ckpt:runs/finder/finder.best.pt=0.04, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A1.pt=0.04, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A2.pt=0.16, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A3.pt=0.24
+== generation 4: A vs ['minseen', 'adminfirst', 'ckpt:runs/remover/remover_init.best.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B2.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B3.pt']
+model selection: FNR over 5 rounds against minseen, adminfirst, ckpt:runs/remover/remover_init.best.pt, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B2.pt, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B3.pt
+iter 0: FNR 0.735 (466/634) queries 31.1
+stage 1/1 (pool 40) iter 1: return -162.62 loss 90.298 steps 5277 205.3s
+stage 1/1 (pool 40) iter 2: return -154.09 loss 200.746 steps 5000 365.5s
+stage 1/1 (pool 40) iter 3: return -175.12 loss 149.333 steps 5674 420.6s
+stage 1/1 (pool 40) iter 4: return -155.66 loss 93.916 steps 5070 324.2s
+stage 1/1 (pool 40) iter 5: return -170.12 loss 96.130 steps 5521 FNR 0.705 (430/610) queries 31.1 (best FNR 0.705 (430/610) queries 31.1 at iter 5) 468.4s
+== generation 4: B vs ['bfs', 'greedy', 'ckpt:runs/finder/finder.best.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A1.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A2.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A3.pt', 'ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A4.pt']
+iter 0: r_B -7.69 open-source-rounds 10.67 collateral 0.026
+iter 1: return -4.81 loss -0.025 steps 288 r_B -7.72 open-source-rounds 10.69 collateral 0.025 (best r_B -7.69) 226.7s
+iter 2: return -10.08 loss -0.032 steps 574 r_B -7.69 open-source-rounds 10.67 collateral 0.026 (best r_B -7.69) 311.5s
+iter 3: return -6.23 loss 0.021 steps 331 r_B -7.69 open-source-rounds 10.67 collateral 0.026 (best r_B -7.69) 278.5s
+iter 4: return -7.66 loss -0.050 steps 832 r_B -7.69 open-source-rounds 10.67 collateral 0.026 (best r_B -7.69) 317.1s
+iter 5: return -10.68 loss -0.016 steps 392 r_B -7.70 open-source-rounds 10.67 collateral 0.029 (best r_B -7.69) 323.8s
+opponent probabilities for A: minseen=0.10, adminfirst=0.28, ckpt:runs/remover/remover_init.best.pt=0.06, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B1.pt=0.06, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B2.pt=0.14, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B3.pt=0.08, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_B4.pt=0.28
+opponent probabilities for B: bfs=0.29, greedy=0.03, ckpt:runs/finder/finder.best.pt=0.03, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A1.pt=0.03, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A2.pt=0.11, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A3.pt=0.20, ckpt:/home/ubuntu/perg/runs/cotrain/cotrain_A4.pt=0.30

@@ -1,7 +1,9 @@
 # Project status
 
-State as of 2026-11-17 (with `more.zip`). Data: `docs/dataset.md`. Graph building: `docs/HANDOFF.md`. Results:
-`docs/results.md` (still the 2026-11-12 node-mode run until the GPU pipeline below is rerun).
+State as of 2026-11-19. Write-up: `docs/REPORT.md` (current design, with results) and `docs/REPORT_old.md`
+(first design). Results: `docs/results.md` and `docs/results_generations.md` (test split, run 2026-11-19 with a
+reduced co-training of 4 generations x 5 iterations). Models: `models/v2/`. Data: `docs/dataset.md`. Graph
+building: `docs/HANDOFF.md`.
 
 ## The goal
 
